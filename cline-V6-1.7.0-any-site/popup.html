@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header>
+    <img src="icons/icon48.png" alt="" />
+    <div>
+      <h1>Watch Together</h1>
+      <p id="siteName">Checking site…</p>
+    </div>
+  </header>
+
+  <section id="notSupported" class="hidden">
+    <p class="muted">Open a show on <b>Netflix</b>, <b>Prime Video</b> or <b>JioHotstar</b>, then click this icon again.</p>
+  </section>
+
+  <!-- No active party -->
+  <section id="setupView" class="hidden">
+    <label>Your name
+      <input id="nameInput" type="text" maxlength="20" placeholder="e.g. Sourav" />
+    </label>
+
+    <button id="createBtn" class="primary">Start Watch Party</button>
+
+    <p id="resumeLine" class="hidden small">
+      <button id="resumeBtn" class="link">↺ Resume last party</button>
+      <span id="resumeCode"></span>
+    </p>
+
+    <div class="or"><span>or join a friend</span></div>
+
+    <label>Party code
+      <input id="codeInput" type="text" maxlength="6" placeholder="ABC123" autocomplete="off" spellcheck="false" />
+    </label>
+    <button id="joinBtn">Join Party</button>
+  </section>
+
+  <!-- Active party -->
+  <section id="activeView" class="hidden">
+    <p class="code-label">Party code</p>
+    <p id="codeDisplay" title="Click to copy">------</p>
+    <p class="muted small">Your friend: open the same episode → click the icon → enter this code.</p>
+
+    <p id="statusLine"><span class="dot"></span><span id="statusText">…</span></p>
+
+    <button id="copyBtn" class="secondary">Copy code</button>
+    <button id="inviteBtn" class="secondary">Copy invite</button>
+    <button id="leaveBtn" class="danger">Leave party</button>
+  </section>
+
+  <script src="popup.js"></script>
+</body>
+</html>
