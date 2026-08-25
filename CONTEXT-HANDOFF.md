@@ -1,15 +1,14 @@
 # WATCH TOGETHER — Context Handoff (as of Aug 26, 2026)
 
 ## Objective
-Maintain the personal "Watch Together" Chrome extension using strict **per-version folders** (`V1`–`V18`) inside `C:\Users\Sourav\ML Coding\watch-together-versions\`. NEVER overwrite an old version's folder; always create the next numbered folder. Deliverables are zips named `wt-V<N>.zip` in the same root and copied to `C:\Users\Sourav\Downloads\`. Push every commit to `https://github.com/srv883/Watch-Movies-Together`.
+Maintain the personal "Watch Together" Chrome extension using strict **per-version folders** (`V1`–`V19`) inside `C:\Users\Sourav\ML Coding\watch-together-versions\`. NEVER overwrite an old version's folder; always create the next numbered folder. Deliverables are zips named `wt-V<N>.zip` in the same root and copied to `C:\Users\Sourav\Downloads\`. Push every commit to `https://github.com/srv883/Watch-Movies-Together`.
 
 ## Current Shipped State
-- **V18** (`wt-V18.zip` — **delivered to `C:\Users\Sourav\Downloads\wt-V18.zip`** + canonical copy in versions root; manifest **1.18.0**, `EXT_VER="1.18.0"`): CURRENT shipping version. Folder `V18-fullscreen\`. Tests `tests\test-V18.js`: **270 passed, 0 failed**. Voice quality fix + fullscreen support + liquid glass emoji bar:
-  - **Voice fix (root cause):** `mungeOpus()` was setting `stereo=1;sprop-stereo=1` in SDP but mic captures mono (`channelCount: 1`). Opus encoder tried to encode mono as stereo → garbled output on receiver. Fixed: `stereo=0;sprop-stereo=0`, removed `cbr=1` (now VBR), removed broken `googNoiseSuppression=0;googAutoGainControl=0;googHighpassFilter=0` (Chrome ignores these legacy SDP params), reduced `maxaveragebitrate` from 128kbps to 96kbps (sufficient for voice), removed invalid `sampleSize:16` from getUserMedia constraints.
-  - **Fullscreen:** Floating elements (`#wt-quick`, `#wt-float-msgs`, `#wt-qtype`) are reparented into the fullscreen container on `fullscreenchange` event so they remain visible when the video goes native fullscreen. Elements return to `documentElement` when fullscreen exits.
-  - **Liquid glass emoji bar:** Semi-transparent (`rgba(16,16,24,0.45)`) with `backdrop-filter: blur(18px) saturate(1.4)`. Scales to 0.82 opacity by default, expands to full on hover. Idle shrink scales bar only (not container). Hover restores.
-  - **Removed "what's playing" label** from emoji bar — cleaner look.
-  - **Floating chat notifications** also get liquid glass backdrop blur.
+- **V19** (`wt-V19.zip` — **delivered to `C:\Users\Sourav\Downloads\wt-V19.zip`** + canonical copy in versions root; manifest **1.19.0**, `EXT_VER="1.19.0"`): CURRENT shipping version. Folder `V19-quickchat\`. Tests `tests\test-V19.js`: **288 passed, 0 failed**. Bar chat input + emoji picker next to bar:
+  - **Chat input below emoji bar:** `#wt-qtype-form` with `#wt-qtype-input` rendered below `#wt-quick-bar`, same liquid glass styling. Hides when panel not shown (`#wt-quick.wt-show`). Sends on Enter.
+  - **Emoji picker next to bar:** `#wt-qtype-picker` inside `#wt-quick` (not in main chat panel). `+` button opens/closes it. Has search + grid. Emoji click sends reaction and closes picker. Main chat picker hidden by default.
+  - **ID rename:** Old overlay input renamed to `#wt-qtype-overlay-input` (`ui.qtypeInput`); new bar input is `ui.qBarInput`.
+- **V18** (`wt-V18.zip`, manifest 1.18.0): frozen. Folder `V18-fullscreen\`. Tests 270 passed. Voice fix (stereo=0 mono Opus) + fullscreen reparent + liquid glass emoji bar.
 - **V17** (`wt-V17.zip`, manifest 1.17.0): frozen. Folder `V17-quicktype\`. Tests 270 passed. Quick-type overlay (T or / shortcut).
 - **V16** (`wt-V16.zip`, manifest 1.16.0): frozen. Folder `V16-floatchat\`. Tests 252 passed. Floating chat notifications + emoji bar reposition.
 - **V15** (`wt-V15.zip`, manifest 1.15.0): frozen. Folder `V15-overlays\`. Tests 232 passed. Action overlays + voice fix (NS/AGC off at constraint level) + gate disabled.
@@ -21,8 +20,8 @@ Maintain the personal "Watch Together" Chrome extension using strict **per-versi
 
 ## Architecture Notes
 - Core logic in `content.js` of each version folder. Popup + background alongside.
-- Test harness: `tests\test-V18.js` — plain node script. Per-instance `makeInstance(env, name, preset)` seeds storage pre-boot.
-- Version alignment rule: manifest version == EXT_VER badge string (currently 1.18.0).
+- Test harness: `tests\test-V19.js` — plain node script. Per-instance `makeInstance(env, name, preset)` seeds storage pre-boot.
+- Version alignment rule: manifest version == EXT_VER badge string (currently 1.19.0).
 - Git repo: `https://github.com/srv883/Watch-Movies-Together` — every version commit pushed here.
 
 ## Conventions & Gotchas
@@ -33,14 +32,15 @@ Maintain the personal "Watch Together" Chrome extension using strict **per-versi
 - In the harness, a lone HOST cannot acquire the mic — pair a guest first.
 - Voice-line rules: mute ≠ close; answer always carries a slot; never redial while a line is healthy.
 - Status strings during outages stay calm/stable.
+- Bar input (`#wt-qtype-input`) is separate from overlay input (`#wt-qtype-overlay-input`). Tests must use correct IDs.
 
 ## Relevant Files
-- `C:\Users\Sourav\ML Coding\watch-together-versions\V18-fullscreen\` — current version (v1.18.0)
-- `C:\Users\Sourav\Downloads\wt-V18.zip` — deliverable
-- `C:\Users\Sourav\ML Coding\watch-together-versions\tests\test-V18.js` — 270-check regression suite
+- `C:\Users\Sourav\ML Coding\watch-together-versions\V19-quickchat\` — current version (v1.19.0): content.js, overlay.css, manifest.json, popup.html, popup.js, lib/peerjs.min.js, icons/
+- `C:\Users\Sourav\Downloads\wt-V19.zip` — deliverable
+- `C:\Users\Sourav\ML Coding\watch-together-versions\tests\test-V19.js` — 288-check regression suite
+- `C:\Users\Sourav\ML Coding\watch-together-versions\V18-fullscreen\` + `wt-V18.zip` — frozen
 - `C:\Users\Sourav\ML Coding\watch-together-versions\V17-quicktype\` + `wt-V17.zip` — frozen
-- `C:\Users\Sourav\ML Coding\watch-together-versions\V16-floatchat\` + `wt-V16.zip` — frozen
 - Git push: `git add -A && git commit -m "..." && git push` from `watch-together-versions\`
 
 ## Next Move (when resumed)
-Nothing pending. Any new feature request → create `V19-*` folder, port from V18, bump manifest+EXT_VER together, extend test suite, zip as wt-V19.zip, commit+push to GitHub.
+Nothing pending. Any new feature request → create `V20-*` folder, port from V19, bump manifest+EXT_VER together, extend test suite, zip as wt-V20.zip, commit+push to GitHub.
