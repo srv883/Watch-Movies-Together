@@ -376,23 +376,23 @@
   display: none;
   align-items: center;
   gap: 4px;
-  background: rgba(16, 16, 24, 0.45);
+  background: rgba(16, 16, 24, 0.65);
   backdrop-filter: blur(18px) saturate(1.4);
   -webkit-backdrop-filter: blur(18px) saturate(1.4);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 14px;
-  padding: 4px 6px;
+  padding: 5px 8px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
   transition: transform 0.22s ease, opacity 0.22s ease, background 0.22s ease, padding 0.22s ease;
-  transform: scale(0.82);
-  opacity: 0.5;
+  transform: scale(0.92);
+  opacity: 0.85;
 }
 #wt-quick.wt-show #wt-quick-bar { display: inline-flex; }
 #wt-quick:hover #wt-quick-bar {
   transform: scale(1);
   opacity: 1;
-  background: rgba(16, 16, 24, 0.82);
-  padding: 5px 8px;
+  background: rgba(16, 16, 24, 0.88);
+  padding: 6px 10px;
 }
 
 /* v19: chat input below emoji bar */
@@ -405,28 +405,27 @@
 .wt-qtype-form input {
   flex: 1;
   min-width: 0;
-  background: rgba(16, 16, 24, 0.55);
+  width: 220px;
+  background: rgba(16, 16, 24, 0.75);
   backdrop-filter: blur(18px) saturate(1.4);
   -webkit-backdrop-filter: blur(18px) saturate(1.4);
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 10px;
   color: #fff;
-  font: 500 13px/1.3 "Segoe UI", system-ui, sans-serif;
-  padding: 6px 12px;
+  font: 500 14px/1.3 "Segoe UI", system-ui, sans-serif;
+  padding: 7px 14px;
   outline: none;
-  opacity: 0.5;
-  transform: scale(0.92);
-  transition: opacity 0.22s ease, transform 0.22s ease, background 0.22s ease;
+  opacity: 1;
+  transition: background 0.22s ease, border-color 0.22s ease;
 }
 #wt-quick:hover .wt-qtype-form input {
-  opacity: 1;
-  transform: scale(1);
-  background: rgba(16, 16, 24, 0.82);
+  background: rgba(16, 16, 24, 0.88);
+  border-color: rgba(255, 255, 255, 0.20);
 }
+.wt-qtype-form input::placeholder { color: rgba(255,255,255,0.4); }
 .wt-qtype-form input:focus {
   border-color: rgba(229, 57, 53, 0.6);
-  opacity: 1;
-  transform: scale(1);
+  background: rgba(16, 16, 24, 0.92);
 }
 
 /* v19: emoji picker attached to quick bar */
@@ -469,9 +468,9 @@
   background: none;
   border: none;
   border-radius: 7px;
-  font-size: 19px;
+  font-size: 20px;
   line-height: 1;
-  padding: 4px 2px;
+  padding: 4px 3px;
   cursor: pointer;
   transition: transform 0.12s ease, background 0.12s ease;
 }
@@ -479,23 +478,23 @@
 
 .wt-quick-sep {
   width: 1px;
-  height: 22px;
-  background: rgba(255, 255, 255, 0.08);
+  height: 24px;
+  background: rgba(255, 255, 255, 0.10);
 }
 
 .wt-quick-plus {
   background: none;
   border: none;
   border-radius: 7px;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 700;
   line-height: 1;
-  padding: 4px 4px;
+  padding: 4px 6px;
   cursor: pointer;
-  color: #9a9ab0;
-  transition: color 0.12s ease;
+  color: #c8c8dd;
+  transition: color 0.12s ease, background 0.12s ease;
 }
-.wt-quick-plus:hover { color: #fff; background: rgba(255, 255, 255, 0.08); }
+.wt-quick-plus:hover { color: #fff; background: rgba(255, 255, 255, 0.12); }
 
 /* drag handle + draggable panels */
 .wt-drag-handle {
@@ -729,7 +728,7 @@
 #wt-root.wt-open #wt-pill { transform: scale(0.93); opacity: 0.85; }
 
 /* ---------- v8: quick tray idle shrink ---------- */
-#wt-quick.wt-idle #wt-quick-bar { transform: scale(0.65); opacity: 0.35; }
+#wt-quick.wt-idle #wt-quick-bar { transform: scale(0.80); opacity: 0.55; }
 #wt-quick.wt-idle:hover #wt-quick-bar { transform: scale(1); opacity: 1; }
 
 /* version badge */
