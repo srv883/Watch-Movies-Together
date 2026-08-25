@@ -1255,9 +1255,9 @@ console.log("\n--- 12. error sweep ---");
      env.lastGum.audio.noiseSuppression === false && env.lastGum.audio.autoGainControl === false,
     "mic constraints: 48kHz mono + EC, NS+AGC OFF (" + JSON.stringify(env.lastGum && env.lastGum.audio) + ")");
   // opus bitrate boost installed in source
-  ok(SRC.includes("maxaveragebitrate=96000") && SRC.includes("usedtx=0") &&
+  ok(SRC.includes("maxaveragebitrate=128000") && SRC.includes("usedtx=0") && SRC.includes("cbr=1") &&
      SRC.includes("stereo=0") && SRC.includes("sprop-stereo=0"),
-    "Opus SDP boost present (96kbps mono, no DTX, stereo=0)");
+    "Opus SDP boost present (128kbps CBR mono, no DTX, stereo=0)");
   // software noise gate: quiet room -> track disabled; speaking -> re-enabled
   const gateTrack = env.micTracks.filter(t => !t.stopped).pop();
   ok(!!gateTrack, "live mic track available for gate test");

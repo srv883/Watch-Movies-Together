@@ -818,13 +818,12 @@
     } catch (_) { stopGate(); }
   }
 
-  // v11: bump Opus quality. Chrome defaults to ~24-32 kbps mono with DTX-ish
-  // behaviour which makes everything sound like a bad phone line and turns
-  // background noise into swirl artifacts. We ask for 128 kbps stereo-capable
-  // with DTX + NS + AGC disabled (those cause the "car engine" hallucination).
+  // v19: replace entire Opus fmtp line. Chrome defaults (~24kbps VBR + DTX)
+  // produce swirl artifacts and garbled voice. We force mono CBR 128kbps,
+  // no DTX, no stereo mismatch with the mono mic capture.
   function mungeOpus(sdp) {
     try {
-      if (!sdp || sdp.indexOf("maxaveragebitrate") !== -1) return sdp;
+      if (!sdp) return sdp;
       const lines = sdp.split(/\r\n/);
       let pt = null;
       for (const l of lines) {
@@ -836,8 +835,7 @@
       const out = lines.map((l) => {
         if (new RegExp("^a=fmtp:" + pt + " ").test(l)) {
           done = true;
-          // v18: mono encoding to match mono mic capture, VBR, no DTX, no stereo mismatch
-          return l + ";stereo=0;sprop-stereo=0;maxaveragebitrate=96000;usedtx=0";
+          return "a=fmtp:" + pt + " minptime=10; useinbandfec=1; stereo=0; sprop-stereo=0; cbr=1; maxaveragebitrate=128000; usedtx=0";
         }
         return l;
       });
