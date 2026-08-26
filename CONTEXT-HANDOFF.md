@@ -1,20 +1,15 @@
 # WATCH TOGETHER — Context Handoff (as of Aug 26, 2026)
 
 ## Objective
-Maintain the personal "Watch Together" Chrome extension using strict **per-version folders** (`V1`–`V22`) inside `C:\Users\Sourav\ML Coding\watch-together-versions\`. NEVER overwrite an old version's folder; always create the next numbered folder. Deliverables are zips named `wt-V<N>.zip` in the same root and copied to `C:\Users\Sourav\Downloads\`. Push every commit to `https://github.com/srv883/Watch-Movies-Together`.
+Maintain the personal "Watch Together" Chrome extension using strict **per-version folders** (`V1`–`V23`) inside `C:\Users\Sourav\ML Coding\watch-together-versions\`. NEVER overwrite an old version's folder; always create the next numbered folder. Deliverables are zips named `wt-V<N>.zip` in the same root and copied to `C:\Users\Sourav\Downloads\`. Push every commit to `https://github.com/srv883/Watch-Movies-Together`.
 
 ## Current Shipped State
-- **V22** (`wt-V22.zip` — **delivered to `C:\Users\Sourav\Downloads\wt-V22.zip`** + canonical copy in versions root; manifest **1.22.0**, `EXT_VER="1.22.0"`): CURRENT shipping version. Folder `V22-denoise\`. Tests `tests\test-V22.js`: **317 passed, 0 failed**. Background-noise fix — friend could hear user's room noise:
-  - **Root cause:** `noiseSuppression: false` hardcoded in getUserMedia since v15 (was blamed for "car engine" artifacts) → all fan/keyboard/room noise passed straight to the wire.
-  - **Fix:** `noiseSuppression: !!S.nc` in `getMicStream()` — follows the NC toggle, default ON.
-  - **Live toggle:** `applyNcToLiveStream()` now applies `{ noiseSuppression: !!S.nc }` via `track.applyConstraints` on the LIVE track (no mic restart); fallback rebuild path also uses the pref. The NC button is now a real denoise on/off switch.
-  - Unchanged: EC:false + AGC:false (chirping/pumping guards), Opus SDP boost, V21 immediate-hotSwap voice logic.
-- **V21** (`wt-V21.zip`, manifest 1.21.0): frozen. Folder `V21-voicefix\`. Tests 311 passed. Voice fix — restored immediate hotSwapMicTrack behavior:
-  - **attachVoiceCall:** Restored immediate `hotSwapMicTrack(S.micStream)` call (V18 style). V19's deferred `call.on("open")` handler NEVER fires on PeerJS MediaConnection (confirmed via PeerJS source analysis) — the mic track was never hot-swapped into the live call after initial SDP setup.
-  - **toggleMic:** Removed `callOpen` guard — redials unconditionally when hotSwap fails. The 5-second debounce inside `requestVoiceRedial` already prevents storms.
-  - **ensureMicIfWanted:** Same — removed `callOpen` guard, unconditional redial on hotSwap failure.
-  - **Opus SDP:** Unchanged from V19 (replaces entire fmtp line, 128kbps CBR mono).
-  - **getUserMedia:** EC:false kept for laptop compatibility; NS was still false here → led to V22.
+- **V23** (`wt-V23.zip` — **delivered to `C:\Users\Sourav\Downloads\wt-V23.zip`** + canonical copy in versions root; manifest **1.23.0**, `EXT_VER="1.23.0"`): CURRENT shipping version. Folder `V23-loudmic\`. Tests `tests\test-V23.js`: **323 passed, 0 failed**. Fixes "clear but low" friend voice:
+  - **Root cause:** V22 enabled `noiseSuppression: !!S.nc` but kept `autoGainControl: false`. Chrome's NS pipeline attenuates the captured signal; without AGC to normalize speech level back up, quiet laptop mics arrive low on the wire.
+  - **Fix:** `autoGainControl: !!S.nc` in `getMicStream()` — AGC follows the denoise toggle (default ON), normalizing speech level alongside NS.
+  - **Live toggle:** `applyNcToLiveStream()` now applies `{ noiseSuppression: !!S.nc, autoGainControl: !!S.nc }` — NC button is a real denoise+loudness switch.
+  - Unchanged: EC:false (chirping guard), Opus SDP boost, V21 immediate-hotSwap voice logic.
+- **V22** (`wt-V22.zip`, manifest 1.22.0): frozen. Folder `V22-denoise\`. Tests 317 passed. Background-noise fix — noiseSuppression follows NC toggle. NS-only, no AGC → "clear but low" on quiet mics → led to V23.
 - **V20** (`wt-V20.zip`, manifest 1.20.0): frozen. Folder `V20-floatcenter\`. Tests 298 passed. Floating chat repositioned to screen center + themed to match emoji bar:
   - **Floating chat repositioned:** `#wt-float-msgs` moved from `bottom: 72px` to `bottom: 35vh` — floats near the center of the screen instead of near the controls.
   - **Theme matched to emoji bar:** `.wt-float-msg` background changed from `rgba(18,18,28,0.55)` to `rgba(16,16,24,0.65)`, saturate 1.3→1.4, box-shadow lightened to `0 4px 20px rgba(0,0,0,0.35)` — identical glass language as the emoji bar.
