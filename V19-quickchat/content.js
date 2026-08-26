@@ -930,15 +930,20 @@
   function attachVoiceCall(call) {
     endVoiceCall();
     S.voiceConn = call;
-    // v11: if the mic was toggled while this line was still being answered,
-    // push the CURRENT desired state into the fresh connection right away so
-    // the wire can never disagree with the button.
-    try {
-      if (S.micEnabled && S.micStream && S.micStream.active) {
-        if (!hotSwapMicTrack(S.micStream)) requestVoiceRedial("attach-reconcile");
-      } else if (!S.micEnabled) hotSwapMicTrack(null);
-    } catch (_) {}
+    // v19: do NOT hot-swap here — the stream was already passed to peer.call()
+    // so PeerJS includes it in the SDP offer. Trying to swap immediately
+    // fails because PeerConnection senders aren't ready yet (ICE negotiating),
+    // which triggers a redial storm → garbled/beeping audio on the wire.
+    // Hot-swap is deferred to the "open" event below.
     clampVoiceJitter(call);
+    call.on("open", () => {
+      // v19: connection is live — now safely push the current mic state
+      try {
+        if (S.micEnabled && S.micStream && S.micStream.active) {
+          hotSwapMicTrack(S.micStream);
+        }
+      } catch (_) {}
+    });
     call.on("stream", (remote) => {
       const a = ensureRemoteAudio();
       wireVoiceResume();
@@ -984,7 +989,11 @@
       await getMicStream();
       watchMicStream(S.micStream);
       setMicUi(true);
-      if (S.voiceConn && !hotSwapMicTrack(S.micStream)) requestVoiceRedial("ensure-mic");
+      if (S.voiceConn) {
+        const callOpen = S.voiceConn.open || (S.voiceConn.peerConnection &&
+          S.voiceConn.peerConnection.iceConnectionState === "connected");
+        if (!hotSwapMicTrack(S.micStream) && callOpen) requestVoiceRedial("ensure-mic");
+      }
       if (!!S.nc) startGate();
     } catch (_) {}
   }
@@ -1040,7 +1049,13 @@ if (!isOpen()) {
       saveMicState(true);
       // v11: if a line is already open (e.g. we answered with the silent
       // track), attach the live mic to it instead of tearing it down.
-      if (S.voiceConn && !hotSwapMicTrack(S.micStream)) requestVoiceRedial("toggle-on");
+      // v19: only redial if the call is actually open and swap still fails.
+      // If not open yet, the attachVoiceCall "open" handler will pick it up.
+      if (S.voiceConn) {
+        const callOpen = S.voiceConn.open || (S.voiceConn.peerConnection &&
+          S.voiceConn.peerConnection.iceConnectionState === "connected");
+        if (!hotSwapMicTrack(S.micStream) && callOpen) requestVoiceRedial("toggle-on");
+      }
       if (!!S.nc) startGate();
       notifyVoiceState();
       syncVoice();

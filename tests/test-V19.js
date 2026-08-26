@@ -308,7 +308,7 @@ function makePeerClass(env) {
   }
   class Call {
     constructor(outStream) {
-      this.out = outStream || null; this.hC = {}; this.hA = {}; this.ended = false;
+      this.out = outStream || null; this.hC = {}; this.hA = {}; this.ended = false; this._open = false;
       env._calls.push(this);
       const self = this;
       const mkSender = (side, stream) => ({
@@ -335,6 +335,7 @@ function makePeerClass(env) {
         on(t, f) { (self.hC[t] = self.hC[t] || []).push(f); },
         close: () => this.end(),
         peerConnection: self.pcCaller,
+        get open() { return self._open; },
       };
     }
     calleeView() {
@@ -347,10 +348,12 @@ function makePeerClass(env) {
           self.sendersIn[0].track = (self.inS.getAudioTracks()[0]) || null;
           later(8, () => self.emitTo(self.hA, "stream", self.out instanceof FakeStream ? self.out : new FakeStream([])));
           later(16, () => self.emitTo(self.hC, "stream", self.inS));
+          later(22, () => { self._open = true; self.emitTo(self.hA, "open"); self.emitTo(self.hC, "open"); });
         },
         on(t, f) { (self.hA[t] = self.hA[t] || []).push(f); },
         close: () => this.end(),
         peerConnection: self.pcCallee,
+        get open() { return self._open; },
       };
     }
     end() {
