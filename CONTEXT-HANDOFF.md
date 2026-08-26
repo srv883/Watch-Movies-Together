@@ -1,19 +1,15 @@
 # WATCH TOGETHER — Context Handoff (as of Aug 26, 2026)
 
 ## Objective
-Maintain the personal "Watch Together" Chrome extension using strict **per-version folders** (`V1`–`V19`) inside `C:\Users\Sourav\ML Coding\watch-together-versions\`. NEVER overwrite an old version's folder; always create the next numbered folder. Deliverables are zips named `wt-V<N>.zip` in the same root and copied to `C:\Users\Sourav\Downloads\`. Push every commit to `https://github.com/srv883/Watch-Movies-Together`.
+Maintain the personal "Watch Together" Chrome extension using strict **per-version folders** (`V1`–`V20`) inside `C:\Users\Sourav\ML Coding\watch-together-versions\`. NEVER overwrite an old version's folder; always create the next numbered folder. Deliverables are zips named `wt-V<N>.zip` in the same root and copied to `C:\Users\Sourav\Downloads\`. Push every commit to `https://github.com/srv883/Watch-Movies-Together`.
 
 ## Current Shipped State
-- **V19** (`wt-V19.zip` — **delivered to `C:\Users\Sourav\Downloads\wt-V19.zip`** + canonical copy in versions root; manifest **1.19.0**, `EXT_VER="1.19.0"`): CURRENT shipping version. Folder `V19-quickchat\`. Tests `tests\test-V19.js`: **288 passed, 0 failed**. Bar chat input + emoji picker next to bar + voice fix #3 + visibility fix:
-  - **Chat input below emoji bar:** `#wt-qtype-form` with `#wt-qtype-input` rendered below `#wt-quick-bar`, same liquid glass styling. Hides when panel not shown (`#wt-quick.wt-show`). Sends on Enter.
-  - **Emoji picker next to bar:** `#wt-qtype-picker` inside `#wt-quick` (not in main chat panel). `+` button opens/closes it. Has search + grid. Emoji click sends reaction and closes picker. Main chat picker hidden by default.
-  - **ID rename:** Old overlay input renamed to `#wt-qtype-overlay-input` (`ui.qtypeInput`); new bar input is `ui.qBarInput`.
-  - **Voice fix #3 (redial storm):** `attachVoiceCall` no longer calls `hotSwapMicTrack` immediately. Instead deferred to `call.on("open")` — senders aren't ready during ICE negotiation, immediate swap fails → triggers `requestVoiceRedial` → storm. `toggleMic`/`ensureMicIfWanted` now check `callOpen` (`S.voiceConn.open || iceConnectionState === "connected"`) before redialing — if call isn't open yet, the "open" handler will handle it.
-  - **Opus SDP fix #2:** Replaced entire fmtp line (was appending to Chrome defaults). CBR 128kbps, DTX off.
-  - **Echo cancellation disabled:** `echoCancellation: false` in getUserMedia constraints — Chrome AEC on laptop hardware (Realtek/Conexant) causes chirping when canceling friend's voice from speakers. Removed forced `sampleRate: 48000`.
-  - **Visibility fix:** Bar default opacity 0.5→0.85, scale 0.82→0.92. +icon font 16→18px, color `#9a9ab0`→`#c8c8dd`. Form input: full opacity, background alpha 0.55→0.75, font 13→14px. Idle shrink: scale 0.65→0.80, opacity 0.35→0.55.
-  - **Test harness:** Fake MediaConnection views now expose `.open` getter + `answer()` fires "open" event after22ms to match real PeerJS behavior.
-- **V18** (`wt-V18.zip`, manifest 1.18.0): frozen. Folder `V18-fullscreen\`. Tests 270 passed. Voice fix (stereo=0 mono Opus) + fullscreen reparent + liquid glass emoji bar.
+- **V20** (`wt-V20.zip` — **delivered to `C:\Users\Sourav\Downloads\wt-V20.zip`** + canonical copy in versions root; manifest **1.20.0**, `EXT_VER="1.20.0"`): CURRENT shipping version. Folder `V20-floatcenter\`. Tests `tests\test-V20.js`: **298 passed, 0 failed**. Floating chat repositioned to screen center + themed to match emoji bar:
+  - **Floating chat repositioned:** `#wt-float-msgs` moved from `bottom: 72px` to `bottom: 35vh` — floats near the center of the screen instead of near the controls.
+  - **Theme matched to emoji bar:** `.wt-float-msg` background changed from `rgba(18,18,28,0.55)` to `rgba(16,16,24,0.65)`, saturate 1.3→1.4, box-shadow lightened to `0 4px 20px rgba(0,0,0,0.35)` — identical glass language as the emoji bar.
+  - **Animation matched to emoji bar:** New `wt-float-in` keyframes use `scale(0.92)→scale(1)→scale(0.92)` with matching opacity — mirrors the bar's idle/hover transition (0.92 scale, 0.85 opacity) instead of the old translateY-based animation.
+  - **Glass mode:** Added `.wt-glass` override for `.wt-float-msg` — lighter bg `rgba(20,20,32,0.4)`, lighter border — consistent with `#wt-quick.wt-glass #wt-quick-bar`.
+- **V19** (`wt-V19.zip`, manifest 1.19.0): frozen. Folder `V19-quickchat\`. Tests 288 passed. Bar chat input + emoji picker next to bar + voice fix #3 + visibility fix.
 - **V17** (`wt-V17.zip`, manifest 1.17.0): frozen. Folder `V17-quicktype\`. Tests 270 passed. Quick-type overlay (T or / shortcut).
 - **V16** (`wt-V16.zip`, manifest 1.16.0): frozen. Folder `V16-floatchat\`. Tests 252 passed. Floating chat notifications + emoji bar reposition.
 - **V15** (`wt-V15.zip`, manifest 1.15.0): frozen. Folder `V15-overlays\`. Tests 232 passed. Action overlays + voice fix (NS/AGC off at constraint level) + gate disabled.
@@ -40,12 +36,12 @@ Maintain the personal "Watch Together" Chrome extension using strict **per-versi
 - Bar input (`#wt-qtype-input`) is separate from overlay input (`#wt-qtype-overlay-input`). Tests must use correct IDs.
 
 ## Relevant Files
-- `C:\Users\Sourav\ML Coding\watch-together-versions\V19-quickchat\` — current version (v1.19.0): content.js, overlay.css, manifest.json, popup.html, popup.js, lib/peerjs.min.js, icons/
-- `C:\Users\Sourav\Downloads\wt-V19.zip` — deliverable
-- `C:\Users\Sourav\ML Coding\watch-together-versions\tests\test-V19.js` — 288-check regression suite
+- `C:\Users\Sourav\ML Coding\watch-together-versions\V20-floatcenter\` — current version (v1.20.0): content.js, overlay.css, manifest.json, popup.html, popup.js, lib/peerjs.min.js, icons/
+- `C:\Users\Sourav\Downloads\wt-V20.zip` — deliverable
+- `C:\Users\Sourav\ML Coding\watch-together-versions\tests\test-V20.js` — 298-check regression suite
+- `C:\Users\Sourav\ML Coding\watch-together-versions\V19-quickchat\` + `wt-V19.zip` — frozen
 - `C:\Users\Sourav\ML Coding\watch-together-versions\V18-fullscreen\` + `wt-V18.zip` — frozen
-- `C:\Users\Sourav\ML Coding\watch-together-versions\V17-quicktype\` + `wt-V17.zip` — frozen
 - Git push: `git add -A && git commit -m "..." && git push` from `watch-together-versions\`
 
 ## Next Move (when resumed)
-Nothing pending. Any new feature request → create `V20-*` folder, port from V19, bump manifest+EXT_VER together, extend test suite, zip as wt-V20.zip, commit+push to GitHub.
+Nothing pending. Any new feature request → create `V21-*` folder, port from V20, bump manifest+EXT_VER together, extend test suite, zip as wt-V21.zip, commit+push to GitHub.
