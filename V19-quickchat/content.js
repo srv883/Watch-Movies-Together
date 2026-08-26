@@ -571,11 +571,10 @@
     if (S.micStream && S.micStream.active) return S.micStream;
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: {
-        echoCancellation: true,
+        echoCancellation: false,
         noiseSuppression: false,
         autoGainControl: false,
-        channelCount: 1,
-        sampleRate: 48000
+        channelCount: 1
       }
     });
     S.micStream = stream;
@@ -645,11 +644,10 @@
         for (const t of stream.getTracks()) { try { t.stop(); } catch (_) {} }
         const fresh = await navigator.mediaDevices.getUserMedia({
           audio: {
-            echoCancellation: true,
+            echoCancellation: false,
             noiseSuppression: false,
             autoGainControl: false,
-            channelCount: 1,
-            sampleRate: 48000
+            channelCount: 1
           }
         });
         S.micStream = fresh;

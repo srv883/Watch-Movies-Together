@@ -1250,10 +1250,10 @@ console.log("\n--- 12. error sweep ---");
 
   console.log("\n--- 20. v11: audio quality hardening ---");
   // constraints: NS + AGC OFF (Chrome's NS/AGC cause "car engine" artifacts)
-  ok(env.lastGum && env.lastGum.audio && env.lastGum.audio.sampleRate === 48000 &&
-     env.lastGum.audio.channelCount === 1 && env.lastGum.audio.echoCancellation === true &&
+  ok(env.lastGum && env.lastGum.audio && env.lastGum.audio.channelCount === 1 &&
+     env.lastGum.audio.echoCancellation === false &&
      env.lastGum.audio.noiseSuppression === false && env.lastGum.audio.autoGainControl === false,
-    "mic constraints: 48kHz mono + EC, NS+AGC OFF (" + JSON.stringify(env.lastGum && env.lastGum.audio) + ")");
+    "mic constraints: mono + EC OFF, NS+AGC OFF (" + JSON.stringify(env.lastGum && env.lastGum.audio) + ")");
   // opus bitrate boost installed in source
   ok(SRC.includes("maxaveragebitrate=128000") && SRC.includes("usedtx=0") && SRC.includes("cbr=1") &&
      SRC.includes("stereo=0") && SRC.includes("sprop-stereo=0"),
