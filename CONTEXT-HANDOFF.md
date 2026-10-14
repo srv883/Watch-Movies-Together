@@ -1,14 +1,15 @@
 # WATCH TOGETHER — Context Handoff (as of Aug 26, 2026)
 
 ## Objective
-Maintain the personal "Watch Together" Chrome extension using strict **per-version folders** (`V1`–`V23`) inside `C:\Users\Sourav\ML Coding\watch-together-versions\`. NEVER overwrite an old version's folder; always create the next numbered folder. Deliverables are zips named `wt-V<N>.zip` in the same root and copied to `C:\Users\Sourav\Downloads\`. Push every commit to `https://github.com/srv883/Watch-Movies-Together`.
+Maintain the personal "Watch Together" Chrome extension using strict **per-version folders** (`V1`–`V24`) inside `C:\Users\Sourav\ML Coding\watch-together-versions\`. NEVER overwrite an old version's folder; always create the next numbered folder. Deliverables are zips named `wt-V<N>.zip` in the same root and copied to `C:\Users\Sourav\Downloads\`. Push every commit to `https://github.com/srv883/Watch-Movies-Together`.
 
 ## Current Shipped State
-- **V23** (`wt-V23.zip` — **delivered to `C:\Users\Sourav\Downloads\wt-V23.zip`** + canonical copy in versions root; manifest **1.23.0**, `EXT_VER="1.23.0"`): CURRENT shipping version. Folder `V23-loudmic\`. Tests `tests\test-V23.js`: **323 passed, 0 failed**. Fixes "clear but low" friend voice:
-  - **Root cause:** V22 enabled `noiseSuppression: !!S.nc` but kept `autoGainControl: false`. Chrome's NS pipeline attenuates the captured signal; without AGC to normalize speech level back up, quiet laptop mics arrive low on the wire.
-  - **Fix:** `autoGainControl: !!S.nc` in `getMicStream()` — AGC follows the denoise toggle (default ON), normalizing speech level alongside NS.
-  - **Live toggle:** `applyNcToLiveStream()` now applies `{ noiseSuppression: !!S.nc, autoGainControl: !!S.nc }` — NC button is a real denoise+loudness switch.
-  - Unchanged: EC:false (chirping guard), Opus SDP boost, V21 immediate-hotSwap voice logic.
+- **V24** (`wt-V24.zip` — **delivered to `C:\Users\Sourav\Downloads\wt-V24.zip`** + canonical copy in versions root; manifest **1.24.0**, `EXT_VER="1.24.0"`): CURRENT shipping version. Folder `V24-sitewhitelist\`. Tests `tests\test-V24.js`: **330 passed, 0 failed**. Streams-only build:
+  - **Manifest `content_scripts.matches`** limited to 6 domains: `netflix.com`, `hotstar.com`, `jiohotstar.com`, `primevideo.com`, `jiotv.com`, `jiocinema.com` (was `<all_urls>`).
+  - **popup.js** `isSupported()` now enforces the same host whitelist (was: any http(s) page). Unsupported message updated.
+  - **content.js** runtime host guard (`const SITE_HOSTS`) bails before creating any UI if the host is not whitelisted (defence-in-depth behind the manifest).
+  - All V23 voice logic unchanged (immediate hotSwap, NS+AGC following NC toggle, Opus boost).
+- **V23** (`wt-V23.zip`, manifest 1.23.0): frozen. Folder `V23-loudmic\`. Tests 323 passed. autoGainControl follows NC toggle — fixes "clear but low" friend voice.
 - **V22** (`wt-V22.zip`, manifest 1.22.0): frozen. Folder `V22-denoise\`. Tests 317 passed. Background-noise fix — noiseSuppression follows NC toggle. NS-only, no AGC → "clear but low" on quiet mics → led to V23.
 - **V20** (`wt-V20.zip`, manifest 1.20.0): frozen. Folder `V20-floatcenter\`. Tests 298 passed. Floating chat repositioned to screen center + themed to match emoji bar:
   - **Floating chat repositioned:** `#wt-float-msgs` moved from `bottom: 72px` to `bottom: 35vh` — floats near the center of the screen instead of near the controls.
