@@ -1,10 +1,19 @@
-# WATCH TOGETHER — Context Handoff (as of Oct 17, 2026)
+# WATCH TOGETHER — Context Handoff (as of Oct 18, 2026)
 
 ## Objective
-Maintain the personal "Watch Together" Chrome extension using strict **per-version folders** (`V1`–`V25`) inside `C:\Users\Sourav\ML Coding\watch-together-versions\`. NEVER overwrite an old version's folder; always create the next numbered folder. Deliverables are zips named `wt-V<N>.zip` in the same root and copied to `C:\Users\Sourav\Downloads\`. Push every commit to `https://github.com/srv883/Watch-Movies-Together`.
+Maintain the personal "Watch Together" Chrome extension using strict **per-version folders** (`V1`–`V26`) inside `C:\Users\Sourav\ML Coding\watch-together-versions\`. NEVER overwrite an old version's folder; always create the next numbered folder. Deliverables are zips named `wt-V<N>.zip` in the same root and copied to `C:\Users\Sourav\Downloads\`. Push every commit to `https://github.com/srv883/Watch-Movies-Together`.
 
 ## Current Shipped State
-- **V25** (`wt-V25.zip` — **delivered to `C:\Users\Sourav\Downloads\wt-V25.zip`** + canonical copy in versions root; manifest **1.25.0**, `EXT_VER="1.25.0"`): CURRENT shipping version. Folder `V25-sitepicker\`. Tests `tests\test-V25.js`: **376 passed, 0 failed**. Polish on top of the V24 streams-only build:
+- **V26** (`wt-V26.zip` — **delivered to `C:\Users\Sourav\Downloads\wt-V26.zip`** + canonical copy in versions root; manifest **1.26.0**, `EXT_VER="1.26.0"`): CURRENT shipping version. Folder `V26-voicelink\`. Tests `tests\test-V26.js`: **401 passed, 0 failed**. Fixes "voice not working at all" (both sides must install V26):
+  - **Voice signaled over the data link** (`voffer`/`vanswer`/`vice`/`vbye`) via `makeDcCall`/`dialDcCall`/`answerDcCall` — no longer needs the PeerJS cloud server (ad blockers like the user's AdBlocker Ultimate / Wi-Fi blips used to kill voice while sync kept working). Uses PeerJS's STUN+TURN set (`VOICE_ICE`). Friends older than 1.26 (hello `v`) still get the legacy `peer.call`; a legacy line dialed before hello is migrated once hello arrives.
+  - **hotSwapMicTrack is async and awaits replaceTrack**: Chrome updates `sender.track` only after the promise resolves; the old sync check reported failure on EVERY mic-on and rebuilt the line (root cause of the V18–V21 "redial storm"). `swapMicOrRedial()` wraps the redial fallback.
+  - **healVoice()** from the host heartbeat re-dials a failed/closed line, or one with no remote stream after 15s (8s guard). Before, a dropped line stayed dead until someone toggled a mic.
+  - **Direct mode fixed**: `finishLink` closed the very RTCPeerConnection carrying the channel (link died instantly in real Chrome) and never ran `onConnOpen` (channel already open). Now kept as `S.directPC`, handshake runs, voice allowed in Direct mode.
+  - **connectToHost**: PeerJS `connect()` returns undefined while its server is unreachable — old code crashed on `c.on` and stopped retrying.
+  - Specific mic errors (blocked / no mic / busy in another app) + hint after 2.5s while the permission prompt is pending. `__wtVoiceDbg()` now shows `path` (link/peerjs), `gotStream`, `friendVer`.
+  - Harness: FakeRTC carries audio (records in `env._calls` keep the old Call shape) and simulates Direct mode for real (the old fake never linked the guest's channel, so Direct tests rode the PeerJS link). Section 29 covers all of the above, incl. a real V25 guest for mixed versions.
+  - **Real-browser voice test**: `tests\live\live.html` + `serve.js` run the real content.js + PeerJS + WebRTC in two tabs with a fake tone mic. Put a copy of content.js (guard line replaced by `void SITE_HOSTS;`), overlay.css and `lib\peerjs.min.js` next to it, `node serve.js <dir> 8766`, open `live.html?role=host&code=XXXXXX` and `?role=guest&code=XXXXXX` (`&block=1` kills PeerJS signaling). Probe with `__flow()` / `__probe()` (getStats packets + levels). Real clicks are needed for the mic (AudioContext gesture).
+- **V25** (`wt-V25.zip`, manifest 1.25.0): frozen. Folder `V25-sitepicker\`. Tests 376 passed. Polish on top of the V24 streams-only build:
   - **Manifest description** no longer claims "Watch ANYTHING on ANY site" — names the 5 supported services (123 chars, under Chrome's 132 limit).
   - **popup.js `SITES`** table (`name`, launch `url`, `hosts`) replaces the bare host list; `siteFor(url)` returns the brand, `isSupported()` wraps it. `SITE_HOSTS` is derived from `SITES`.
   - **Popup header** shows the friendly name ("Netflix", "JioHotstar", …) instead of the raw hostname.
@@ -39,7 +48,7 @@ Maintain the personal "Watch Together" Chrome extension using strict **per-versi
 - Core logic in `content.js` of each version folder; popup (`popup.html/js/css`) alongside. No background service worker.
 - Supported sites live in THREE places that must match: manifest `content_scripts.matches`, `SITE_HOSTS` at the top of content.js, and `SITES[].hosts` in popup.js. test-V25 section 28a fails if they drift.
 - Test harness: `tests\test-V25.js` — plain node script. Per-instance `makeInstance(env, name, preset, host)` seeds storage pre-boot (host defaults to `www.netflix.com`). `runPopup(url, store)` runs the real popup.js against a fake DOM built from popup.html ids.
-- Version alignment rule: manifest version == EXT_VER badge string (currently 1.25.0).
+- Version alignment rule: manifest version == EXT_VER badge string (currently 1.26.0).
 - Git repo: `https://github.com/srv883/Watch-Movies-Together` — every version commit pushed here.
 
 ## Conventions & Gotchas
@@ -48,7 +57,7 @@ Maintain the personal "Watch Together" Chrome extension using strict **per-versi
 - Opus SDP must match mic capture: mono mic → `stereo=0` in SDP. Never set stereo=1 with mono capture.
 - `position: fixed` elements don't automatically appear in fullscreen — must reparent into fullscreen container.
 - In the harness, a lone HOST cannot acquire the mic — pair a guest first.
-- Voice-line rules: mute ≠ close; answer always carries a slot; never redial while a line is healthy. `attachVoiceCall` hot-swaps the mic IMMEDIATELY (redial fallback) — PeerJS `MediaConnection` never emits `"open"`, so never defer to it and never gate `toggleMic` / `ensureMicIfWanted` on `callOpen` (that was the V19/V20 total-voice-failure bug, fixed in V21). The 5s debounce in `requestVoiceRedial` prevents redial storms.
+- Voice-line rules: mute ≠ close; answer always carries a slot; never redial while a line is healthy. `attachVoiceCall` hot-swaps the mic IMMEDIATELY (redial fallback) — PeerJS `MediaConnection` never emits `"open"`, so never defer to it and never gate `toggleMic` / `ensureMicIfWanted` on `callOpen` (that was the V19/V20 total-voice-failure bug, fixed in V21). The 5s debounce in `requestVoiceRedial` prevents redial storms. `replaceTrack` is async — always await it before reading `sender.track` (V26).
 - Both sides must run the same version when testing voice fixes (user + friend were once on V21 vs V22).
 - Status strings during outages stay calm/stable.
 - Bar input (`#wt-qtype-input`) is separate from overlay input (`#wt-qtype-overlay-input`). Tests must use correct IDs.
@@ -61,4 +70,4 @@ Maintain the personal "Watch Together" Chrome extension using strict **per-versi
 - Git push: `git add -A && git commit -m "..." && git push` from `watch-together-versions\`
 
 ## Next Move (when resumed)
-Nothing pending. Any new feature request → create `V26-*` folder, port from V25, bump manifest+EXT_VER together, extend test suite, zip as wt-V26.zip, commit+push to GitHub.
+Nothing pending. Any new feature request → create `V27-*` folder, port from V26, bump manifest+EXT_VER together, extend test suite, zip as wt-V27.zip, commit+push to GitHub.
