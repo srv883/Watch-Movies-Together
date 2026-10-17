@@ -1,0 +1,122 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>WT live voice test</title>
+<link rel="stylesheet" href="overlay.css" />
+<style>
+  body { background: #111; color: #ddd; font: 13px system-ui; margin: 0; padding: 12px; }
+  #log { white-space: pre-wrap; font: 11px Consolas, monospace; max-height: 260px; overflow: auto; }
+  video { width: 320px; height: 180px; background: #000; }
+</style>
+<script>
+(() => {
+  const qs = new URLSearchParams(location.search);
+  const role = qs.get("role") || "host";
+  const code = (qs.get("code") || "LIVE01").toUpperCase();
+  const tone = Number(qs.get("tone") || (role === "host" ? 440 : 660));
+  const micOn = qs.get("mic") === "1";
+  window.__role = role;
+
+  // ---- console capture ----
+  window.__log = [];
+  for (const k of ["log", "warn", "error"]) {
+    const o = console[k].bind(console);
+    console[k] = (...a) => { try { window.__log.push(k + ": " + a.map(x => (x && x.stack) || String(x)).join(" ")); } catch (_) {} o(...a); };
+  }
+  window.addEventListener("error", e => window.__log.push("uncaught: " + e.message));
+  window.addEventListener("unhandledrejection", e => window.__log.push("unhandled: " + (e.reason && e.reason.stack || e.reason)));
+
+  // ---- per-tab chrome.storage stub (real host/guest are separate machines) ----
+  const store = { wt_party: { id: code, role, name: role === "host" ? "Sourav" : "Priya" }, wt_nc: true, wt_mic_state: micOn };
+  const listeners = [];
+  window.chrome = {
+    storage: {
+      local: {
+        get: async (k) => { const r = {}; (Array.isArray(k) ? k : [k]).forEach(x => { if (x in store) r[x] = store[x]; }); return r; },
+        set: async (o) => { const ch = {}; for (const k in o) { ch[k] = { oldValue: store[k], newValue: o[k] }; store[k] = o[k]; } listeners.forEach(f => f(ch, "local")); },
+      },
+      onChanged: { addListener: f => listeners.push(f) },
+    },
+    runtime: { id: "live-test", getManifest: () => ({ version: "test" }) },
+  };
+
+  // ---- track PeerJS signaling sockets so a test can kill them (ad-block sim) ----
+  window.__ws = [];
+  window.__blockWs = qs.get("block") === "1";
+  const OrigWS = window.WebSocket;
+  window.WebSocket = class extends OrigWS {
+    constructor(u, p) {
+      super(window.__blockWs ? "ws://127.0.0.1:9/blocked" : u, p);
+      window.__ws.push(this);
+    }
+  };
+  window.__killSignaling = () => { window.__blockWs = true; window.__ws.forEach(s => { try { s.close(); } catch (_) {} }); return window.__ws.length; };
+
+  // ---- collect every RTCPeerConnection ----
+  window.__pcs = [];
+  const OrigPC = window.RTCPeerConnection;
+  class TrackedPC extends OrigPC {
+    constructor(...a) { super(...a); window.__pcs.push(this); }
+  }
+  window.RTCPeerConnection = TrackedPC;
+
+  // ---- fake mic: a steady test tone, constraints recorded ----
+  window.__gum = [];
+  window.__toneCtx = null;
+  const md = navigator.mediaDevices;
+  md.getUserMedia = async (c) => {
+    window.__gum.push(JSON.stringify(c));
+    if (!window.__toneCtx) window.__toneCtx = new AudioContext();
+    const ctx = window.__toneCtx;
+    try { await ctx.resume(); } catch (_) {}
+    const osc = ctx.createOscillator();
+    osc.frequency.value = tone;
+    const g = ctx.createGain(); g.gain.value = 0.3;
+    const dest = ctx.createMediaStreamDestination();
+    osc.connect(g); g.connect(dest); osc.start();
+    return dest.stream;
+  };
+
+  window.__clickMic = () => document.querySelector("#wt-mic").click();
+  window.__flow = async (ms = 2500) => {
+    const pick = async () => { const p = await window.__probe(); const m = p.pcs.filter(x => x.conn === "connected" && x.transceivers.length); return { m, p }; };
+    const a = await pick(); await new Promise(r => setTimeout(r, ms)); const b = await pick();
+    const lines = b.m.map((x, i) => { const y = a.m[i] || {}; return { inPkts: (x.in ? x.in.pkts : 0) - (y.in ? y.in.pkts : 0), inLevel: x.in && +(+x.in.level || 0).toFixed(3), outPkts: (x.out ? x.out.pkts : 0) - (y.out ? y.out.pkts : 0), senders: x.senders.join(",") }; });
+    return { role: b.p.role, dbg: b.p.dbg, mediaPCs: b.m.length, lines, remote: b.p.remoteAudio && b.p.remoteAudio.tracks.join(","), log: window.__log.slice(-8), msgs: [...document.querySelectorAll("#wt-msgs > *")].slice(-5).map(e => e.textContent) };
+  };
+
+  window.__probe = async () => {
+    const out = { role, ctxState: window.__toneCtx && window.__toneCtx.state, gum: window.__gum.length, pcs: [] };
+    try { out.dbg = window.__wtVoiceDbg && window.__wtVoiceDbg(); } catch (e) { out.dbg = String(e); }
+    const a = document.querySelector("#wt-remote-audio");
+    out.remoteAudio = a ? { paused: a.paused, hasSrc: !!a.srcObject, tracks: a.srcObject ? a.srcObject.getTracks().map(t => t.kind + ":" + t.readyState + ":" + (t.muted ? "muted" : "unmuted")) : [] } : null;
+    for (const pc of window.__pcs) {
+      const p = { conn: pc.connectionState, ice: pc.iceConnectionState, sig: pc.signalingState,
+        senders: pc.getSenders().map(s => s.track ? (s.track.kind + ":" + s.track.readyState + ":" + (s.track.enabled ? "en" : "dis") + ":" + s.track.label.slice(0, 20)) : "null"),
+        transceivers: pc.getTransceivers().map(t => t.mid + ":" + t.direction + "/" + t.currentDirection) };
+      try {
+        const st = await pc.getStats();
+        st.forEach(r => {
+          if (r.type === "outbound-rtp" && r.kind === "audio") p.out = { bytes: r.bytesSent, pkts: r.packetsSent };
+          if (r.type === "inbound-rtp" && r.kind === "audio") p.in = { bytes: r.bytesReceived, pkts: r.packetsReceived, level: r.audioLevel, energy: r.totalAudioEnergy };
+          if (r.type === "media-source" && r.kind === "audio") p.src = { level: r.audioLevel, energy: r.totalAudioEnergy };
+        });
+      } catch (e) { p.statsErr = String(e); }
+      const dc = pc.sctp ? "data" : "media";
+      p.kind = dc;
+      out.pcs.push(p);
+    }
+    return out;
+  };
+})();
+</script>
+<script src="lib/peerjs.min.js"></script>
+<script src="content.js"></script>
+</head>
+<body>
+  <h3 id="hdr"></h3>
+  <video id="vid" muted playsinline loop src=""></video>
+  <script>document.getElementById("hdr").textContent = "role: " + window.__role;</script>
+</body>
+</html>
