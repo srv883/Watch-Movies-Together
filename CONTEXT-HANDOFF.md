@@ -46,8 +46,8 @@ Maintain the personal "Watch Together" Chrome extension using strict **per-versi
 
 ## Architecture Notes
 - Core logic in `content.js` of each version folder; popup (`popup.html/js/css`) alongside. No background service worker.
-- Supported sites live in THREE places that must match: manifest `content_scripts.matches`, `SITE_HOSTS` at the top of content.js, and `SITES[].hosts` in popup.js. test-V25 section 28a fails if they drift.
-- Test harness: `tests\test-V25.js` — plain node script. Per-instance `makeInstance(env, name, preset, host)` seeds storage pre-boot (host defaults to `www.netflix.com`). `runPopup(url, store)` runs the real popup.js against a fake DOM built from popup.html ids.
+- Supported sites live in THREE places that must match: manifest `content_scripts.matches`, `SITE_HOSTS` at the top of content.js, and `SITES[].hosts` in popup.js. test-V26 section 28a fails if they drift.
+- Test harness: `tests\test-V26.js` — plain node script. Per-instance `makeInstance(env, name, preset, host, src)` (src = another build's content.js, e.g. V25 for mixed-version tests) seeds storage pre-boot (host defaults to `www.netflix.com`). `runPopup(url, store)` runs the real popup.js against a fake DOM built from popup.html ids.
 - Version alignment rule: manifest version == EXT_VER badge string (currently 1.26.0).
 - Git repo: `https://github.com/srv883/Watch-Movies-Together` — every version commit pushed here.
 
@@ -63,10 +63,10 @@ Maintain the personal "Watch Together" Chrome extension using strict **per-versi
 - Bar input (`#wt-qtype-input`) is separate from overlay input (`#wt-qtype-overlay-input`). Tests must use correct IDs.
 
 ## Relevant Files
-- `C:\Users\Sourav\ML Coding\watch-together-versions\V25-sitepicker\` — current version (v1.25.0): content.js, overlay.css, manifest.json, popup.html, popup.js, popup.css, lib/peerjs.min.js, icons/
-- `C:\Users\Sourav\Downloads\wt-V25.zip` — deliverable
-- `C:\Users\Sourav\ML Coding\watch-together-versions\tests\test-V25.js` — 376-check regression suite
-- `C:\Users\Sourav\ML Coding\watch-together-versions\V24-sitewhitelist\` + `wt-V24.zip` — frozen
+- `C:\Users\Sourav\ML Coding\watch-together-versions\V26-voicelink\` — current version (v1.26.0): content.js, overlay.css, manifest.json, popup.html, popup.js, popup.css, lib/peerjs.min.js, icons/
+- `C:\Users\Sourav\Downloads\wt-V26.zip` — deliverable
+- `C:\Users\Sourav\ML Coding\watch-together-versions\tests\test-V26.js` — 401-check regression suite; `tests\live\` — real-browser voice test
+- `C:\Users\Sourav\ML Coding\watch-together-versions\V25-sitepicker\` + `wt-V25.zip` — frozen
 - Git push: `git add -A && git commit -m "..." && git push` from `watch-together-versions\`
 
 ## Next Move (when resumed)
