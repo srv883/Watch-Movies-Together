@@ -72,7 +72,7 @@
     try { await ctx.resume(); } catch (_) {}
     const osc = ctx.createOscillator();
     osc.frequency.value = tone;
-    const g = ctx.createGain(); g.gain.value = 0.3;
+    const g = ctx.createGain(); g.gain.value = Number(qs.get("vol") || 0.3);
     const dest = ctx.createMediaStreamDestination();
     osc.connect(g); g.connect(dest); osc.start();
     return dest.stream;

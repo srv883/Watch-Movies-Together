@@ -1,10 +1,17 @@
 # WATCH TOGETHER — Context Handoff (as of Oct 18, 2026)
 
 ## Objective
-Maintain the personal "Watch Together" Chrome extension using strict **per-version folders** (`V1`–`V26`) inside `C:\Users\Sourav\ML Coding\watch-together-versions\`. NEVER overwrite an old version's folder; always create the next numbered folder. Deliverables are zips named `wt-V<N>.zip` in the same root and copied to `C:\Users\Sourav\Downloads\`. Push every commit to `https://github.com/srv883/Watch-Movies-Together`.
+Maintain the personal "Watch Together" Chrome extension using strict **per-version folders** (`V1`–`V27`) inside `C:\Users\Sourav\ML Coding\watch-together-versions\`. NEVER overwrite an old version's folder; always create the next numbered folder. Deliverables are zips named `wt-V<N>.zip` in the same root and copied to `C:\Users\Sourav\Downloads\`. Push every commit to `https://github.com/srv883/Watch-Movies-Together`.
 
 ## Current Shipped State
-- **V26** (`wt-V26.zip` — **delivered to `C:\Users\Sourav\Downloads\wt-V26.zip`** + canonical copy in versions root; manifest **1.26.0**, `EXT_VER="1.26.0"`): CURRENT shipping version. Folder `V26-voicelink\`. Tests `tests\test-V26.js`: **401 passed, 0 failed**. Fixes "voice not working at all" (both sides must install V26):
+- **V27** (`wt-V27.zip` — **delivered to `C:\Users\Sourav\Downloads\wt-V27.zip`** + canonical copy in versions root; manifest **1.27.0**, `EXT_VER="1.27.0"`): CURRENT shipping version. Folder `V27-voiceboost\`. Tests `tests\test-V27.js`: **422 passed, 0 failed**. Fixes "my voice is clear to her, hers to me is feeble" (Priya's quiet Lenovo mic; receiver-side fix, only the LISTENER needs V27):
+  - **Friend's voice plays through Web Audio** (`setupVoiceBoost` from the call's "stream" handler): source → gain → DynamicsCompressor limiter (threshold -10, ratio 12) → destination, plus a `post` analyser for diagnostics.
+  - **Auto-level** (`vbTick`, every 100 ms): EMA of the friend's SPEECH RMS (frames < 0.004 = silence, gain held), gain → `VB_TARGET_RMS 0.07 / level`, clamped ×1..×8 (`VB_MAX_AUTO`), × manual slider. One-time sysMsg "<name>'s mic is quiet – auto-boosting their voice" at ≥ ×2.5.
+  - **Slider 0–200%** (`VB_MAX_MANUAL 2`, saved in `wt_voice_vol`); element volume capped at 1.
+  - **Routing**: `<audio id="wt-remote-audio">` keeps `srcObject` (Chrome only feeds remote WebRTC audio to Web Audio while a media element holds it) and is `muted` while the AudioContext runs; while it is suspended (no gesture) the element plays instead; `resumeRemoteAudio()` resumes the context on gestures. `__wtVoiceDbg().boost` → `{ctx, auto, gain, inRms, outRms}`.
+  - **Verified live in real Chrome** (tests\live, guest `&vol=0.015`): in RMS 0.0106 → ×6.6 → out ≈ 0.115 (limiter adds ~+4 dB makeup gain); a loud voice (0.21) stays ×1; 200% doubles, 0% silences; element muted, no double audio.
+  - Harness: fake analysers fed from a remote stream (`__remote`) read `env.remoteRms`; section 30.
+- **V26** (`wt-V26.zip`, manifest 1.26.0): frozen. Folder `V26-voicelink\`. Tests 401 passed. Fixes "voice not working at all" (both sides must install V26+):
   - **Voice signaled over the data link** (`voffer`/`vanswer`/`vice`/`vbye`) via `makeDcCall`/`dialDcCall`/`answerDcCall` — no longer needs the PeerJS cloud server (ad blockers like the user's AdBlocker Ultimate / Wi-Fi blips used to kill voice while sync kept working). Uses PeerJS's STUN+TURN set (`VOICE_ICE`). Friends older than 1.26 (hello `v`) still get the legacy `peer.call`; a legacy line dialed before hello is migrated once hello arrives.
   - **hotSwapMicTrack is async and awaits replaceTrack**: Chrome updates `sender.track` only after the promise resolves; the old sync check reported failure on EVERY mic-on and rebuilt the line (root cause of the V18–V21 "redial storm"). `swapMicOrRedial()` wraps the redial fallback.
   - **healVoice()** from the host heartbeat re-dials a failed/closed line, or one with no remote stream after 15s (8s guard). Before, a dropped line stayed dead until someone toggled a mic.
@@ -46,9 +53,9 @@ Maintain the personal "Watch Together" Chrome extension using strict **per-versi
 
 ## Architecture Notes
 - Core logic in `content.js` of each version folder; popup (`popup.html/js/css`) alongside. No background service worker.
-- Supported sites live in THREE places that must match: manifest `content_scripts.matches`, `SITE_HOSTS` at the top of content.js, and `SITES[].hosts` in popup.js. test-V26 section 28a fails if they drift.
-- Test harness: `tests\test-V26.js` — plain node script. Per-instance `makeInstance(env, name, preset, host, src)` (src = another build's content.js, e.g. V25 for mixed-version tests) seeds storage pre-boot (host defaults to `www.netflix.com`). `runPopup(url, store)` runs the real popup.js against a fake DOM built from popup.html ids.
-- Version alignment rule: manifest version == EXT_VER badge string (currently 1.26.0).
+- Supported sites live in THREE places that must match: manifest `content_scripts.matches`, `SITE_HOSTS` at the top of content.js, and `SITES[].hosts` in popup.js. test-V27 section 28a fails if they drift.
+- Test harness: `tests\test-V27.js` — plain node script. Per-instance `makeInstance(env, name, preset, host, src)` (src = another build's content.js, e.g. V25 for mixed-version tests) seeds storage pre-boot (host defaults to `www.netflix.com`). `runPopup(url, store)` runs the real popup.js against a fake DOM built from popup.html ids.
+- Version alignment rule: manifest version == EXT_VER badge string (currently 1.27.0).
 - Git repo: `https://github.com/srv883/Watch-Movies-Together` — every version commit pushed here.
 
 ## Conventions & Gotchas
@@ -63,11 +70,11 @@ Maintain the personal "Watch Together" Chrome extension using strict **per-versi
 - Bar input (`#wt-qtype-input`) is separate from overlay input (`#wt-qtype-overlay-input`). Tests must use correct IDs.
 
 ## Relevant Files
-- `C:\Users\Sourav\ML Coding\watch-together-versions\V26-voicelink\` — current version (v1.26.0): content.js, overlay.css, manifest.json, popup.html, popup.js, popup.css, lib/peerjs.min.js, icons/
-- `C:\Users\Sourav\Downloads\wt-V26.zip` — deliverable
-- `C:\Users\Sourav\ML Coding\watch-together-versions\tests\test-V26.js` — 401-check regression suite; `tests\live\` — real-browser voice test
-- `C:\Users\Sourav\ML Coding\watch-together-versions\V25-sitepicker\` + `wt-V25.zip` — frozen
+- `C:\Users\Sourav\ML Coding\watch-together-versions\V27-voiceboost\` — current version (v1.27.0): content.js, overlay.css, manifest.json, popup.html, popup.js, popup.css, lib/peerjs.min.js, icons/
+- `C:\Users\Sourav\Downloads\wt-V27.zip` — deliverable
+- `C:\Users\Sourav\ML Coding\watch-together-versions\tests\test-V27.js` — 422-check regression suite; `tests\live\` — real-browser voice test (`&vol=` sets the fake mic level)
+- `C:\Users\Sourav\ML Coding\watch-together-versions\V26-voicelink\` + `wt-V26.zip` — frozen
 - Git push: `git add -A && git commit -m "..." && git push` from `watch-together-versions\`
 
 ## Next Move (when resumed)
-Nothing pending. Any new feature request → create `V27-*` folder, port from V26, bump manifest+EXT_VER together, extend test suite, zip as wt-V27.zip, commit+push to GitHub.
+Nothing pending. Any new feature request → create `V28-*` folder, port from V27, bump manifest+EXT_VER together, extend test suite, zip as wt-V28.zip, commit+push to GitHub.
