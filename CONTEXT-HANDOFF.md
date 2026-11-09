@@ -1,15 +1,18 @@
 # WATCH TOGETHER — Context Handoff (as of Nov 10, 2026)
 
 ## Objective
-Maintain the personal "Watch Together" Chrome extension using strict **per-version folders** (`V1`–`V28`) inside `C:\Users\Sourav\ML Coding\watch-together-versions\`. NEVER overwrite an old version's folder; always create the next numbered folder. Deliverables are zips named `wt-V<N>.zip` in the same root and copied to `C:\Users\Sourav\Downloads\`. Push every commit to `https://github.com/srv883/Watch-Movies-Together`.
+Maintain the personal "Watch Together" Chrome extension using strict **per-version folders** (`V1`–`V29`) inside `C:\Users\Sourav\ML Coding\watch-together-versions\`. NEVER overwrite an old version's folder; always create the next numbered folder. Deliverables are zips named `wt-V<N>.zip` in the same root and copied to `C:\Users\Sourav\Downloads\`. Push every commit to `https://github.com/srv883/Watch-Movies-Together`.
 
 ## Current Shipped State
-- **V28** (`wt-V28.zip` — **delivered to `C:\Users\Sourav\Downloads\wt-V28.zip`** + canonical copy in versions root; manifest **1.28.0**, `EXT_VER="1.28.0"`): CURRENT shipping version. Folder `V28-clearvoice\`. Tests `tests\test-V28.js`: **438 passed, 0 failed**. "Voice still not good" after V27 — measured on the new **real-Chrome rig** (`tests\rig\`, see its README) and fixed (BOTH sides should install it — echo cancellation works on the side that talks):
+- **V29** (`wt-V29.zip` — **delivered to `C:\Users\Sourav\Downloads\wt-V29.zip`** + canonical copy in versions root; manifest **1.29.0**, `EXT_VER="1.29.0"`): CURRENT shipping version. Folder `V29-louder\`. Tests `tests\test-V29.js`: **439 passed, 0 failed**. V28 + one change: auto-level target `VB_TARGET_RMS` 0.07 → **0.13 (~-17.7 dBFS)**. The full V27-vs-V28 rig matrix showed V28 played an AGC-levelled voice ~4 dB QUIETER than V27 (V27's compressor makeup gain had been lifting voices over the movie) — wrong direction for a user complaining the friend is faint.
+  - **Rig results V29** (heard dBFS; V27 → V29): normal -16.2 → -16.2, quiet(NC on) -17.1 → -15.3, very quiet(NC on) -16.7 → -15.4, quiet raw(NC off) -19.3 → -17.0 (×11.7), very quiet raw -26 → -24.4 (×16 cap), room noise -57.4 → -61.6 (not boosted). No clipping (peaks ≤ 0.72), envelope match 0.95–0.99 (V27 0.95–0.99 too), EC on, 52–63 kbps, movie 0.8 → 0.32 while talking and back to 0.8. Mid-call NC off/on, mic off/on verified.
+  - Correction: an early single V27 run reported envelope 0.73 ("limiter squashed voices"); the full matrix did not reproduce it (V27 0.99) — it was an alignment fluke. The real V27→V28 difference was loudness (V27's +4 dB makeup gain), not clarity.
+- **V28** (`wt-V28.zip`, manifest 1.28.0): frozen. Folder `V28-clearvoice\`. Tests 438 passed. "Voice still not good" after V27 — measured on the new **real-Chrome rig** (`tests\rig\`, see its README) and fixed (BOTH sides should install it — echo cancellation works on the side that talks):
   - **Echo cancellation ON** (`micConstraints()`): EC + NS + AGC all follow the NC switch (default ON; NC off = raw mic). EC had been forced off since V19 (blamed for "beeping" that was really the redial storm). On laptop speakers each mic sent the other's voice back (echo — which V27 then boosted ×8 for a quiet mic) plus the movie soundtrack. Chrome cannot switch EC on a live track: `applyNcToLiveStream` checks `getSettings()` and re-acquires the mic (hot-swapped onto the same line).
   - **Opus 64 kbps VBR + in-band FEC** (`mungeOpus`; was 128 kbps CBR). Rig: 51–63 kbps.
   - **Auto-level v2** (`vbTick`): floor = 10th percentile of the last 5 s of 100 ms ticks; speech = ≥ +16 dB over floor and ≥ -58 dBFS for 2 ticks in a row; cap ×16; boost never lifts the floor above -54 dBFS (`VB_NOISE_CEIL`). Limiter -4 dBFS / 20:1 with Chrome's DynamicsCompressor makeup gain undone (`LIM_MAKEUP_UNDO` gain node) — normal voices now pass at unity.
   - **Movie ducking** (`duckTick`/`unduck`): S.video goes to 40% (`DUCK_LEVEL`) while the friend talks, back after 0.9 s of silence, restored to the exact value; if the user/site changes volume meanwhile we stop touching it; muted/paused movies left alone; leaving the party restores. `S.duckOff` disables (no UI).
-  - **Rig results V28** (friend's mic → what you hear, dBFS / envelope match): normal -20.4/0.98, quiet(NC on) -20.9/0.97, very quiet(NC on) -20.9/0.95, quiet raw(NC off) -21.7/0.96 (×5.7), very quiet raw -24.4/0.998 (×16), room-noise-only -61.6 (×1, no pumping), movie ducked 0.8→0.32 and restored to 0.8. NC off/on mid-call, mic off/on, V28↔V27 both ways, 2-minute call (0 packets lost, ~74 ms jitter buffer) all verified. V27 baseline on the same rig: limiter added +4 dB and squashed normal voices (envelope 0.73), very quiet raw mic only reached -26 dBFS, EC off.
+  - **Rig results V28** (friend's mic → what you hear, dBFS / envelope match): normal -20.4/0.98, quiet(NC on) -20.9/0.97, very quiet(NC on) -20.9/0.95, quiet raw(NC off) -21.7/0.96 (×5.7), very quiet raw -24.4/0.998 (×16), room-noise-only -61.6 (×1, no pumping), movie ducked 0.8→0.32 and restored to 0.8. NC off/on mid-call, mic off/on, V28↔V27 both ways, 2-minute call (0 packets lost, ~74 ms jitter buffer) all verified. V27 baseline on the same rig: its limiter's makeup gain played voices ~4 dB louder (clarity equal, ~0.99), very quiet raw mic only reached -26 dBFS, EC off. (V28's unity level turned out ~4 dB quieter than V27 → fixed in V29.)
 - **V27** (`wt-V27.zip`, manifest 1.27.0): frozen. Folder `V27-voiceboost\`. Tests 422 passed. Fixes "my voice is clear to her, hers to me is feeble" (Priya's quiet Lenovo mic; receiver-side fix, only the LISTENER needs V27):
   - **Friend's voice plays through Web Audio** (`setupVoiceBoost` from the call's "stream" handler): source → gain → DynamicsCompressor limiter (threshold -10, ratio 12) → destination, plus a `post` analyser for diagnostics.
   - **Auto-level** (`vbTick`, every 100 ms): EMA of the friend's SPEECH RMS (frames < 0.004 = silence, gain held), gain → `VB_TARGET_RMS 0.07 / level`, clamped ×1..×8 (`VB_MAX_AUTO`), × manual slider. One-time sysMsg "<name>'s mic is quiet – auto-boosting their voice" at ≥ ×2.5.
@@ -59,9 +62,9 @@ Maintain the personal "Watch Together" Chrome extension using strict **per-versi
 
 ## Architecture Notes
 - Core logic in `content.js` of each version folder; popup (`popup.html/js/css`) alongside. No background service worker.
-- Supported sites live in THREE places that must match: manifest `content_scripts.matches`, `SITE_HOSTS` at the top of content.js, and `SITES[].hosts` in popup.js. test-V28 section 28a fails if they drift.
-- Test harness: `tests\test-V28.js` — plain node script. Per-instance `makeInstance(env, name, preset, host, src)` (src = another build's content.js, e.g. V25 for mixed-version tests) seeds storage pre-boot (host defaults to `www.netflix.com`). `runPopup(url, store)` runs the real popup.js against a fake DOM built from popup.html ids.
-- Version alignment rule: manifest version == EXT_VER badge string (currently 1.28.0).
+- Supported sites live in THREE places that must match: manifest `content_scripts.matches`, `SITE_HOSTS` at the top of content.js, and `SITES[].hosts` in popup.js. test-V29 section 28a fails if they drift.
+- Test harness: `tests\test-V29.js` — plain node script. Per-instance `makeInstance(env, name, preset, host, src)` (src = another build's content.js, e.g. V25 for mixed-version tests) seeds storage pre-boot (host defaults to `www.netflix.com`). `runPopup(url, store)` runs the real popup.js against a fake DOM built from popup.html ids.
+- Version alignment rule: manifest version == EXT_VER badge string (currently 1.29.0).
 - **Audio changes must be measured on the real-Chrome rig** (`tests\rig\`, `node tests\rig\matrix.js <build>`), not only the fake harness: the fake harness cannot hear. Echo cancellation itself cannot be measured there (no acoustic path) — only that it is enabled and does not degrade speech.
 - Git repo: `https://github.com/srv883/Watch-Movies-Together` — every version commit pushed here.
 
@@ -77,11 +80,11 @@ Maintain the personal "Watch Together" Chrome extension using strict **per-versi
 - Bar input (`#wt-qtype-input`) is separate from overlay input (`#wt-qtype-overlay-input`). Tests must use correct IDs.
 
 ## Relevant Files
-- `C:\Users\Sourav\ML Coding\watch-together-versions\V28-clearvoice\` — current version (v1.28.0): content.js, overlay.css, manifest.json, popup.html, popup.js, popup.css, lib/peerjs.min.js, icons/
-- `C:\Users\Sourav\Downloads\wt-V28.zip` — deliverable
-- `C:\Users\Sourav\ML Coding\watch-together-versions\tests\test-V28.js` — 438-check regression suite; `tests\rig\` — real-Chrome voice rig (TTS mics, scored); `tests\live\` — interactive two-tab voice page (`&vol=` sets the fake mic level)
-- `C:\Users\Sourav\ML Coding\watch-together-versions\V27-voiceboost\` + `wt-V27.zip` — frozen
+- `C:\Users\Sourav\ML Coding\watch-together-versions\V29-louder\` — current version (v1.29.0): content.js, overlay.css, manifest.json, popup.html, popup.js, popup.css, lib/peerjs.min.js, icons/
+- `C:\Users\Sourav\Downloads\wt-V29.zip` — deliverable
+- `C:\Users\Sourav\ML Coding\watch-together-versions\tests\test-V29.js` — 439-check regression suite; `tests\rig\` — real-Chrome voice rig (TTS mics, scored); `tests\live\` — interactive two-tab voice page (`&vol=` sets the fake mic level)
+- `C:\Users\Sourav\ML Coding\watch-together-versions\V28-clearvoice\` + `wt-V28.zip` — frozen
 - Git push: `git add -A && git commit -m "..." && git push` from `watch-together-versions\`
 
 ## Next Move (when resumed)
-Nothing pending. Any new feature request → create `V29-*` folder, port from V28, bump manifest+EXT_VER together, extend test suite (+ rig matrix for audio changes), zip as wt-V29.zip, commit+push to GitHub.
+Nothing pending. Any new feature request → create `V30-*` folder, port from V29, bump manifest+EXT_VER together, extend test suite (+ rig matrix for audio changes), zip as wt-V30.zip, commit+push to GitHub.
