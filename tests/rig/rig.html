@@ -1,0 +1,154 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>WT voice rig</title>
+<link rel="stylesheet" href="overlay.css" />
+<script>
+(() => {
+  const qs = new URLSearchParams(location.search);
+  const role = qs.get("role") || "host";
+  const code = (qs.get("code") || "RIG001").toUpperCase();
+  window.__role = role;
+
+  window.__log = [];
+  for (const k of ["log", "warn", "error"]) {
+    const o = console[k].bind(console);
+    console[k] = (...a) => { try { window.__log.push(k + ": " + a.map(x => (x && x.stack) || String(x)).join(" ")); } catch (_) {} o(...a); };
+  }
+  window.addEventListener("error", e => window.__log.push("uncaught: " + e.message));
+  window.addEventListener("unhandledrejection", e => window.__log.push("unhandled: " + (e.reason && e.reason.stack || e.reason)));
+
+  // per-tab chrome.storage stub
+  const store = { wt_party: { id: code, role, name: role === "host" ? "Sourav" : "Priya" } };
+  if (qs.has("nc")) store.wt_nc = qs.get("nc") === "1";
+  if (qs.has("vol")) store.wt_voice_vol = Number(qs.get("vol"));
+  const listeners = [];
+  window.chrome = {
+    storage: {
+      local: {
+        get: async (k) => { const r = {}; (Array.isArray(k) ? k : [k]).forEach(x => { if (x in store) r[x] = store[x]; }); return r; },
+        set: async (o) => { const ch = {}; for (const k in o) { ch[k] = { oldValue: store[k], newValue: o[k] }; store[k] = o[k]; } listeners.forEach(f => f(ch, "local")); },
+      },
+      onChanged: { addListener: f => listeners.push(f) },
+    },
+    runtime: { id: "rig", getManifest: () => ({ version: "rig" }) },
+  };
+
+  // optional: kill PeerJS signaling
+  window.__blockWs = qs.get("block") === "1";
+  const OrigWS = window.WebSocket;
+  window.WebSocket = class extends OrigWS {
+    constructor(u, p) { super(window.__blockWs ? "ws://127.0.0.1:9/blocked" : u, p); }
+  };
+
+  window.__pcs = [];
+  const OrigPC = window.RTCPeerConnection;
+  window.RTCPeerConnection = class extends OrigPC {
+    constructor(...a) { super(...a); window.__pcs.push(this); }
+  };
+
+  // REAL getUserMedia (Chrome fake device fed from a WAV), just observed
+  window.__mics = [];
+  const md = navigator.mediaDevices;
+  const origGum = md.getUserMedia.bind(md);
+  md.getUserMedia = async (c) => {
+    const s = await origGum(c);
+    window.__mics.push({ c: JSON.stringify(c), s });
+    return s;
+  };
+
+  // ---- recorders ----
+  // "heard": whatever the extension sends to the speakers (any node -> destination)
+  // "raw":   the friend's remote stream itself (network + codec, before any boost)
+  const rec = window.__rec = { on: false, heard: [], raw: [], rawSetup: false, sr: 48000 };
+  const origConnect = AudioNode.prototype.connect;
+  function tapFor(ctx) {
+    if (ctx.__rigTap) return ctx.__rigTap;
+    const sp = ctx.createScriptProcessor(4096, 1, 1);
+    sp.onaudioprocess = (e) => { if (rec.on) rec.heard.push(new Float32Array(e.inputBuffer.getChannelData(0))); };
+    origConnect.call(sp, ctx.destination);
+    ctx.__rigTap = sp;
+    rec.sr = ctx.sampleRate;
+    return sp;
+  }
+  AudioNode.prototype.connect = function (t, ...r) {
+    const res = origConnect.call(this, t, ...r);
+    try {
+      if (t && this.context && t === this.context.destination && this !== this.context.__rigTap && !this.__rigHooked) {
+        this.__rigHooked = true;
+        origConnect.call(this, tapFor(this.context));
+      }
+    } catch (_) {}
+    return res;
+  };
+  function setupRaw() {
+    const a = document.querySelector("#wt-remote-audio");
+    if (!a || !a.srcObject) return false;
+    if (rec.rawStream === a.srcObject) return true;
+    rec.rawStream = a.srcObject;
+    const ctx = rec.rawCtx || (rec.rawCtx = new (window.__OrigAC || AudioContext)());
+    if (rec.rawSrc) { try { rec.rawSrc.disconnect(); } catch (_) {} }
+    rec.rawSrc = ctx.createMediaStreamSource(a.srcObject);
+    if (!rec.rawSp) {
+      rec.rawSp = ctx.createScriptProcessor(4096, 1, 1);
+      rec.rawSp.onaudioprocess = (e) => { if (rec.on) rec.raw.push(new Float32Array(e.inputBuffer.getChannelData(0))); };
+      origConnect.call(rec.rawSp, ctx.destination);
+    }
+    origConnect.call(rec.rawSrc, rec.rawSp);
+    return true;
+  }
+  setInterval(setupRaw, 500);
+  const b64 = (chunks) => {
+    let n = 0; chunks.forEach(c => n += c.length);
+    const all = new Float32Array(n); let o = 0; chunks.forEach(c => { all.set(c, o); o += c.length; });
+    const u8 = new Uint8Array(all.buffer); let s = "";
+    for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000));
+    return btoa(s);
+  };
+  rec.start = () => { rec.heard = []; rec.raw = []; rec.on = true; return true; };
+  rec.stop = () => { rec.on = false; return { sr: rec.sr, rawSr: rec.rawCtx ? rec.rawCtx.sampleRate : 0, heard: b64(rec.heard), raw: b64(rec.raw) }; };
+
+  // ---- stats ----
+  window.__stats = async () => {
+    const out = { role, dbg: null, mic: null, lines: [] };
+    try { out.dbg = window.__wtVoiceDbg && window.__wtVoiceDbg(); } catch (e) { out.dbg = String(e); }
+    const m = window.__mics[window.__mics.length - 1];
+    if (m) {
+      const t = m.s.getAudioTracks()[0];
+      out.mic = { constraints: m.c, settings: t && t.getSettings(), readyState: t && t.readyState, count: window.__mics.length };
+    }
+    const a = document.querySelector("#wt-remote-audio");
+    out.el = a ? { muted: a.muted, paused: a.paused, volume: a.volume, hasSrc: !!a.srcObject } : null;
+    for (const pc of window.__pcs) {
+      if (pc.connectionState !== "connected" || !pc.getTransceivers().length) continue;
+      const L = { codec: null };
+      const st = await pc.getStats();
+      const byId = {}; st.forEach(r => byId[r.id] = r);
+      st.forEach(r => {
+        if (r.type === "inbound-rtp" && r.kind === "audio") {
+          L.in = { pkts: r.packetsReceived, lost: r.packetsLost, jitterMs: +(r.jitter * 1000).toFixed(1),
+            jbMs: r.jitterBufferEmittedCount ? +(1000 * r.jitterBufferDelay / r.jitterBufferEmittedCount).toFixed(1) : null,
+            jbTargetMs: r.jitterBufferEmittedCount && r.jitterBufferTargetDelay != null ? +(1000 * r.jitterBufferTargetDelay / r.jitterBufferEmittedCount).toFixed(1) : null,
+            concealPct: r.totalSamplesReceived ? +(100 * r.concealedSamples / r.totalSamplesReceived).toFixed(2) : null,
+            level: r.audioLevel, bytes: r.bytesReceived };
+          const c = byId[r.codecId]; if (c) L.codec = { mime: c.mimeType, fmtp: c.sdpFmtpLine, ch: c.channels };
+        }
+        if (r.type === "outbound-rtp" && r.kind === "audio") L.out = { pkts: r.packetsSent, bytes: r.bytesSent, targetBitrate: r.targetBitrate };
+        if (r.type === "remote-inbound-rtp" && r.kind === "audio") L.rtt = { rttMs: r.roundTripTime != null ? +(r.roundTripTime * 1000).toFixed(1) : null, fracLost: r.fractionLost };
+        if (r.type === "media-source" && r.kind === "audio") L.src = { level: r.audioLevel, echoReturnLoss: r.echoReturnLoss };
+      });
+      out.lines.push(L);
+    }
+    return out;
+  };
+})();
+</script>
+<script src="lib/peerjs.min.js"></script>
+<script src="content.js"></script>
+</head>
+<body><h3 id="hdr"></h3><video id="vid" playsinline loop style="width:320px;height:180px;background:#000"></video>
+<script>(function(){ const q=new URLSearchParams(location.search); const v=document.getElementById("vid"); if(q.get("movie")==="1"){ v.src="movie.wav"; v.volume=0.8; v.play().catch(()=>{}); } else { v.muted=true; } })();</script>
+<script>document.getElementById("hdr").textContent = "rig role: " + window.__role;</script>
+</body>
+</html>
