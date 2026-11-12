@@ -1,0 +1,299 @@
+WATCH TOGETHER - DETAILED CONTEXT HANDOFF
+==========================================
+As of: 13 Nov 2026
+Current version: V29 (manifest 1.29.0, EXT_VER "1.29.0"), folder V29-louder
+Repo: https://github.com/srv883/Watch-Movies-Together (branch main, last commit 34c4591)
+Local root: C:\Users\Sourav\ML Coding\watch-together-versions\
+
+
+1. WHAT THIS PROJECT IS
+-----------------------
+A personal Chrome extension (Manifest V3) that lets two people (Sourav = usually
+host, friend Priya = usually guest) watch the same streaming episode in sync,
+with chat, emoji reactions, floating messages, watch history and a live voice
+call. Peer-to-peer over WebRTC via PeerJS (lib/peerjs.min.js, v1.5.4); no own
+server. Optional "Direct connect" mode exchanges codes by hand when the PeerJS
+cloud signaling server (0.peerjs.com) is blocked.
+
+Supported sites only (since V24): netflix.com, hotstar.com, jiohotstar.com,
+primevideo.com, jiotv.com, jiocinema.com.
+
+
+2. WORKING PROTOCOL (MUST FOLLOW)
+---------------------------------
+- Strict per-version folders: V1 ... V29 inside the local root. NEVER edit or
+  overwrite an old version folder. Every change = copy the latest folder to
+  the next number (V30-<shortname>), then edit the copy.
+- Bump BOTH manifest.json "version" and content.js EXT_VER together
+  (V30 -> "1.30.0"). Tests assert they match.
+- Copy the previous test suite to tests\test-V<N>.js, point it at the new
+  folder, extend it, run until 0 failures:   node tests\test-V<N>.js
+- Audio/voice changes must ALSO be measured on the real-Chrome rig
+  (tests\rig, section 7) - the fake harness cannot hear.
+- Deliverable: zip the CONTENTS of the folder as wt-V<N>.zip in the root and
+  copy it to C:\Users\Sourav\Downloads\. (PowerShell Compress-Archive -Path
+  "<folder>\*" was used for every version.)
+- Update CONTEXT-HANDOFF.md (and this .txt), commit, and push every commit to
+  origin main.
+- The user wants Claude to run every step itself (build, test, zip, commit,
+  push) - do not hand over commands. The user is terse/blunt; stay concise and
+  professional.
+
+
+3. USER ENVIRONMENT FACTS (verified on this laptop)
+---------------------------------------------------
+- Chrome 156 (C:\Program Files\Google\Chrome\Application\chrome.exe),
+  profile "Default". Also has AdBlocker Ultimate, Return YouTube Dislike,
+  Google Docs Offline.
+- Installed Watch Together (checked 13 Nov): unpacked from
+  C:\Users\Sourav\Downloads\wt-V27  (extension id ddlnpniciogajakjncpmngpljcejkpci)
+  -> V29 has been delivered but NOT yet installed on this laptop.
+- Chrome mic permission for https://www.hotstar.com is ALLOWED.
+- Saved extension settings seen: wt_name "sourav", wt_mic_state false; voice
+  slider never moved (100%), NC never toggled (default ON).
+- Friend Priya: Lenovo laptop, quiet mic. Both use laptop speakers (assumed
+  from the echo symptoms). They have at times run DIFFERENT versions (e.g.
+  V21 vs V22) - always tell them BOTH to install the newest zip.
+- Installing: chrome://extensions -> remove old Watch Together -> Developer
+  mode -> Load unpacked -> the unzipped wt-V<N> folder.
+- Note: Chrome 137+ dropped --load-extension for branded Chrome, which is why
+  the test rig injects content.js into a test page instead of loading the
+  extension (section 7).
+
+
+4. CURRENT STATE - V29 IN DETAIL
+--------------------------------
+Files in V29-louder\: manifest.json, content.js (~3560 lines), overlay.css,
+popup.html, popup.js, popup.css, lib\peerjs.min.js, icons\.
+Tests: tests\test-V29.js = 439 passed, 0 failed.
+
+V29 = V28 + one change: auto-level target VB_TARGET_RMS 0.07 -> 0.13
+(about -17.7 dBFS). Reason: the full rig matrix showed V28 played a normal /
+AGC-levelled voice about 4 dB QUIETER than V27 (V27's compressor makeup gain
+had been lifting voices over the movie). Wrong direction for a user who says
+the friend is faint.
+
+What V29 does for voice (cumulative from V26-V29):
+a) Voice call setup goes over the existing data link ("voffer", "vanswer",
+   "vice", "vbye" messages), not through the PeerJS cloud server. Works when
+   ad blockers / Wi-Fi blips kill the PeerJS server, and works in Direct mode.
+   Friends older than 1.26 (detected from the "hello" message version) still
+   get the legacy PeerJS media call.
+b) Echo cancellation + noise suppression + auto gain all ON by default, all
+   controlled by the one NC (headphones) button. NC off = raw mic.
+   Chrome cannot switch echo cancellation on a live mic, so toggling NC
+   re-acquires the mic and hot-swaps it onto the same call (no redial).
+c) Opus codec forced to 64 kbps VBR, mono, in-band FEC, no DTX (SDP munge).
+d) The friend's voice plays through Web Audio:
+   source -> gain (auto-level x manual slider) -> peak limiter -> makeup-gain
+   undo -> speakers. The hidden <audio id="wt-remote-audio"> keeps the stream
+   (Chrome only feeds remote WebRTC audio to Web Audio while an element holds
+   it) and is muted while the graph runs; if the AudioContext is suspended
+   (no click yet) the element plays instead, and any click resumes the graph.
+e) Auto-level: measures the friend's speech level every 100 ms. Noise floor =
+   10th percentile of the last 5 s. Speech = at least +16 dB over the floor
+   and above -58 dBFS for 2 ticks in a row. Gain -> target / level, x1..x16,
+   but the boosted noise floor is never lifted above about -54 dBFS. Silence
+   and room noise never raise the gain. One-time chat note
+   "<name>'s mic is quiet - auto-boosting their voice" at x2.5 or more.
+f) Volume slider in the panel: 0-200% (saved as wt_voice_vol).
+g) Movie ducking: while the friend talks the video volume drops to 40% of
+   its value, comes back after 0.9 s of silence to the EXACT previous value.
+   If the user/site changes the volume meanwhile, ducking stops touching it.
+   Muted or paused movies are left alone. Leaving the party restores it.
+   (S.duckOff = true disables it; there is no UI switch.)
+h) Self-heal: the host's heartbeat re-dials a voice line that failed/closed or
+   produced no audio for 15 s (8 s guard).
+i) Mic swap awaits replaceTrack() (fixed the old "redial storm").
+j) Specific mic error messages (blocked for the site / no mic / mic busy in
+   another app) and a hint if the permission prompt is pending > 2.5 s.
+
+Real-Chrome rig results for V29 (what the listener hears from the friend):
+  friend's mic                      V27 heard   V29 heard   V29 boost
+  normal (-20 dBFS)                 -16.2       -16.2       x1.6
+  quiet (-38), NC on                -17.1       -15.3       x2.0
+  very quiet (-48), NC on           -16.7       -15.4       x1.6
+  quiet (-38), NC off (raw)         -19.3       -17.0       x11.7
+  very quiet (-48), NC off (raw)    -26.0       -24.4       x16 (cap)
+  room noise only                   -57.4       -61.6       x1 (not boosted)
+  No clipping (peaks <= 0.72), envelope match 0.95-0.99, echo cancellation
+  ON (V27: off), 52-63 kbps (V27: 124 kbps CBR), movie 0.8 -> 0.32 while the
+  friend talks and back to 0.8. Mid-call NC off/on and mic off/on verified;
+  V28/V29 <-> V27 mixed versions work; 2-minute call: 0 packets lost, ~2 ms
+  jitter, ~74 ms jitter buffer.
+
+NOT verified: real acoustic echo (needs real speakers + mic in a room) and a
+real call between the two laptops on V29.
+
+
+5. VERSION HISTORY (most recent first)
+--------------------------------------
+V29 louder (1.29.0, 439 tests)   Voice target -17.7 dBFS (V28 was 4 dB quieter than V27).
+V28 clearvoice (1.28.0, 438)     Echo cancellation ON with NS+AGC (NC switch); Opus
+                                 64k VBR+FEC; auto-level v2 (percentile noise floor,
+                                 x16, hiss cap); limiter -4 dBFS with Chrome makeup gain
+                                 undone; movie ducking; tests/rig created.
+V27 voiceboost (1.27.0, 422)     Friend's voice through Web Audio with auto-boost (x8)
+                                 + limiter; slider 0-200%.
+V26 voicelink (1.26.0, 401)      Voice signaled over the data link (no PeerJS server
+                                 needed); async replaceTrack fix (redial storm root
+                                 cause); voice self-heal; Direct mode actually works
+                                 (it used to close its own connection); guest retry
+                                 crash when PeerJS connect() returns undefined; better
+                                 mic errors; tests/live page.
+V25 sitepicker (1.25.0, 376)     Popup: friendly site names, quick-launch buttons on
+                                 unsupported tabs, off-site hint during a party,
+                                 site-aware invite text; manifest description fixed.
+V24 sitewhitelist (1.24.0, 330)  Extension limited to the 6 streaming domains
+                                 (manifest + popup + content.js runtime guard).
+V23 loudmic (1.23.0, 323)        autoGainControl follows NC toggle.
+V22 denoise (1.22.0, 317)        noiseSuppression follows NC toggle (default ON).
+V21 voicefix (1.21.0, 311)       Total voice failure fixed: PeerJS MediaConnection never
+                                 emits "open"; immediate mic hot-swap restored.
+V20 floatcenter (1.20.0, 298)    Floating chat moved to screen centre, glass theme.
+V19 quickchat (1.19.0, 288)      Bar chat input + emoji picker; (EC was turned off here
+                                 and the hot-swap deferred - both later reversed).
+V18 fullscreen                   Fullscreen support, liquid-glass emoji bar.
+V17 quicktype (270)              Quick-type overlay (T or / key).
+V16 floatchat (252)              Floating chat notifications.
+V15 overlays (232)               Action overlays; noise gate disabled.
+V14 longrun (208)                Fixed ~45-minute silent drop (keepalive worker etc.).
+V13 lowlatency (198)             Fixed ~2 s voice lag (jitter buffer clamp 60 ms).
+V12 remote-audio (192)           Autoplay-blocked voice recovery ("Click to enable voice").
+V11 hist-voice (175)             Mute keeps the line open; watch history.
+V10 dropfix-nc (136)             Connection-drop resilience; NC toggle.
+V1-V9, cline-V1..V8, legacy-v1.4.4: early builds (kept frozen, not used).
+
+
+6. ARCHITECTURE MAP (V29-louder\content.js, approx. line numbers)
+-----------------------------------------------------------------
+   8  SITE_HOSTS + runtime host guard (bails on non-whitelisted hosts)
+  16  EXT_VER
+  24  DC_VOICE_MIN_VER "1.26.0", VOICE_ICE (Google STUN + PeerJS TURN)
+ 125  bestVideo() - largest <video> >= 100x80 px is the synced player
+ 245  applyRemote() - apply friend's play/pause/seek/rate
+ 345  sendHb() - heartbeat every ~4 s, re-sends hello, calls healVoice()
+ 626  voice boost constants (VB_*, LIM_*, DUCK_*)
+ 700  unduck() / duckTick() - movie ducking
+ 729  vbTick() - auto-level + speech detector (every 100 ms)
+ 756  setupVoiceBoost() - builds the Web Audio graph per remote stream
+ 813  micConstraints() - EC/NS/AGC follow S.nc, mono
+ 825  getMicStream()
+ 885  applyNcToLiveStream() - applyConstraints, verify via getSettings, else rebuild
+ 917  hotSwapMicTrack() (async) / 957 swapMicOrRedial() / 967 requestVoiceRedial()
+1080  mungeOpus() / 1104 installOpusBoost() - patches setLocalDescription
+1116  toggleNoiseCancel()
+1190  attachVoiceCall() - common for data-link calls and legacy PeerJS calls
+1253  makeDcCall() / 1327 dialDcCall() / 1350 answerDcCall() - data-link voice
+1392  healVoice()
+1448  doSyncVoice() - host is ALWAYS the dialer
+1485  toggleMic()
+1528  startParty() / 1617 connectToHost() / 1716 onConnOpen() /
+1734  onConnClose() / 1755 stopParty()
+1795  onData() - message switch: hello, play/pause/seek/state/hb, chat, react,
+      typing, voice, vrr (voice repair request), voffer/vanswer/vice/vbye,
+      needstate ...
+2361  ensureUi() - panel, buttons (#wt-mic, #wt-nc-btn, #wt-voice-vol,
+      #wt-link-btn ...), quick bar, overlays
+3320  finishLink() - Direct mode: keeps S.directPC alive, runs onConnOpen()
+ end  window.__wtVoiceDbg() - debug snapshot: role, open, micEnabled, line,
+      path (link/peerjs), gotStream, friendVer, boost {ctx, auto, gain, inRms,
+      floor, speaking, duck, outRms}
+
+Popup (popup.js): SITES table (name, launch url, hosts) -> siteFor(url);
+storage keys: wt_party {id, role, name}, wt_status, wt_recent, wt_name.
+Other storage keys used by content.js: wt_mic_state, wt_nc, wt_voice_vol,
+wt_glass, wt_pos_root, wt_pos_quick, wt_react_freq, wt_react_recent, wt_history.
+
+The supported-site list lives in THREE places that must match: manifest
+content_scripts.matches, SITE_HOSTS in content.js, SITES[].hosts in popup.js
+(test section 28a fails if they drift).
+
+
+7. TESTING
+----------
+A) Fake harness (fast, deterministic):  node tests\test-V29.js   (439 checks)
+   Runs the real content.js twice (host + guest) in node vm with a fake DOM,
+   fake PeerJS, fake RTCPeerConnection that carries audio, fake clock, plus the
+   real popup.js against a fake popup DOM. Key sections: 13 direct connect,
+   21-23 voice line rules, 28 popup/site list, 29 data-link voice, 30 voice
+   boost, 31 echo cancellation / smarter boost / ducking.
+   Helpers: makeInstance(env, name, preset, host, src) (src = another build's
+   content.js for mixed-version tests), runPopup(url, store), env.remoteRms /
+   env.remotePattern / env.remotePause drive the fake remote voice level.
+
+B) Real-Chrome voice rig (tests\rig, see its README):
+     powershell -File tests\rig\tts.ps1        (Windows TTS voices -> WAV)
+     node tests\rig\make-variants.js           (levels -20/-38/-48 dBFS + noise)
+     movie.wav: node -e "const W=require('./tests/rig/wav');W.writeWav('tests/rig/movie.wav',W.noise(48000*30,0.1,21),48000)"
+     node tests\rig\matrix.js V29-louder       (7-scenario table)
+     node tests\rig\run.js --build V29-louder --guest guest_quiet.wav --nc 0 --movie 1 --extra 1
+   Two headless Chromes with temporary profiles, fake mics fed from the WAVs,
+   real PeerJS + WebRTC over the internet. Records what each listener hears
+   and the raw incoming stream; scores level (dBFS), envelope match vs the
+   source, peaks/clipping, Opus kbps, jitter buffer, EC state, boost factor,
+   movie ducking timeline; --extra 1 also tests NC off/on, mic off/on and duck
+   restore; --gbuild runs the guest on another build; --long <s> long call.
+   Cannot measure real acoustic echo.
+
+C) Interactive two-tab page (tests\live): live.html + serve.js, fake tone mic,
+   ?role=host|guest&code=XXXXXX, &block=1 kills PeerJS signaling, &vol= mic
+   level. Probe with __flow() / __probe() in the console. Needs real clicks on
+   the mic button (AudioContext gesture).
+
+
+8. HARD-WON RULES / GOTCHAS
+---------------------------
+- PeerJS MediaConnection NEVER emits "open". Never defer anything to it and
+  never gate toggleMic / ensureMicIfWanted on a "call open" flag (V19/V20
+  total voice failure).
+- replaceTrack() is async; Chrome updates sender.track only after it
+  resolves. Always await before checking (V18-V21 "redial storm", garbled /
+  beeping voice).
+- Keep echo cancellation ON with NC. It was turned off in V19 to "fix
+  beeping" - the beeping was the redial storm. EC off = echo + movie leak on
+  laptop speakers.
+- Voice-line rules: mute != close; the callee always answers with an audio
+  slot (silent track if mic off); host always dials; never redial a healthy
+  line; requestVoiceRedial has a 5 s debounce.
+- Opus SDP must stay stereo=0 to match the mono mic.
+- Chrome's DynamicsCompressor adds automatic makeup gain (0.6 x reduction at
+  0 dBFS) - V28+ cancels it with a gain node (LIM_MAKEUP_UNDO).
+- Remote WebRTC audio reaches Web Audio only while a media element holds the
+  stream - keep #wt-remote-audio attached (muted).
+- PeerJS connect() returns undefined (no throw) when its server is
+  unreachable - guard it.
+- Direct mode: never close S.directPC while the link is up; the data channel
+  is already open when finishLink runs, so call onConnOpen() manually.
+- position:fixed UI must be re-parented into the fullscreen element.
+- Fake DOM uses .tag not .tagName; fake events need preventDefault in try.
+- In the harness a lone host cannot get a mic - pair a guest first.
+- When writing node one-liners in Git Bash, Windows paths with backslashes
+  and \u escapes get mangled inside heredocs/templates - use the Edit tool.
+- Both people must run the same (latest) version when judging voice fixes.
+
+
+9. OPEN ITEMS / NEXT STEPS
+--------------------------
+1. Install V29 on BOTH laptops (this laptop still runs V27) and do a real
+   call on a streaming site. Echo cancellation only helps the side that talks,
+   so Priya must have V29 too.
+2. If Priya is still faint on V29: confirm her NC (headphones) button is ON,
+   check her Windows microphone level / Lenovo mic settings. Possible next
+   tweaks: raise VB_MAX_AUTO above 16 (very quiet raw mic currently reaches
+   -24.4 dBFS), or add sender-side gain.
+3. If echo remains with both on V29: suggest headphones, or consider adding a
+   UI toggle for ducking / exposing DUCK_LEVEL.
+4. Any new work -> V30-<name> folder, port from V29, bump versions, extend
+   tests (and rig matrix for audio), zip wt-V30.zip to root + Downloads,
+   update CONTEXT-HANDOFF.md + this .txt, commit, push.
+
+
+10. KEY PATHS
+-------------
+Root:            C:\Users\Sourav\ML Coding\watch-together-versions\
+Current build:   ...\V29-louder\
+Current zip:     ...\wt-V29.zip  and  C:\Users\Sourav\Downloads\wt-V29.zip
+Tests:           ...\tests\test-V29.js, ...\tests\rig\, ...\tests\live\
+Handoff:         ...\CONTEXT-HANDOFF.md  and  ...\CONTEXT-HANDOFF.txt (this file)
+Chrome profile:  C:\Users\Sourav\AppData\Local\Google\Chrome\User Data\Default
