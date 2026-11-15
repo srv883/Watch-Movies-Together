@@ -1,7 +1,56 @@
 WATCH TOGETHER - DETAILED CONTEXT HANDOFF
 ==========================================
 As of: 15 Nov 2026
-Current version: V31 (manifest 1.31.0, EXT_VER "1.31.0"), folder V31-binge
+Current version: V32 (manifest 1.32.0, EXT_VER "1.32.0"), folder V32-sametitle
+(Sections below describe V31 and earlier in detail; V32 = V31 + section 0.)
+
+
+0. V32 IN SHORT (newest - read this first)
+------------------------------------------
+Files: V32-sametitle\, zip wt-V32.zip (root + Downloads) = wt-latest.zip;
+latest.json says 1.32.0. Tests: tests\test-V32.js 613/613 (section 34 = V32).
+Real-Chrome e2e: 44 checks, 44/44 in both clean full runs. NEVER run two e2e
+runs at the same time (shared ports 9411/9412 - they kill each other).
+Found by re-reading V31 against the users' history (party time was logged on
+Hotstar's HOME page = auto-playing trailers were driving the party):
+a) SYNC ONLY ON THE SAME TITLE. Every action / heartbeat / state / buf carries
+   k = title key (content id where the site has one: "hotstar:<id>" from
+   .../<id>/watch, "netflix:<id>"; else V31's site+path, legacyKey). Messages
+   about another title are ignored (no seek, pause, drift, re-sync or
+   buffering wait across episodes). On Hotstar/Netflix a page with no watch
+   URL whose video is short (< 300 s) or missing is the catalogue
+   (browsingNow): its events are not sent, remote actions are not applied,
+   heartbeat says away:true with no clock, nothing goes to watch history.
+   Long or endless (live) videos always sync. Status line: "Megha is browsing
+   - sync paused" / "... is on another video - sync paused" / "Connected to
+   ... - open the video to sync".
+b) NEWCOMERS ADOPT THE PARTY'S POSITION. A player is "fresh" for 6 s after it
+   is bound, after emptied/loadstart, after our own title change, and on a
+   page's FIRST link when the page is < 45 s old. While fresh: events without
+   a real gesture (pointer/key within 1.5 s) are not broadcast and trigger
+   "needstate"; state and hb carry fresh:true; a settled friend (and always
+   the host) ignores a fresh state; a fresh friend's hb is not used for
+   drift/re-sync. A tab that reloads mid-episode now rejoins at the friend's
+   position instead of dragging the friend to its start point. (pageYoung must
+   count only on the first link - e2e S14 caught the guest taking itself for
+   the newcomer when the HOST reloaded.)
+c) THE LINKED TAB WINS. Every open supported-site tab used to start its own
+   copy of the party. The linked tab writes wt_live {tab, at} each heartbeat
+   (tab id kept in sessionStorage); any other unlinked tab stands by (no
+   dialing, no backup route, no wt_status/wt_chat writes, status "The party
+   is running in your other tab") and takes over after 10 s of silence.
+d) Polish: untaken "Go there" offers leave after 20 s; nav carries pk (new
+   key format) plus prev (V31 format) so mixed 1.31/1.32 pairs auto-follow.
+   __wtVoiceDbg().sync = {mode, mine, friend, friendAway, browsing, fresh}.
+Harness (V32): video.dispatch of play/pause/seeked/ratechange first fires a
+document keydown (env.noGesture = true = the player acting on its own);
+env.stubFor[name] shares one chrome stub between tabs; I.closeTab();
+env.perfFor[name] = page age. Rig: all sessions on episode pages, host counts
+as Hotstar family, user(...) adds the key press, S13 trailers (/home, clip via
+stall.wav&at=999 for a finite duration), S14 reload mid-episode (&auto=1).
+V31 on these: S13 1/4, S14a fail.
+Next: install V32 on BOTH laptops; new work -> V33-<name> from V32.
+Not verified: a real two-laptop session on the real Hotstar site.
 Repo: https://github.com/srv883/Watch-Movies-Together (branch main)
 Local root: C:\Users\Sourav\ML Coding\watch-together-versions\
 

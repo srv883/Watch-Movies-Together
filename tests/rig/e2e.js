@@ -20,7 +20,8 @@ for (const b of new Set([BUILD, GBUILD])) {
   const src = fs.readFileSync(path.join(VERS, b, "content.js"), "utf8")
     .replace('if (!SITE_HOSTS.some(d => host === d || host.endsWith("." + d))) return;', "void SITE_HOSTS; // rig: guard bypassed")
     // the rig's pages count as a streaming site (follow-the-friend compares hosts)
-    .replace('const SITE_HOSTS = [', 'const SITE_HOSTS = ["127.0.0.1", ');
+    .replace('const SITE_HOSTS = [', 'const SITE_HOSTS = ["127.0.0.1", ')
+    .replace('const NAV_FAMILIES = { hotstar: [', 'const NAV_FAMILIES = { hotstar: ["127.0.0.1", ');
   fs.writeFileSync(path.join(www, "content.js"), src);
   fs.copyFileSync(path.join(VERS, b, "lib/peerjs.min.js"), path.join(www, "lib/peerjs.min.js"));
   fs.copyFileSync(path.join(VERS, b, "overlay.css"), path.join(www, "overlay.css"));
@@ -60,7 +61,7 @@ const server = http.createServer((q, r) => {
   let f = path.join(wwwRoot, decodeURIComponent(pth));
   // "episode" pages: /<build>/shows/<show>/<id>/<episode>/<id>/watch -> rig.html,
   // and their relative assets -> the build folder
-  if (parts.length > 2 && base === "watch") f = path.join(wwwRoot, parts[0], "rig.html");
+  if (parts.length > 1 && (base === "watch" || base === "home")) f = path.join(wwwRoot, parts[0], "rig.html");
   else if (parts.length > 2 && !fs.existsSync(f)) f = path.join(wwwRoot, parts[0], parts[parts.length - 2] === "lib" ? "lib" : "", base);
   fs.readFile(f, (e, d) => {
     if (e) { r.writeHead(404); return r.end(); }
@@ -121,6 +122,7 @@ const J = {
   pcs: `(async () => { const out = []; for (const pc of (window.__pcs || [])) { const o = { st: pc.connectionState, ice: pc.iceConnectionState, local: [], remote: [], pair: null }; try { const st = await pc.getStats(); st.forEach(r => { if (r.type === "local-candidate") o.local.push(r.candidateType); if (r.type === "remote-candidate") o.remote.push(r.candidateType); if (r.type === "candidate-pair" && r.nominated) o.pair = r.state; }); } catch (_) {} out.push(o); } return out; })()`,
   banner: `[...document.querySelectorAll(".wt-banner")].map(b => b.textContent).join(" | ")`,
 };
+const user = (js) => `(() => { document.dispatchEvent(new Event("keydown", { bubbles: true })); return (${js}); })()`;
 const chat = (text) => `(() => { const i = document.querySelector("#wt-input"); i.value = ${JSON.stringify(text)}; const f = document.querySelector("#wt-form"); f.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true })); return true; })()`;
 
 (async () => {
@@ -133,8 +135,8 @@ const chat = (text) => `(() => { const i = document.querySelector("#wt-input"); 
   const want = (id) => !ONLY || ONLY.includes(id);
   const waitFor = async (P, expr, pred, ms) => { const t = Date.now(); let v; while (Date.now() - t < ms) { try { v = await P.eval(expr); if (pred(v)) return { ok: true, ms: Date.now() - t, v }; } catch (_) {} await sleep(200); } return { ok: false, ms: Date.now() - t, v }; };
   const synced = (s) => /Synced with/.test(s);
-  const url = (role, extra = "", page = "rig.html") => `http://127.0.0.1:${sport}/${role === "guest" ? GBUILD : BUILD}/${page}?role=${role}&code=${code}&vid=1${extra}`;
   const EP = (slug, id) => `shows/the-office/1001/${slug}/${id}/watch`;
+  const url = (role, extra = "", page = EP("night-out", "2001")) => `http://127.0.0.1:${sport}/${role === "guest" ? GBUILD : BUILD}/${page}?role=${role}&code=${code}&vid=1${extra}`;
   const twoWayVoice = async (ms) => {
     const t = Date.now();
     const a0 = await H.eval(J.inPkts).catch(() => 0), b0 = await G.eval(J.inPkts).catch(() => 0);
@@ -146,7 +148,7 @@ const chat = (text) => `(() => { const i = document.querySelector("#wt-input"); 
     return { ok: false, ms: Date.now() - t, hostIn: (await H.eval(J.inPkts).catch(() => 0)) - a0, guestIn: (await G.eval(J.inPkts).catch(() => 0)) - b0 };
   };
   const newCode = () => ("E" + Math.random().toString(36).slice(2, 7)).toUpperCase().replace(/[^A-Z0-9]/g, "X").slice(0, 6);
-  async function boot(extraHost = "", extraGuest = "", page = "rig.html") {
+  async function boot(extraHost = "", extraGuest = "", page = EP("night-out", "2001")) {
     code = newCode();
     ch.forEach(c => { try { c.kill(); } catch (_) {} });
     if (ch.length) await sleep(1500);
@@ -169,34 +171,34 @@ const chat = (text) => `(() => { const i = document.querySelector("#wt-input"); 
     // ---------------- S2: playback sync ----------------
     if (want("S2")) {
       await sleep(1500);
-      await H.eval(`document.getElementById("vid").play().then(() => true)`, true);
+      await H.eval(user(`document.getElementById("vid").play().then(() => true)`), true);
       const p1 = await waitFor(G, J.vid, v => !v.paused && v.t > 0.3, 6000);
       rec("S2a", "host PLAY -> guest plays", p1.ok, { ms: p1.ms, guest: p1.v });
       await sleep(2500);
       const hv = await H.eval(J.vid), gv = await G.eval(J.vid);
       rec("S2b", "positions stay in sync while playing (<1.0 s)", Math.abs(hv.t - gv.t) < 1.0, { host: hv.t, guest: gv.t });
-      await H.eval(`document.getElementById("vid").pause(), true`, true);
+      await H.eval(user(`(document.getElementById("vid").pause(), true)`), true);
       const p2 = await waitFor(G, J.vid, v => v.paused, 6000);
       const hv2 = await H.eval(J.vid), gv2 = await G.eval(J.vid);
       rec("S2c", "host PAUSE -> guest pauses at same spot", p2.ok && Math.abs(hv2.t - gv2.t) < 0.8, { ms: p2.ms, host: hv2.t, guest: gv2.t });
-      await H.eval(`(() => { const v = document.getElementById("vid"); v.currentTime = 30; return true; })()`, true);
+      await H.eval(user(`(() => { const v = document.getElementById("vid"); v.currentTime = 30; return true; })()`), true);
       const p3 = await waitFor(G, J.vid, v => Math.abs(v.t - 30) < 0.8, 6000);
       rec("S2d", "host SEEK to 30 s -> guest follows", p3.ok, { ms: p3.ms, guest: p3.v });
-      await G.eval(`document.getElementById("vid").play().then(() => true)`, true);
+      await G.eval(user(`document.getElementById("vid").play().then(() => true)`), true);
       const p4 = await waitFor(H, J.vid, v => !v.paused, 6000);
       rec("S2e", "guest PLAY -> host plays (both directions)", p4.ok, { ms: p4.ms, host: p4.v });
       await sleep(1500);
-      await G.eval(`(() => { const v = document.getElementById("vid"); v.currentTime = 10; return true; })()`, true);
+      await G.eval(user(`(() => { const v = document.getElementById("vid"); v.currentTime = 10; return true; })()`), true);
       const p5 = await waitFor(H, J.vid, v => Math.abs(v.t - 10) < 1.5, 6000);
       rec("S2f", "guest SEEK to 10 s -> host follows", p5.ok, { ms: p5.ms, host: p5.v });
-      await H.eval(`(() => { document.getElementById("vid").playbackRate = 1.5; return true; })()`, true);
+      await H.eval(user(`(() => { document.getElementById("vid").playbackRate = 1.5; return true; })()`), true);
       const p6 = await waitFor(G, J.vid, v => Math.abs(v.rate - 1.5) < 0.01, 6000);
       rec("S2g", "host speed 1.5x -> guest 1.5x", p6.ok, { ms: p6.ms, guest: p6.v });
-      await H.eval(`(() => { document.getElementById("vid").playbackRate = 1; return true; })()`, true);
+      await H.eval(user(`(() => { document.getElementById("vid").playbackRate = 1; return true; })()`), true);
       await sleep(3000);
       const hv7 = await H.eval(J.vid), gv7 = await G.eval(J.vid);
       rec("S2h", "still in sync after speed changes (<1.0 s)", Math.abs(hv7.t - gv7.t) < 1.0, { host: hv7, guest: gv7 });
-      await H.eval(`document.getElementById("vid").pause(), true`, true);
+      await H.eval(user(`(document.getElementById("vid").pause(), true)`), true);
       await sleep(1200);
     }
 
@@ -318,7 +320,7 @@ const chat = (text) => `(() => { const i = document.querySelector("#wt-input"); 
       await waitFor(G, J.status, synced, 5000);
       if (r1.ok) {
         await sleep(1500);
-        await H.eval(`document.getElementById("vid").play().then(() => true)`, true);
+        await H.eval(user(`document.getElementById("vid").play().then(() => true)`), true);
         await waitFor(G, J.vid, v => !v.paused && v.t > 0.3, 6000);
         // host's download stops at 8 s of movie -> real buffering
         const hs = await waitFor(H, J.dbg, d => d && d.buf && d.buf.me, 25000);
@@ -354,6 +356,82 @@ const chat = (text) => `(() => { const i = document.querySelector("#wt-input"); 
         rec("S12f", "guest's data back -> both resume together (<1.0 s apart)", hr.ok && !g4.paused && Math.abs(h4.t - g4.t) < 1.0,
           { ms: hr.ms, host: h4, guest: g4 });
       } else rec("S12a", "buffering scenario connects", false, { hDbg: await H.eval(J.dbg).catch(() => null), gDbg: await G.eval(J.dbg).catch(() => null), hPcs: await H.eval(J.pcs).catch(() => null), gPcs: await G.eval(J.pcs).catch(() => null), gLog: await G.eval(J.log).catch(() => null) });
+    }
+
+    // ---------------- S13: catalogue trailers / another page never drive the party ----------------
+    if (want("S13")) {
+      await boot("&mic=0", "&mic=0&stall=t&at=999");
+      const r1 = await waitFor(H, J.status, synced, 30000);
+      await waitFor(G, J.status, synced, 5000);
+      if (r1.ok) {
+        await sleep(1500);
+        await H.eval(user(`document.getElementById("vid").play().then(() => true)`), true);
+        await waitFor(G, J.vid, v => !v.paused && v.t > 0.3, 6000);
+        await sleep(6000);
+        // Megha goes back to the catalogue (SPA, like Hotstar); the "trailer" there is this page's 60 s clip
+        await G.eval(`history.pushState({}, "", ${JSON.stringify("/" + GBUILD + "/home")}), true`);
+        const st = await waitFor(H, J.status, x => /browsing/i.test(x), 6000);
+        rec("S13a", "friend goes to the catalogue -> host is told sync is paused", st.ok, { ms: st.ms, host: st.v, guest: await G.eval(J.status), ...(st.ok ? {} : { gSync: await G.eval(`(() => { const d = window.__wtVoiceDbg(); const v = document.getElementById("vid"); return { sync: d.sync, nav: d.nav, href: location.href, dur: v.duration, log: window.__log.slice(-5) }; })()`).catch(e => String(e)), hSync: await H.eval(`window.__wtVoiceDbg().sync`).catch(e => String(e)) }) });
+        const h0 = await H.eval(J.vid);
+        // trailer restarts and pauses on the guest's page (what Hotstar's hero banner does on its own)
+        await G.eval(`(() => { const v = document.getElementById("vid"); v.currentTime = 1; v.pause(); return true; })()`);
+        await sleep(2500);
+        await G.eval(`document.getElementById("vid").play().then(() => true)`);
+        await sleep(4500);
+        const h1 = await H.eval(J.vid);
+        rec("S13b", "trailer seek/pause/play on the friend's side do not touch the host's episode",
+          !h1.paused && h1.t > h0.t + 5 && h1.t < h0.t + 9, { before: h0, after: h1 });
+        // host seeks while the friend is browsing: the trailer must not follow
+        const g0 = await G.eval(J.vid);
+        await H.eval(user(`(() => { const v = document.getElementById("vid"); v.currentTime = 40; return true; })()`), true);
+        await sleep(2000);
+        const g1 = await G.eval(J.vid);
+        rec("S13c", "host's seek does not move the friend's trailer", Math.abs(g1.t - 40) > 5, { guestBefore: g0, guestAfter: g1 });
+        // Megha opens the episode again: back in sync at the host's position, by itself
+        await G.eval(`history.pushState({}, "", ${JSON.stringify("/" + GBUILD + "/" + EP("night-out", "2001"))}), true`);
+        const back = await waitFor(G, J.status, synced, 8000);
+        await sleep(3000);
+        const h2 = await H.eval(J.vid), g2 = await G.eval(J.vid);
+        rec("S13d", "back on the episode -> synced again at the host's position (<1.0 s)", back.ok && !g2.paused && Math.abs(h2.t - g2.t) < 1.0,
+          { ms: back.ms, host: h2, guest: g2 });
+      } else rec("S13a", "trailer scenario connects", false, {});
+    }
+
+    // ---------------- S14: a tab that reloads mid-episode rejoins the party's position ----------------
+    if (want("S14")) {
+      await boot("&mic=0&auto=1", "&mic=0&auto=1");
+      const r1 = await waitFor(H, J.status, synced, 30000);
+      await waitFor(G, J.status, synced, 5000);
+      if (r1.ok) {
+        await sleep(8000);   // both settled (the players auto-started like a streaming site's)
+        await H.eval(user(`(() => { const v = document.getElementById("vid"); v.currentTime = 5; return v.play().then(() => true); })()`), true);   // (the clip is only 60 s long)
+        await waitFor(G, J.vid, v => !v.paused && v.t > 4.5, 6000);
+        await sleep(3000);
+        const g0 = await G.eval(J.vid);
+        // HOST tab reloads: its player auto-starts from 0 again
+        await H.send("Page.navigate", { url: url("host", "&mic=0&auto=1") });
+        const samples = [];
+        const t0 = Date.now();
+        while (Date.now() - t0 < 14000) { try { samples.push(await G.eval(J.vid)); } catch (_) {} await sleep(400); }
+        const r2 = await waitFor(H, J.status, synced, 30000);
+        await sleep(2500);
+        const h1 = await H.eval(J.vid), g1 = await G.eval(J.vid);
+        const minG = Math.min(...samples.map(x => x.t));
+        rec("S14a", "host reloads mid-episode -> the guest is never pulled back to the start", minG >= g0.t - 1.5, { guestBefore: g0.t, guestMin: minG, guestNow: g1 });
+        rec("S14b", "the reloaded host rejoins at the guest's position (<1.5 s)", r2.ok && !h1.paused && !g1.paused && Math.abs(h1.t - g1.t) < 1.5, { ms: r2.ms, host: h1, guest: g1 });
+        // GUEST tab reloads
+        const h2 = await H.eval(J.vid);
+        await G.send("Page.navigate", { url: url("guest", "&mic=0&auto=1") });
+        const hs = [];
+        const t1 = Date.now();
+        while (Date.now() - t1 < 14000) { try { hs.push(await H.eval(J.vid)); } catch (_) {} await sleep(400); }
+        const r3 = await waitFor(G, J.status, synced, 30000);
+        await sleep(2500);
+        const h3 = await H.eval(J.vid), g3 = await G.eval(J.vid);
+        const minH = Math.min(...hs.map(x => x.t));
+        rec("S14c", "guest reloads mid-episode -> the host is never pulled back", minH >= h2.t - 1.5 && !hs.some(x => x.paused), { hostBefore: h2.t, hostMin: minH, hostNow: h3 });
+        rec("S14d", "the reloaded guest rejoins at the host's position (<1.5 s)", r3.ok && !g3.paused && Math.abs(h3.t - g3.t) < 1.5, { ms: r3.ms, host: h3, guest: g3 });
+      } else rec("S14a", "reload scenario connects", false, {});
     }
   } catch (e) {
     rec("X", "harness", false, String(e && e.message || e));

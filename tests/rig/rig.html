@@ -165,7 +165,7 @@
 <script src="content.js"></script>
 </head>
 <body><h3 id="hdr"></h3><video id="vid" playsinline loop style="width:320px;height:180px;background:#000"></video>
-<script>(function(){ const q=window.__qs||new URLSearchParams(location.search); const v=document.getElementById("vid"); if(q.get("stall")){ v.src="stall.wav?id="+q.get("stall")+"&at="+(q.get("at")||"8")+"&n="+Date.now(); v.loop=false; v.volume=0.8; v.preload="auto"; } else if(q.get("movie")==="1"){ v.src="movie.wav"; v.volume=0.8; v.play().catch(()=>{}); } else if(q.get("vid")==="1"){ v.src="movie.wav"; v.loop=false; v.volume=0.8; v.preload="auto"; } else { v.muted=true; } })();</script>
+<script>(function(){ const q=window.__qs||new URLSearchParams(location.search); const v=document.getElementById("vid"); if(q.get("stall")){ v.src="stall.wav?id="+q.get("stall")+"&at="+(q.get("at")||"8")+"&n="+Date.now(); v.loop=false; v.volume=0.8; v.preload="auto"; } else if(q.get("movie")==="1"){ v.src="movie.wav"; v.volume=0.8; v.play().catch(()=>{}); } else if(q.get("vid")==="1"){ v.src="movie.wav"; v.loop=false; v.volume=0.8; v.preload="auto"; } else { v.muted=true; } if(q.get("auto")==="1"){ v.play().catch(()=>{}); } })();</script>
 <script>document.getElementById("hdr").textContent = "rig role: " + window.__role;</script>
 </body>
 </html>

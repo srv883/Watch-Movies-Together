@@ -49,3 +49,20 @@ V31 adds (30 checks, ~3 min):
   "Waiting for …" banner, never rewind, and both must resume < 1 s apart.
   V30 on the same scenario: the healthy side played on and the stalled side
   then skipped ~14 s of the episode.
+
+V32 adds (44 checks, ~4 min). ALL sessions now run on an "episode page"
+(`/<build>/shows/the-office/1001/night-out/2001/watch`) and the rig's host
+counts as the Hotstar family (content ids, catalogue detection). Every
+play/pause/seek the test performs is preceded by a synthetic key press
+(`user(...)`) - content.js only broadcasts a freshly loaded player's events
+when a real gesture came first.
+- **S13 catalogue trailers**: the guest goes to `/<build>/home` (SPA) where the
+  same clip plays as a "trailer" (it is loaded through the ranged `stall.wav`
+  route with `at=999` so it has a finite duration - the plain `movie.wav`
+  route reports an endless stream, which is never treated as a trailer). Its
+  seek/pause/play must not touch the host, the host's seek must not move it,
+  and going back to the episode re-syncs by itself. V31: 1/4.
+- **S14 reload mid-episode**: `&auto=1` auto-starts the clip on load like a
+  streaming site. Host tab reloads -> guest must never be pulled back and the
+  host rejoins at the guest's position; then the same with the guest. V31: the
+  guest was pulled from 8 s back to 4.7 s.
