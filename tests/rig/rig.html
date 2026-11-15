@@ -6,7 +6,12 @@
 <link rel="stylesheet" href="overlay.css" />
 <script>
 (() => {
-  const qs = new URLSearchParams(location.search);
+  // v31: a "follow the friend" page load arrives WITHOUT our query string -
+  // keep the rig's settings (and its storage) in sessionStorage like a real tab
+  let qs = new URLSearchParams(location.search);
+  if (!qs.get("role")) { try { qs = new URLSearchParams(sessionStorage.getItem("rigqs") || ""); } catch (_) {} }
+  try { sessionStorage.setItem("rigqs", qs.toString()); } catch (_) {}
+  window.__qs = qs;
   const role = qs.get("role") || "host";
   const code = (qs.get("code") || "RIG001").toUpperCase();
   window.__role = role;
@@ -20,7 +25,9 @@
   window.addEventListener("unhandledrejection", e => window.__log.push("unhandled: " + (e.reason && e.reason.stack || e.reason)));
 
   // per-tab chrome.storage stub
-  const store = { wt_party: { id: code, role, name: role === "host" ? "Sourav" : "Megha" } };
+  let saved = {};
+  try { saved = JSON.parse(sessionStorage.getItem("rigstore") || "{}") || {}; } catch (_) {}
+  const store = Object.assign(saved, { wt_party: { id: code, role, name: role === "host" ? "Sourav" : "Megha" } });
   if (qs.get("mic") === "1") store.wt_mic_state = true;
   if (qs.has("nc")) store.wt_nc = qs.get("nc") === "1";
   if (qs.has("vol")) store.wt_voice_vol = Number(qs.get("vol"));
@@ -29,7 +36,7 @@
     storage: {
       local: {
         get: async (k) => { const r = {}; (Array.isArray(k) ? k : [k]).forEach(x => { if (x in store) r[x] = store[x]; }); return r; },
-        set: async (o) => { const ch = {}; for (const k in o) { ch[k] = { oldValue: store[k], newValue: o[k] }; store[k] = o[k]; } listeners.forEach(f => f(ch, "local")); },
+        set: async (o) => { const ch = {}; for (const k in o) { ch[k] = { oldValue: store[k], newValue: o[k] }; store[k] = o[k]; } try { sessionStorage.setItem("rigstore", JSON.stringify(store)); } catch (_) {} listeners.forEach(f => f(ch, "local")); },
       },
       onChanged: { addListener: f => listeners.push(f) },
     },
@@ -158,7 +165,7 @@
 <script src="content.js"></script>
 </head>
 <body><h3 id="hdr"></h3><video id="vid" playsinline loop style="width:320px;height:180px;background:#000"></video>
-<script>(function(){ const q=new URLSearchParams(location.search); const v=document.getElementById("vid"); if(q.get("movie")==="1"){ v.src="movie.wav"; v.volume=0.8; v.play().catch(()=>{}); } else if(q.get("vid")==="1"){ v.src="movie.wav"; v.loop=false; v.volume=0.8; v.preload="auto"; } else { v.muted=true; } })();</script>
+<script>(function(){ const q=window.__qs||new URLSearchParams(location.search); const v=document.getElementById("vid"); if(q.get("stall")){ v.src="stall.wav?id="+q.get("stall")+"&at="+(q.get("at")||"8")+"&n="+Date.now(); v.loop=false; v.volume=0.8; v.preload="auto"; } else if(q.get("movie")==="1"){ v.src="movie.wav"; v.volume=0.8; v.play().catch(()=>{}); } else if(q.get("vid")==="1"){ v.src="movie.wav"; v.loop=false; v.volume=0.8; v.preload="auto"; } else { v.muted=true; } })();</script>
 <script>document.getElementById("hdr").textContent = "rig role: " + window.__role;</script>
 </body>
 </html>

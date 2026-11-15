@@ -1,0 +1,5 @@
+{
+  "version": "1.31.0",
+  "zip": "https://github.com/srv883/Watch-Movies-Together/raw/main/wt-V31.zip",
+  "notes": "Follows each other to the next episode, pauses while either of you is buffering, keeps the chat across episodes."
+}

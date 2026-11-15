@@ -32,3 +32,20 @@ reload, S7 all P2P links killed (Wi-Fi blip), S8 PeerJS server dies mid-party
 then link drops, S9 PeerJS server unreachable from the start (backup route),
 S10 guest opens before host. Page hooks: `&block=1` (PeerJS server
 unreachable), `&mic=1` (remembered mic ON), `__killLinks()`, `__killSignaling()`.
+
+V31 adds (30 checks, ~3 min):
+- **S11 follow the friend**: both tabs start on an "episode page"
+  (`/<build>/shows/the-office/1001/night-out/2001/watch` is served as rig.html);
+  the host changes episode the way Hotstar does (`history.pushState`), the
+  guest must show the countdown banner, load the new episode by itself,
+  reconnect, and still have the chat from before the page load. The rig keeps
+  its query string and its storage stub in `sessionStorage`, like a real tab
+  keeps chrome.storage.
+- **S12 buffering**: `&stall=<id>&at=<s>` plays `stall.wav`, which the rig
+  server delivers only up to `<s>` seconds of audio until `GET /__release?id=<id>`
+  - a REAL stall (`readyState` 2, `waiting`). Range requests are honoured
+  (without that Chrome restarts the download from 0 and the clip jumps back).
+  Host stalls at 8 s, then guest at 22 s: the other side must pause with a
+  "Waiting for …" banner, never rewind, and both must resume < 1 s apart.
+  V30 on the same scenario: the healthy side played on and the stalled side
+  then skipped ~14 s of the episode.

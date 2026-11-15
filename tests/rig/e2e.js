@@ -18,15 +18,50 @@ for (const b of new Set([BUILD, GBUILD])) {
   const www = path.join(wwwRoot, b);
   fs.mkdirSync(path.join(www, "lib"), { recursive: true });
   const src = fs.readFileSync(path.join(VERS, b, "content.js"), "utf8")
-    .replace('if (!SITE_HOSTS.some(d => host === d || host.endsWith("." + d))) return;', "void SITE_HOSTS; // rig: guard bypassed");
+    .replace('if (!SITE_HOSTS.some(d => host === d || host.endsWith("." + d))) return;', "void SITE_HOSTS; // rig: guard bypassed")
+    // the rig's pages count as a streaming site (follow-the-friend compares hosts)
+    .replace('const SITE_HOSTS = [', 'const SITE_HOSTS = ["127.0.0.1", ');
   fs.writeFileSync(path.join(www, "content.js"), src);
   fs.copyFileSync(path.join(VERS, b, "lib/peerjs.min.js"), path.join(www, "lib/peerjs.min.js"));
   fs.copyFileSync(path.join(VERS, b, "overlay.css"), path.join(www, "overlay.css"));
   fs.copyFileSync(path.join(__dirname, "rig.html"), path.join(www, "rig.html"));
   fs.copyFileSync(path.join(__dirname, "movie.wav"), path.join(www, "movie.wav"));
 }
+// stall.wav?id=X&at=S : the movie, but the download stops after S seconds of
+// audio until /__release?id=X - a REAL buffering stall for the <video>
+// Range requests are honoured (Chrome re-requests a stalled download from
+// where it stopped); bytes past the cut wait for the release. A new page load
+// (new n=) re-arms the stall.
+const stallOk = {}, stallPage = {}, stallLog = [];
+function serveStall(q, r, build, qp) {
+  const id = qp.get("id") || "x", at = Number(qp.get("at") || 8), n = qp.get("n") || "";
+  if (stallPage[id] !== n) { stallPage[id] = n; stallOk[id] = false; }
+  const buf = fs.readFileSync(path.join(wwwRoot, build, "movie.wav"));
+  const cut = Math.min(buf.length, 44 + Math.floor(buf.readUInt32LE(28) * at / 2) * 2);
+  let start = 0, end = buf.length - 1;
+  const m = /bytes=(\d+)-(\d*)/.exec(q.headers.range || "");
+  if (m) { start = Math.min(+m[1], buf.length - 1); if (m[2]) end = Math.min(+m[2], end); }
+  stallLog.push({ id, range: q.headers.range || null, t: Date.now() });
+  const hd = { "Content-Type": "audio/wav", "Cache-Control": "no-store", "Accept-Ranges": "bytes", "Content-Length": end - start + 1 };
+  if (m) hd["Content-Range"] = `bytes ${start}-${end}/${buf.length}`;
+  r.writeHead(m ? 206 : 200, hd);
+  const first = Math.max(start, Math.min(end + 1, stallOk[id] ? end + 1 : cut));
+  if (first > start) r.write(buf.subarray(start, first));
+  if (first > end) return r.end();
+  const t = setInterval(() => { if (stallOk[id]) { clearInterval(t); r.end(buf.subarray(first, end + 1)); } }, 100);
+  r.on("close", () => clearInterval(t));
+}
 const server = http.createServer((q, r) => {
-  const f = path.join(wwwRoot, decodeURIComponent(q.url.split("?")[0]));
+  const [pth, qstr] = q.url.split("?");
+  const parts = decodeURIComponent(pth).split("/").filter(Boolean);
+  if (parts[0] === "__release") { stallOk[new URLSearchParams(qstr || "").get("id")] = true; r.writeHead(200); return r.end("ok"); }
+  const base = parts[parts.length - 1] || "";
+  if (base === "stall.wav") return serveStall(q, r, parts[0], new URLSearchParams(qstr || ""));
+  let f = path.join(wwwRoot, decodeURIComponent(pth));
+  // "episode" pages: /<build>/shows/<show>/<id>/<episode>/<id>/watch -> rig.html,
+  // and their relative assets -> the build folder
+  if (parts.length > 2 && base === "watch") f = path.join(wwwRoot, parts[0], "rig.html");
+  else if (parts.length > 2 && !fs.existsSync(f)) f = path.join(wwwRoot, parts[0], parts[parts.length - 2] === "lib" ? "lib" : "", base);
   fs.readFile(f, (e, d) => {
     if (e) { r.writeHead(404); return r.end(); }
     const t = { ".html": "text/html", ".css": "text/css", ".js": "text/javascript", ".wav": "audio/wav" }[path.extname(f)] || "application/octet-stream";
@@ -83,6 +118,8 @@ const J = {
   inPkts: `(async () => { let n = 0; for (const pc of (window.__pcs||[])) { if (pc.connectionState !== "connected" || !pc.getTransceivers().length) continue; const st = await pc.getStats(); st.forEach(r => { if (r.type === "inbound-rtp" && r.kind === "audio") n += r.packetsReceived; }); } return n; })()`,
   inLevel: `(async () => { let lv = 0; for (const pc of (window.__pcs||[])) { if (pc.connectionState !== "connected" || !pc.getTransceivers().length) continue; const st = await pc.getStats(); st.forEach(r => { if (r.type === "inbound-rtp" && r.kind === "audio") lv = Math.max(lv, r.totalAudioEnergy || 0); }); } return lv; })()`,
   log: `window.__log.slice(-6)`,
+  pcs: `(async () => { const out = []; for (const pc of (window.__pcs || [])) { const o = { st: pc.connectionState, ice: pc.iceConnectionState, local: [], remote: [], pair: null }; try { const st = await pc.getStats(); st.forEach(r => { if (r.type === "local-candidate") o.local.push(r.candidateType); if (r.type === "remote-candidate") o.remote.push(r.candidateType); if (r.type === "candidate-pair" && r.nominated) o.pair = r.state; }); } catch (_) {} out.push(o); } return out; })()`,
+  banner: `[...document.querySelectorAll(".wt-banner")].map(b => b.textContent).join(" | ")`,
 };
 const chat = (text) => `(() => { const i = document.querySelector("#wt-input"); i.value = ${JSON.stringify(text)}; const f = document.querySelector("#wt-form"); f.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true })); return true; })()`;
 
@@ -96,7 +133,8 @@ const chat = (text) => `(() => { const i = document.querySelector("#wt-input"); 
   const want = (id) => !ONLY || ONLY.includes(id);
   const waitFor = async (P, expr, pred, ms) => { const t = Date.now(); let v; while (Date.now() - t < ms) { try { v = await P.eval(expr); if (pred(v)) return { ok: true, ms: Date.now() - t, v }; } catch (_) {} await sleep(200); } return { ok: false, ms: Date.now() - t, v }; };
   const synced = (s) => /Synced with/.test(s);
-  const url = (role, extra = "") => `http://127.0.0.1:${sport}/${role === "guest" ? GBUILD : BUILD}/rig.html?role=${role}&code=${code}&vid=1${extra}`;
+  const url = (role, extra = "", page = "rig.html") => `http://127.0.0.1:${sport}/${role === "guest" ? GBUILD : BUILD}/${page}?role=${role}&code=${code}&vid=1${extra}`;
+  const EP = (slug, id) => `shows/the-office/1001/${slug}/${id}/watch`;
   const twoWayVoice = async (ms) => {
     const t = Date.now();
     const a0 = await H.eval(J.inPkts).catch(() => 0), b0 = await G.eval(J.inPkts).catch(() => 0);
@@ -108,15 +146,16 @@ const chat = (text) => `(() => { const i = document.querySelector("#wt-input"); 
     return { ok: false, ms: Date.now() - t, hostIn: (await H.eval(J.inPkts).catch(() => 0)) - a0, guestIn: (await G.eval(J.inPkts).catch(() => 0)) - b0 };
   };
   const newCode = () => ("E" + Math.random().toString(36).slice(2, 7)).toUpperCase().replace(/[^A-Z0-9]/g, "X").slice(0, 6);
-  async function boot(extraHost = "", extraGuest = "") {
+  async function boot(extraHost = "", extraGuest = "", page = "rig.html") {
     code = newCode();
     ch.forEach(c => { try { c.kill(); } catch (_) {} });
+    if (ch.length) await sleep(1500);
     ch = [launch("eh", 9411, path.join(__dirname, "host.wav")), launch("eg", 9412, path.join(__dirname, "guest_normal.wav"))];
     H = await cdpPage(9411); G = await cdpPage(9412);
     for (const P of [H, G]) { await P.send("Page.enable"); await P.send("Runtime.enable"); }
-    await H.send("Page.navigate", { url: url("host", extraHost) });
+    await H.send("Page.navigate", { url: url("host", extraHost, page) });
     await sleep(600);
-    await G.send("Page.navigate", { url: url("guest", extraGuest) });
+    await G.send("Page.navigate", { url: url("guest", extraGuest, page) });
   }
 
   try {
@@ -221,7 +260,7 @@ const chat = (text) => `(() => { const i = document.querySelector("#wt-input"); 
       const n = await G.eval(`__killLinks()`);
       const r2 = await waitFor(G, J.status, synced, 60000);
       const r3 = await waitFor(H, J.status, synced, 8000);
-      rec("S8b", "server down + link drop -> reconnects anyway", r2.ok && r3.ok, { killed: n, ms: r2.ms, host: r3.v, guest: r2.v });
+      rec("S8b", "server down + link drop -> reconnects anyway", r2.ok && r3.ok, { killed: n, ms: r2.ms, host: r3.v, guest: r2.v, ...(r2.ok && r3.ok ? {} : { hDbg: await H.eval(J.dbg).catch(() => null), gDbg: await G.eval(J.dbg).catch(() => null), hLog: await H.eval(J.log).catch(() => null), gLog: await G.eval(J.log).catch(() => null) }) });
       if (r2.ok) { const v5 = await twoWayVoice(30000); rec("S8c", "voice back without the PeerJS server", v5.ok, v5); }
     }
 
@@ -243,10 +282,83 @@ const chat = (text) => `(() => { const i = document.querySelector("#wt-input"); 
       const r1 = await waitFor(G, J.status, synced, 45000);
       rec("S10", "guest opens first, host 12 s later -> connects", r1.ok, { ms: r1.ms, guest: r1.v });
     }
+
+    // ---------------- S11: follow the friend to the next episode ----------------
+    if (want("S11")) {
+      await boot("&mic=0", "&mic=0", EP("night-out", "2001"));
+      const r1 = await waitFor(H, J.status, synced, 30000);
+      const r1g = await waitFor(G, J.status, synced, 5000);
+      rec("S11a", "party on an episode page connects", r1.ok && r1g.ok, { ms: r1.ms, ...(r1.ok ? {} : { hDbg: await H.eval(J.dbg).catch(() => null), gDbg: await G.eval(J.dbg).catch(() => null), hPcs: await H.eval(J.pcs).catch(() => null), gPcs: await G.eval(J.pcs).catch(() => null), gLog: await G.eval(J.log).catch(() => null) }) });
+      if (r1.ok) {
+        const tag = "before-follow-" + Math.random().toString(36).slice(2, 6);
+        await H.eval(chat(tag), true);
+        await waitFor(G, J.msgs, m => m.some(x => x.includes(tag)), 5000);
+        await sleep(1500); // let the guest save its chat
+        const next = `/${BUILD}/` + EP("did-i-stutter", "2002");
+        await H.eval(`history.pushState({}, "", ${JSON.stringify(next)}), true`);   // Hotstar-style SPA episode change
+        const b = await waitFor(G, J.banner, t => /Sourav moved to The Office . Did I Stutter/.test(t), 6000);
+        rec("S11b", "guest sees 'Sourav moved to ... Did I Stutter - following in ...'", b.ok, { ms: b.ms, banner: b.v });
+        const n = await waitFor(G, `location.pathname`, p => p.endsWith("/did-i-stutter/2002/watch"), 12000);
+        rec("S11c", "guest's tab follows to the new episode by itself", n.ok, { ms: n.ms, at: n.v });
+        const r2 = await waitFor(G, J.status, synced, 40000);
+        const r3 = await waitFor(H, J.status, synced, 8000);
+        rec("S11d", "party reconnects on the new episode", r2.ok && r3.ok, { ms: r2.ms, guest: r2.v, host: r3.v });
+        const m = await waitFor(G, J.msgs, ms => ms.some(x => x.includes(tag)), 5000);
+        rec("S11e", "chat from before the page load is still there", m.ok, { lines: (m.v || []).length });
+        await sleep(3000);
+        const hb = await H.eval(J.banner);
+        rec("S11f", "host is not asked to follow back", !hb, { hostBanner: hb });
+      }
+    }
+
+    // ---------------- S12: buffering - host stalls, then guest stalls ----------------
+    if (want("S12")) {
+      await boot("&mic=0&stall=h&at=8", "&mic=0&stall=g&at=22");
+      const r1 = await waitFor(H, J.status, synced, 30000);
+      await waitFor(G, J.status, synced, 5000);
+      if (r1.ok) {
+        await sleep(1500);
+        await H.eval(`document.getElementById("vid").play().then(() => true)`, true);
+        await waitFor(G, J.vid, v => !v.paused && v.t > 0.3, 6000);
+        // host's download stops at 8 s of movie -> real buffering
+        const hs = await waitFor(H, J.dbg, d => d && d.buf && d.buf.me, 25000);
+        const gw = await waitFor(G, J.vid, v => v.paused, 4000);
+        const gb = await G.eval(J.banner);
+        rec("S12a", "host buffers -> guest pauses and shows 'Waiting for Sourav'", hs.ok && gw.ok && /Waiting for Sourav/.test(gb || ""),
+          { hostRs: hs.v && hs.v.buf && hs.v.buf.rs, ms: gw.ms, guest: gw.v, banner: gb });
+        // no rewind loop while the host is stuck
+        const samples = [];
+        for (let i = 0; i < 16; i++) { samples.push(await G.eval(J.vid)); await sleep(500); }
+        const back = samples.filter((s2, i) => i && s2.t < samples[i - 1].t - 1).length;
+        rec("S12b", "guest waits quietly (no rewinding, stays paused) while the host buffers", back === 0 && samples.every(s2 => s2.paused),
+          { backJumps: back, first: samples[0], last: samples[samples.length - 1] });
+        await fetch(`http://127.0.0.1:${sport}/__release?id=h`);
+        const gr = await waitFor(G, J.vid, v => !v.paused, 8000);
+        await sleep(2500);
+        const h2 = await H.eval(J.vid), g2 = await G.eval(J.vid);
+        rec("S12c", "host's data back -> both resume together (<1.0 s apart)", gr.ok && !h2.paused && Math.abs(h2.t - g2.t) < 1.0,
+          { ms: gr.ms, host: h2, guest: g2 });
+        // guest's download stops at 22 s of movie -> host waits
+        const gs = await waitFor(G, J.dbg, d => d && d.buf && d.buf.me, 25000);
+        const hw = await waitFor(H, J.vid, v => v.paused, 4000);
+        const hbn = await H.eval(J.banner);
+        rec("S12d", "guest buffers -> host pauses and shows 'Waiting for Megha'", gs.ok && hw.ok && /Waiting for Megha/.test(hbn || ""),
+          { ms: hw.ms, host: hw.v, banner: hbn });
+        await sleep(6000);
+        const g3 = await G.eval(J.vid);
+        rec("S12e", "buffering guest is not paused by the host's wait", !g3.paused, { guest: g3 });
+        await fetch(`http://127.0.0.1:${sport}/__release?id=g`);
+        const hr = await waitFor(H, J.vid, v => !v.paused, 8000);
+        await sleep(2500);
+        const h4 = await H.eval(J.vid), g4 = await G.eval(J.vid);
+        rec("S12f", "guest's data back -> both resume together (<1.0 s apart)", hr.ok && !g4.paused && Math.abs(h4.t - g4.t) < 1.0,
+          { ms: hr.ms, host: h4, guest: g4 });
+      } else rec("S12a", "buffering scenario connects", false, { hDbg: await H.eval(J.dbg).catch(() => null), gDbg: await G.eval(J.dbg).catch(() => null), hPcs: await H.eval(J.pcs).catch(() => null), gPcs: await G.eval(J.pcs).catch(() => null), gLog: await G.eval(J.log).catch(() => null) });
+    }
   } catch (e) {
     rec("X", "harness", false, String(e && e.message || e));
   } finally {
-    try { results.push({ id: "logs", host: await H.eval(J.log), guest: await G.eval(J.log) }); } catch (_) {}
+    try { results.push({ id: "logs", host: await H.eval(J.log), guest: await G.eval(J.log), stall: stallLog }); } catch (_) {}
     ch.forEach(c => { try { c.kill(); } catch (_) {} });
     server.close();
   }

@@ -1,7 +1,7 @@
 WATCH TOGETHER - DETAILED CONTEXT HANDOFF
 ==========================================
 As of: 15 Nov 2026
-Current version: V30 (manifest 1.30.0, EXT_VER "1.30.0"), folder V30-solidlink
+Current version: V31 (manifest 1.31.0, EXT_VER "1.31.0"), folder V31-binge
 Repo: https://github.com/srv883/Watch-Movies-Together (branch main)
 Local root: C:\Users\Sourav\ML Coding\watch-together-versions\
 
@@ -28,15 +28,18 @@ primevideo.com, jiotv.com, jiocinema.com.
 
 2. WORKING PROTOCOL (MUST FOLLOW)
 ---------------------------------
-- Strict per-version folders: V1 ... V30 inside the local root. NEVER edit or
+- Strict per-version folders: V1 ... V31 inside the local root. NEVER edit or
   overwrite an old version folder. Every change = copy the latest folder to
-  the next number (V31-<shortname>), then edit the copy.
+  the next number (V32-<shortname>), then edit the copy.
 - Bump BOTH manifest.json "version" and content.js EXT_VER together
-  (V31 -> "1.31.0"). Tests assert they match.
+  (V32 -> "1.32.0"). Tests assert they match.
+- Since V31 also: update latest.json (version, zip URL, notes) and copy the
+  new zip to wt-latest.zip in the repo root. The popup's "new version" notice
+  and the in-party update link read those two files from GitHub.
 - Copy the previous test suite to tests\test-V<N>.js, point it at the new
   folder, extend it, run until 0 failures:   node tests\test-V<N>.js
 - Run the REAL-CHROME end-to-end test before shipping:
-      node tests\rig\e2e.js --build V<N>-<name>        (24 checks, ~80 s)
+      node tests\rig\e2e.js --build V<N>-<name>        (36 checks, ~3.5 min)
   Audio changes: also  node tests\rig\matrix.js V<N>-<name>
 - Deliverable: zip the CONTENTS of the folder as wt-V<N>.zip in the root and
   copy it to C:\Users\Sourav\Downloads\ (PowerShell Compress-Archive -Path
@@ -59,6 +62,9 @@ primevideo.com, jiotv.com, jiocinema.com.
 - Chrome mic permission for https://www.hotstar.com is ALLOWED.
 - Saved settings: wt_name "sourav", host of party 4V89BD, mic state off,
   voice slider never moved, NC never toggled (default ON).
+- What they watch (watch history in the extension's storage): The Office on
+  Hotstar, episode after episode (URLs like /in/shows/the-office/<id>/
+  night-out/<id>/watch) -> motivated V31's follow-the-next-episode feature.
 - Real session history (from the extension's storage log):
     20 Oct  connected ~1.5 h, two drops that recovered in ~1 min
     24 Oct  3 attempts never connected: "Network hiccup" / "Still
@@ -77,12 +83,62 @@ primevideo.com, jiotv.com, jiocinema.com.
   broker.hivemq.com:8884 (9 s); public.mqtthq.com failed (not used).
 
 
-4. CURRENT STATE - V30 IN DETAIL
+4. CURRENT STATE - V31 IN DETAIL
 --------------------------------
-Files in V30-solidlink\: manifest.json, content.js (~3700 lines), overlay.css,
+Files in V31-binge\: manifest.json, content.js (~4300 lines), overlay.css,
 popup.html, popup.js, popup.css, lib\peerjs.min.js, icons\.
-Tests: tests\test-V30.js = 462 passed, 0 failed.
-Real-Chrome end-to-end (tests\rig\e2e.js): 24/24 in four separate runs.
+Tests: tests\test-V31.js = 545 passed, 0 failed (section 33 = V31).
+Real-Chrome end-to-end (tests\rig\e2e.js, 36 checks): 36/36 in 3 of 5 full
+runs. The other two runs each had one connection-setup failure between the
+two test Chromes on this PC (run 1: S8b did not re-link within 60 s - passed
+3/3 when re-run alone and in every later run; run 3: the last two fresh boots
+never linked - the guest's WebRTC dial timed out on both the PeerJS and the
+backup route). Those checks passed in all other runs; no V31 feature failed
+in a run where the browsers connected. The rig now records WebRTC states and
+candidate types (J.pcs) whenever a fresh boot fails to connect.
+  S11 follow: banner in 0.2-0.4 s, guest's tab moves to the new episode after
+      the 5 s countdown, party back in 2-5 s, chat restored, host not asked.
+  S12 buffering: host stall -> guest paused at once, never rewound, both
+      resume 0.05-0.07 s apart; guest stall -> host waits, same result.
+      V30 on S12: 4/8 (healthy side plays on, stalled side skips ~14 s).
+
+What V31 added (built for how they use it: The Office on Hotstar, binge):
+a) FOLLOW EACH OTHER TO THE NEXT EPISODE. Every second the page's site+path
+   is read (watchKey; watch pages only: /watch, /play/, /detail/, jiocinema
+   /movies|tv-shows/...; home/browse pages = null). When it changes mid-party
+   we send {t:"nav", href (origin+path only - never the query string), key,
+   prev, title}. The friend sees a banner at the top of the screen:
+     "Sourav moved to The Office . Did I Stutter - following in 5..."
+     [Go now] [Stay here]
+   and the tab loads that URL; the party rejoins by itself (it lives in
+   storage). Automatic only if both were on the same title and the friend
+   didn't pick something themselves in the last 8 s; otherwise just an offer
+   banner [Go there]. "hello" carries at/atTitle: a joining GUEST is taken to
+   the host's episode; the host is only offered the guest's. Only links on the
+   6 supported sites; javascript:, other sites and look-alike hosts ignored.
+b) BUFFERING HOLD. If our video is starved (readyState < 3 while playing) for
+   1.5 s we send {t:"buf", on:true}; the friend pauses right there (not
+   broadcast as a real pause) with "Waiting for Sourav - their video is
+   buffering..." [Play anyway]; when the data is back ({buf, on:false}) the
+   friend resumes from our spot. Both buffering -> nobody pauses while
+   starved, the first one ready waits. Max wait 45 s. Heartbeats carry
+   buf/hold flags; drift correction and the V30 re-sync stand down while
+   anyone buffers. A real play/pause from either side ends the wait.
+   Real-Chrome stall, V30 vs V31: on V30 the healthy side played on, got
+   rewound once, and the stalled side then SKIPPED ~14 s of the episode to
+   catch up; on V31 both wait and resume < 0.1 s apart.
+c) CHAT SURVIVES PAGE LOADS (wt_chat {room, items}, last 80 lines, 6 h):
+   following = a page load, so the conversation comes back (dimmed, above
+   the new lines). Same party code only.
+d) UPDATE NOTICE. The popup reads latest.json from the GitHub repo (raw.
+   githubusercontent.com, at most every 6 h, cached in wt_update; CORS is
+   open, no new permissions) and shows "New version X is out" [Download
+   update] + install steps + [Open chrome://extensions]. Download links are
+   pinned to this repo. In a party, the version-mismatch line now says WHO is
+   behind and links wt-latest.zip.
+e) The speaker icon and the pill glow green while the friend is talking.
+f) System lines in the chat render links. __wtVoiceDbg() adds buf {me,
+   friend, hold, ignore, rs} and nav {key, follow}.
 
 What V30 fixed (all found by the new end-to-end test; V29 failed these):
 a) SYNC - lost clicks. Each side ignored its own video events for 0.4 s
@@ -152,11 +208,16 @@ Mixed V30 <-> V29 works, but the V29 side keeps its sync bug and there is no
 backup route -> BOTH must install V30.
 
 NOT verified: real acoustic echo (needs real speakers + mic), and a real
-session between the two laptops on V30.
+session between the two laptops on V30/V31 on the real Hotstar site (the rig
+uses local pages that imitate Hotstar's URLs and a real stalled download).
 
 
 5. VERSION HISTORY (most recent first)
 --------------------------------------
+V31 binge (1.31.0, 545 tests)    Follow each other to the next episode; buffering
+                                 hold; chat survives page loads; popup update
+                                 notice (latest.json); friend-talking glow;
+                                 e2e S11/S12.
 V30 solidlink (1.30.0, 462 tests) Exact sync echo suppression + host re-sync;
                                  fast reconnect (replace dead link); no false
                                  "Network hiccup"; automatic encrypted backup
@@ -180,49 +241,57 @@ V14 longrun (208); V13 lowlatency (198); V12 remote-audio (192);
 V11 hist-voice (175); V10 dropfix-nc (136); V1-V9, cline-*, legacy: early builds.
 
 
-6. ARCHITECTURE MAP (V30-solidlink\content.js, approx. line numbers)
---------------------------------------------------------------------
+6. ARCHITECTURE MAP (V31-binge\content.js, approx. line numbers)
+----------------------------------------------------------------
    8  SITE_HOSTS + runtime host guard
-  16  EXT_VER          24 DC_VOICE_MIN_VER "1.26.0"     26 VOICE_ICE (STUN + PeerJS TURN)
- 129  bestVideo() - largest <video> >= 100x80 px is the synced player
- 172  ECHO_MS / expectEcho() / isEcho() - v30 exact echo suppression
- 186  onPlayPause()   211 onSeeked()   231 onRateChange()   (user actions -> send)
- 241  seekTo() (arms a time echo)   249 remotePlay()/remotePause()
- 286  applyRemote() - apply friend's play/pause/seek/rate/state
- 366  driftCheck()    387 reconcileWithHost() - v30 guest safety net
- 407  sendHb() - heartbeat ~4 s (also re-sends hello, runs healVoice)
- 688  voice boost constants (VB_*, LIM_*, DUCK_*)
- 771  duckTick()   791 vbTick()   818 setupVoiceBoost()
- 875  micConstraints()   887 getMicStream()   947 applyNcToLiveStream()
- 979  hotSwapMicTrack() (async)   1142 mungeOpus()
-1252  attachVoiceCall()   1315 makeDcCall() (+dialDcCall/answerDcCall)
-1454  healVoice()   1510 doSyncVoice() (host always dials)   1547 toggleMic()
-1590  startParty() (calls alStart)   1668 connectToHost()
-1717  acceptIncoming() - v30 replace a dead link on re-dial
-1737  handleErr() - ignores server errors while linked (v30)
-1798  onConnOpen()   1816 onConnClose()   1837 stopParty() (calls alStop)
-1878  onData() - message switch: hello, play/pause/seek/rate/state, hb, chat,
-      react, typing, voice, vrr, voffer/vanswer/vice/vbye, needstate ...
-2445  ensureUi() - panel and buttons (#wt-mic, #wt-nc-btn, #wt-voice-vol,
-      #wt-link-btn ...)
-3404  finishLink() - manual Direct connect
-3436  AL_RELAYS + backup route: 3454 alDerive (topic + AES key),
-      3467 alSocket (MQTT client), 3537 alOnRelay, 3581 alOffer,
-      3598 alAnswer, 3619 alLinkUp, 3643 alTick, 3664 alStart/alStop
- end  window.__wtVoiceDbg() - role, open, micEnabled, line, path, route
-      (peerjs/direct), relays, gotStream, friendVer, boost {...}
+  16  EXT_VER   24 DC_VOICE_MIN_VER "1.26.0"   26 UPDATE_URL (wt-latest.zip)
+  28  VOICE_ICE (STUN + PeerJS TURN)
+ 186  expectEcho() / isEcho() - v30 exact echo suppression
+ 201  userOverridesHold() - v31: a user action during a buffering wait wins
+      onPlayPause() / onSeeked() / onRateChange() follow (user actions -> send)
+ 308  applyRemote() - apply friend's play/pause/seek/rate/state (play/pause
+      end a buffering wait)
+ 391  driftCheck()   414 reconcileWithHost() (both stand down while buffering)
+ 437  helloMsg() - hello + at/atTitle (what we're watching)
+ 444  sendHb() - heartbeat ~4 s (+ buf/hold flags; re-sends hello; healVoice)
+ 470  v31 buffering hold: BUF_ARM_MS, HOLD_MAX_MS, 477 bufTick(),
+      504 startHold(), 516 endHold(), 528 onFriendBuf()
+ 543  showBanner()/hideBanner() - #wt-banners (top-centre cards)
+ 590  v31 follow: FOLLOW_SECS, NAV_CONFLICT_MS, parseHref/cleanHref,
+      613 watchKey(), 624 navLabel(), 650 navTick(), 667 offerFollow(),
+      719 onFriendNav(), 731 onFriendAt()
+1058  showTalking()   1117 vbTick()  (voice boost/ducking just above/below)
+1917  startParty() (alStart, restoreChat)   2026 scheduleRetry()
+2046  acceptIncoming()   2066 handleErr()   2127 onConnOpen()
+      onConnClose() (clears buffering state)   2172 stopParty()
+2218  onData() - message switch: hello (+at), play/pause/seek/rate/state, hb
+      (+buf), buf, nav, chat, react, typing, voice, vrr, voffer/vanswer/
+      vice/vbye, needstate
+2800  ensureUi()   ~3200 msgRow()/addMsg()/sysMsg()
+3242  v31 chat log: CHAT_KEEP, logLine(), saveChat(), 3261 restoreChat()
+3809  finishLink() - manual Direct connect
+3841  AL_RELAYS + backup route (alDerive, alSocket, alOnRelay, alOffer,
+      alAnswer, alLinkUp, alNeedLink, alTick, alStart/alStop)
+ end  window.__wtVoiceDbg() - role, open, micEnabled, line, path, route,
+      relays, gotStream, friendVer, boost {...}, buf {...}, nav {...}
 
-Popup (popup.js): SITES table -> siteFor(url); storage wt_party {id, role,
-name}, wt_status, wt_recent, wt_name. Content storage: wt_mic_state, wt_nc,
+Popup (popup.js): SITES table -> siteFor(url); v31 checkUpdate()/newerThan()/
+safeZip()/showUpdate(). Storage wt_party {id, role, name}, wt_status,
+wt_recent, wt_name, wt_update. Content storage: wt_mic_state, wt_nc,
 wt_voice_vol, wt_glass, wt_pos_root, wt_pos_quick, wt_react_freq,
-wt_react_recent, wt_history.
+wt_react_recent, wt_history, wt_chat.
 The site list lives in THREE places that must match: manifest matches,
 SITE_HOSTS in content.js, SITES[].hosts in popup.js (test 28a).
 
 
 7. TESTING
 ----------
-A) Fake harness:  node tests\test-V30.js   (462 checks, ~1 min)
+A) Fake harness:  node tests\test-V31.js   (545 checks, ~1.5 min)
+   Since V31 every fake tab is on the same title (/watch/80000001?wt=<name>;
+   env.locFor[name] overrides; location.assign records into env.navs);
+   runPopup(url, store, fetchImpl) is offline unless a test passes a fetch.
+   Section 33 = buffering hold, follow, chat restore, version line, talking
+   glow, popup update notice.
    Real content.js x2 in node vm: fake DOM, fake PeerJS, fake
    RTCPeerConnection (carries audio, simulates Direct mode), fake clock, real
    popup.js, and (section 32) an in-memory fake MQTT broker with real
@@ -232,12 +301,18 @@ A) Fake harness:  node tests\test-V30.js   (462 checks, ~1 min)
    Limits: the fake <video> never fires events by itself and fake links never
    die silently -> use B) for real behaviour.
 
-B) Real-Chrome end-to-end:  node tests\rig\e2e.js --build V30-solidlink
+B) Real-Chrome end-to-end:  node tests\rig\e2e.js --build V31-binge
    Two headless Chromes (temp profiles, never the user's), fake mics from TTS
-   WAVs, real PeerJS/WebRTC/MQTT over the internet; 24 checks (see section 4
-   table). Mixed versions: --gbuild V29-louder. Subset: --only S2,S3.
+   WAVs, real PeerJS/WebRTC/MQTT over the internet; 36 checks (section 4
+   table + S11 follow-the-friend, S12 buffering). Mixed versions: --gbuild
+   V30-solidlink. Subset: --only S2,S3.
    Page hooks: &block=1 (PeerJS server unreachable), &mic=1 (mic remembered
-   ON), __killLinks(), __killSignaling().
+   ON), __killLinks(), __killSignaling(), &stall=<id>&at=<s> (stall.wav: the
+   download stops after <s> s until GET /__release?id=<id>). Episode pages
+   /<build>/shows/the-office/1001/<slug>/<id>/watch are served as rig.html;
+   the rig keeps its query + storage stub in sessionStorage across a follow.
+   The rig server MUST honour Range requests for stall.wav (without it
+   Chrome restarts the download from 0 and the clip jumps back).
 
 C) Real-Chrome voice quality:  node tests\rig\matrix.js V30-solidlink
    7 scenarios (normal / quiet / very quiet, NC on/off, noise only, movie),
@@ -251,6 +326,10 @@ D) Interactive two-tab page: tests\live (live.html + serve.js).
 ---------------------------
 - Sync: never ignore video events by a time window - only the exact change
   we applied (V30). Never let play/pause disagreement persist silently.
+- Buffering: drift correction and the re-sync must stand down while either
+  side buffers (buf/hold flags) - positions are frozen on purpose (V31).
+- Follow: only ever navigate to origin+path on SITE_HOSTS; never carry the
+  friend's query string; arriving where we followed to is not "our own pick".
 - The PeerJS server is only needed to START a link: never treat its errors as
   a broken party while linked, and never refuse a friend's re-dial because we
   "still have" a link - it is probably dead (V30).
@@ -277,24 +356,32 @@ D) Interactive two-tab page: tests\live (live.html + serve.js).
 
 9. OPEN ITEMS / NEXT STEPS
 --------------------------
-1. Install V30 on BOTH laptops (this laptop still runs V27) and do a real
-   session on a streaming site.
+1. Install V31 on BOTH laptops (this laptop still runs V27) and do a real
+   session on Hotstar: change episode on one side -> the other follows;
+   from V31 on, the popup announces newer versions by itself.
 2. If voice is still faint: confirm the friend's NC (headphones) button is ON
    and her Windows mic level; possible tweak: raise VB_MAX_AUTO above 16.
 3. If echo remains with both on V30: headphones, or add a ducking/echo UI.
 4. If both PeerJS AND all three MQTT relays are blocked on someone's network,
    only manual Direct connect remains.
-5. New work -> V31-<name>: copy V30, bump versions, extend tests, run
-   e2e.js (+ matrix.js for audio), zip wt-V31.zip to root + Downloads,
-   update both handoffs, commit, push.
+5. Netflix: seeks still set video.currentTime; Netflix's player is known to
+   throw error M7375 on that. Fix = a MAIN-world script calling Netflix's own
+   player API - not done (untestable without a Netflix login; they watch
+   Hotstar). Prime Video episodes share one /detail/ URL, so follow works
+   per title there, not per episode.
+6. New work -> V32-<name>: copy V31, bump versions, extend tests, run
+   e2e.js (+ matrix.js for audio), zip wt-V32.zip to root + Downloads, copy
+   it to wt-latest.zip, update latest.json, update both handoffs, commit,
+   push.
 
 
 10. KEY PATHS
 -------------
 Root:            C:\Users\Sourav\ML Coding\watch-together-versions\
-Current build:   ...\V30-solidlink\
-Current zip:     ...\wt-V30.zip  and  C:\Users\Sourav\Downloads\wt-V30.zip
-Tests:           ...\tests\test-V30.js, ...\tests\rig\ (e2e.js, matrix.js,
+Current build:   ...\V31-binge\
+Current zip:     ...\wt-V31.zip  and  C:\Users\Sourav\Downloads\wt-V31.zip
+                 (+ ...\wt-latest.zip and ...\latest.json for the updater)
+Tests:           ...\tests\test-V31.js, ...\tests\rig\ (e2e.js, matrix.js,
                  run.js, rig.html, tts.ps1, make-variants.js, wav.js),
                  ...\tests\live\
 Handoff:         ...\CONTEXT-HANDOFF.md  and  ...\CONTEXT-HANDOFF.txt
