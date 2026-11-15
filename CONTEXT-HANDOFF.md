@@ -1,10 +1,18 @@
-# WATCH TOGETHER — Context Handoff (as of Nov 10, 2026)
+# WATCH TOGETHER — Context Handoff (as of Nov 15, 2026)
 
 ## Objective
-Maintain the personal "Watch Together" Chrome extension using strict **per-version folders** (`V1`–`V29`) inside `C:\Users\Sourav\ML Coding\watch-together-versions\`. NEVER overwrite an old version's folder; always create the next numbered folder. Deliverables are zips named `wt-V<N>.zip` in the same root and copied to `C:\Users\Sourav\Downloads\`. Push every commit to `https://github.com/srv883/Watch-Movies-Together`.
+Maintain the personal "Watch Together" Chrome extension using strict **per-version folders** (`V1`–`V30`) inside `C:\Users\Sourav\ML Coding\watch-together-versions\`. NEVER overwrite an old version's folder; always create the next numbered folder. Deliverables are zips named `wt-V<N>.zip` in the same root and copied to `C:\Users\Sourav\Downloads\`. Push every commit to `https://github.com/srv883/Watch-Movies-Together`.
 
 ## Current Shipped State
-- **V29** (`wt-V29.zip` — **delivered to `C:\Users\Sourav\Downloads\wt-V29.zip`** + canonical copy in versions root; manifest **1.29.0**, `EXT_VER="1.29.0"`): CURRENT shipping version. Folder `V29-louder\`. Tests `tests\test-V29.js`: **439 passed, 0 failed**. V28 + one change: auto-level target `VB_TARGET_RMS` 0.07 → **0.13 (~-17.7 dBFS)**. The full V27-vs-V28 rig matrix showed V28 played an AGC-levelled voice ~4 dB QUIETER than V27 (V27's compressor makeup gain had been lifting voices over the movie) — wrong direction for a user complaining the friend is faint.
+- **V30** (`wt-V30.zip` — **delivered to `C:\Users\Sourav\Downloads\wt-V30.zip`** + canonical copy in versions root; manifest **1.30.0**, `EXT_VER="1.30.0"`): CURRENT shipping version. Folder `V30-solidlink\`. Tests `tests\test-V30.js`: **462 passed, 0 failed**; real-Chrome end-to-end `tests\rig\e2e.js`: **24/24, four clean runs** (V29 failed 6 + 1 slow). BOTH sides must install V30 (the sync fixes and the backup route need both). Found by the new e2e test:
+  - **Sync: exact echo suppression** (`expectEcho`/`isEcho`, `remotePlay`/`remotePause`, `seekTo` arms a time echo): the old 400 ms `applyingRemote` window in `onPlayPause`/`onSeeked`/`onRateChange` also swallowed REAL clicks made just after a friend's action (guest play after a host seek never sent; speed change after a friend's seek never sent) → one side playing, the other paused, forever. Now only the one event we caused is ignored (one-shot, 2.5 s, seek match within 2 s).
+  - **Sync safety net** `reconcileWithHost` (from the `hb` handler, guest only): if play/pause or speed disagree with the host for 2 heartbeats in a row and nobody acted for 4 s, the guest adopts the host's state + "🔄 Re-synced with …".
+  - **Fast reconnect** `acceptIncoming`: a friend re-dialing (same peer id) or any dial while our link has been silent > 6 s replaces the old link immediately (host used to refuse until ICE gave up on the dead link: 43 s → 4.3 s in e2e S7).
+  - **handleErr while linked**: PeerJS server errors no longer flip the panel to "Network hiccup" when the party link is up (e2e S8a).
+  - **Automatic backup route** (`AL_*`, `alStart`/`alTick`/`alSocket`/`alOffer`/`alAnswer`/`alLinkUp`): if there's no live link for 6 s, both sides join public MQTT-over-WebSocket relays (emqx, mosquitto, hivemq — all three in parallel; minimal MQTT 3.1.1 client in content.js) on a topic = SHA-256 of the party code, exchange offer/answer (AES-GCM, key = PBKDF2(code)), and bring up the same direct RTCPeerConnection + data channel as Direct connect (`S.directMode`, `S.directPC`, voice over data link). Only the host offers. Relays stay closed while PeerJS works and close 30 s after a healthy link. User history showed whole evenings lost to 0.peerjs.com being unreachable (Oct 24 "Network hiccup…/Still reconnecting…", Nov 12 friend never got through). e2e: server down from the start → linked in ~15 s; server down + link drop → back in ~14 s, voice included.
+  - Voice unchanged from V29 (rig matrix within noise). `__wtVoiceDbg()` adds `route` (peerjs/direct) and `relays`.
+  - Mixed with V29: works, but the V29 side keeps the old sync bug (e2e S2e/S2h) and there is no backup route.
+- **V29** (`wt-V29.zip`, manifest 1.29.0): frozen. Folder `V29-louder\`. Tests 439 passed. V28 + one change: auto-level target `VB_TARGET_RMS` 0.07 → **0.13 (~-17.7 dBFS)**. The full V27-vs-V28 rig matrix showed V28 played an AGC-levelled voice ~4 dB QUIETER than V27 (V27's compressor makeup gain had been lifting voices over the movie) — wrong direction for a user complaining the friend is faint.
   - **Rig results V29** (heard dBFS; V27 → V29): normal -16.2 → -16.2, quiet(NC on) -17.1 → -15.3, very quiet(NC on) -16.7 → -15.4, quiet raw(NC off) -19.3 → -17.0 (×11.7), very quiet raw -26 → -24.4 (×16 cap), room noise -57.4 → -61.6 (not boosted). No clipping (peaks ≤ 0.72), envelope match 0.95–0.99 (V27 0.95–0.99 too), EC on, 52–63 kbps, movie 0.8 → 0.32 while talking and back to 0.8. Mid-call NC off/on, mic off/on verified.
   - Correction: an early single V27 run reported envelope 0.73 ("limiter squashed voices"); the full matrix did not reproduce it (V27 0.99) — it was an alignment fluke. The real V27→V28 difference was loudness (V27's +4 dB makeup gain), not clarity.
 - **V28** (`wt-V28.zip`, manifest 1.28.0): frozen. Folder `V28-clearvoice\`. Tests 438 passed. "Voice still not good" after V27 — measured on the new **real-Chrome rig** (`tests\rig\`, see its README) and fixed (BOTH sides should install it — echo cancellation works on the side that talks):
@@ -62,9 +70,10 @@ Maintain the personal "Watch Together" Chrome extension using strict **per-versi
 
 ## Architecture Notes
 - Core logic in `content.js` of each version folder; popup (`popup.html/js/css`) alongside. No background service worker.
-- Supported sites live in THREE places that must match: manifest `content_scripts.matches`, `SITE_HOSTS` at the top of content.js, and `SITES[].hosts` in popup.js. test-V29 section 28a fails if they drift.
-- Test harness: `tests\test-V29.js` — plain node script. Per-instance `makeInstance(env, name, preset, host, src)` (src = another build's content.js, e.g. V25 for mixed-version tests) seeds storage pre-boot (host defaults to `www.netflix.com`). `runPopup(url, store)` runs the real popup.js against a fake DOM built from popup.html ids.
-- Version alignment rule: manifest version == EXT_VER badge string (currently 1.29.0).
+- Supported sites live in THREE places that must match: manifest `content_scripts.matches`, `SITE_HOSTS` at the top of content.js, and `SITES[].hosts` in popup.js. test-V30 section 28a fails if they drift.
+- Test harness: `tests\test-V30.js` — plain node script. `env.FakeWS = makeFakeMqtt(env)` wires an in-memory MQTT broker (section 32 backup-route tests; real WebCrypto in the vm). Per-instance `makeInstance(env, name, preset, host, src)` (src = another build's content.js, e.g. V25 for mixed-version tests) seeds storage pre-boot (host defaults to `www.netflix.com`). `runPopup(url, store)` runs the real popup.js against a fake DOM built from popup.html ids.
+- Version alignment rule: manifest version == EXT_VER badge string (currently 1.30.0).
+- **Before shipping, run the real-Chrome end-to-end test** `node tests\rig\e2e.js --build <folder>` (24 checks: connect, play/pause/seek/speed sync both ways, chat, voice, reloads, link drop, PeerJS server down, guest-first). The fake harness's `<video>` never fires events on its own and its links never die silently — the e2e test is what found the V29 sync and reconnect bugs.
 - **Audio changes must be measured on the real-Chrome rig** (`tests\rig\`, `node tests\rig\matrix.js <build>`), not only the fake harness: the fake harness cannot hear. Echo cancellation itself cannot be measured there (no acoustic path) — only that it is enabled and does not degrade speech.
 - Git repo: `https://github.com/srv883/Watch-Movies-Together` — every version commit pushed here.
 
@@ -77,14 +86,18 @@ Maintain the personal "Watch Together" Chrome extension using strict **per-versi
 - Voice-line rules: mute ≠ close; answer always carries a slot; never redial while a line is healthy. `attachVoiceCall` hot-swaps the mic IMMEDIATELY (redial fallback) — PeerJS `MediaConnection` never emits `"open"`, so never defer to it and never gate `toggleMic` / `ensureMicIfWanted` on `callOpen` (that was the V19/V20 total-voice-failure bug, fixed in V21). The 5s debounce in `requestVoiceRedial` prevents redial storms. `replaceTrack` is async — always await it before reading `sender.track` (V26). Echo cancellation stays ON with NC (V28) — do not turn it off again to chase "beeping"; that was the redial storm.
 - Both sides must run the same version when testing voice fixes (user + friend were once on V21 vs V22).
 - Status strings during outages stay calm/stable.
+- Sync events: never ignore video events by time window — only the exact change we applied (`expectEcho`), or real clicks get lost (V30).
+- The PeerJS server is only needed to START a link; never treat its errors as a broken party while `isOpen()` (V30). Never refuse a friend's re-dial because we "still have" a link — it is probably dead (V30).
+- The friend's display name in real sessions is **Megha** (Priya in old notes/tests).
 - Bar input (`#wt-qtype-input`) is separate from overlay input (`#wt-qtype-overlay-input`). Tests must use correct IDs.
 
 ## Relevant Files
-- `C:\Users\Sourav\ML Coding\watch-together-versions\V29-louder\` — current version (v1.29.0): content.js, overlay.css, manifest.json, popup.html, popup.js, popup.css, lib/peerjs.min.js, icons/
-- `C:\Users\Sourav\Downloads\wt-V29.zip` — deliverable
-- `C:\Users\Sourav\ML Coding\watch-together-versions\tests\test-V29.js` — 439-check regression suite; `tests\rig\` — real-Chrome voice rig (TTS mics, scored); `tests\live\` — interactive two-tab voice page (`&vol=` sets the fake mic level)
-- `C:\Users\Sourav\ML Coding\watch-together-versions\V28-clearvoice\` + `wt-V28.zip` — frozen
+- `C:\Users\Sourav\ML Coding\watch-together-versions\V30-solidlink\` — current version (v1.30.0): content.js, overlay.css, manifest.json, popup.html, popup.js, popup.css, lib/peerjs.min.js, icons/
+- `C:\Users\Sourav\Downloads\wt-V30.zip` — deliverable
+- `C:\Users\Sourav\ML Coding\watch-together-versions\tests\test-V30.js` — 462-check regression suite; `tests\rig\` — real-Chrome rig: `e2e.js` (whole-session end-to-end) + `matrix.js`/`run.js` (voice quality, TTS mics, scored); `tests\live\` — interactive two-tab voice page (`&vol=` sets the fake mic level)
+- `C:\Users\Sourav\ML Coding\watch-together-versions\V29-louder\` + `wt-V29.zip` — frozen
 - Git push: `git add -A && git commit -m "..." && git push` from `watch-together-versions\`
 
 ## Next Move (when resumed)
-Nothing pending. Any new feature request → create `V30-*` folder, port from V29, bump manifest+EXT_VER together, extend test suite (+ rig matrix for audio changes), zip as wt-V30.zip, commit+push to GitHub.
+1. Install V30 on BOTH laptops (as of Nov 15 this laptop still ran V27 from `Downloads\wt-V27`) and do a real session.
+2. Any new request → create `V31-*` folder, port from V30, bump manifest+EXT_VER together, extend test suite, run `tests\rig\e2e.js` (+ rig matrix for audio changes), zip as wt-V31.zip, update CONTEXT-HANDOFF.md + CONTEXT-HANDOFF.txt, commit+push to GitHub.

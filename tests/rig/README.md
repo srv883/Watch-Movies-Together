@@ -19,3 +19,16 @@ echo-cancellation state, auto-boost factor, movie volume while the friend talks
 (`--movie 1`), and with `--extra 1` NC off/on, mic off/on and duck restore.
 Options: `--gbuild` (guest on another build), `--nc 0|1`, `--long <s>`.
 Generated files (wavs, prof-*, www, out-*, res-*) are git-ignored.
+
+## End-to-end session test (`e2e.js`)
+
+    node tests\rig\e2e.js --build V30-solidlink            # 24 checks, ~80 s
+    node tests\rig\e2e.js --build V30-solidlink --gbuild V29-louder --only S2,S3,S5,S7
+
+Needs `movie.wav` (60 s: `node -e "const W=require('./tests/rig/wav');W.writeWav('tests/rig/movie.wav',W.noise(48000*60,0.1,21),48000)"`)
+plus host.wav / guest_normal.wav. Scenarios: S1 connect, S2 play/pause/seek/speed
+sync both ways, S3 chat both ways, S4 two-way voice, S5 guest reload, S6 host
+reload, S7 all P2P links killed (Wi-Fi blip), S8 PeerJS server dies mid-party
+then link drops, S9 PeerJS server unreachable from the start (backup route),
+S10 guest opens before host. Page hooks: `&block=1` (PeerJS server
+unreachable), `&mic=1` (remembered mic ON), `__killLinks()`, `__killSignaling()`.

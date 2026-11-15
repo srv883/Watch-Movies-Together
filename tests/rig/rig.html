@@ -20,7 +20,8 @@
   window.addEventListener("unhandledrejection", e => window.__log.push("unhandled: " + (e.reason && e.reason.stack || e.reason)));
 
   // per-tab chrome.storage stub
-  const store = { wt_party: { id: code, role, name: role === "host" ? "Sourav" : "Priya" } };
+  const store = { wt_party: { id: code, role, name: role === "host" ? "Sourav" : "Megha" } };
+  if (qs.get("mic") === "1") store.wt_mic_state = true;
   if (qs.has("nc")) store.wt_nc = qs.get("nc") === "1";
   if (qs.has("vol")) store.wt_voice_vol = Number(qs.get("vol"));
   const listeners = [];
@@ -36,11 +37,20 @@
   };
 
   // optional: kill PeerJS signaling
-  window.__blockWs = qs.get("block") === "1";
+  // block=1: the PeerJS cloud server is unreachable (other websockets still work)
+  window.__blockPeer = qs.get("block") === "1";
+  window.__ws = [];
   const OrigWS = window.WebSocket;
   window.WebSocket = class extends OrigWS {
-    constructor(u, p) { super(window.__blockWs ? "ws://127.0.0.1:9/blocked" : u, p); }
+    constructor(u, p) {
+      const dead = window.__blockPeer && /peerjs/i.test(String(u));
+      super(dead ? "ws://127.0.0.1:9/blocked" : u, p);
+      window.__ws.push({ url: String(u), ws: this });
+    }
   };
+  window.__killSignaling = () => { window.__blockPeer = true; window.__ws.filter(x => /peerjs/i.test(x.url)).forEach(x => { try { x.ws.close(); } catch (_) {} }); return true; };
+  // simulate this side's network dropping every P2P link (data + voice)
+  window.__killLinks = () => { let n = 0; (window.__pcs || []).forEach(pc => { if (pc.connectionState !== "closed") { try { pc.close(); n++; } catch (_) {} } }); return n; };
 
   window.__pcs = [];
   const OrigPC = window.RTCPeerConnection;
@@ -148,7 +158,7 @@
 <script src="content.js"></script>
 </head>
 <body><h3 id="hdr"></h3><video id="vid" playsinline loop style="width:320px;height:180px;background:#000"></video>
-<script>(function(){ const q=new URLSearchParams(location.search); const v=document.getElementById("vid"); if(q.get("movie")==="1"){ v.src="movie.wav"; v.volume=0.8; v.play().catch(()=>{}); } else { v.muted=true; } })();</script>
+<script>(function(){ const q=new URLSearchParams(location.search); const v=document.getElementById("vid"); if(q.get("movie")==="1"){ v.src="movie.wav"; v.volume=0.8; v.play().catch(()=>{}); } else if(q.get("vid")==="1"){ v.src="movie.wav"; v.loop=false; v.volume=0.8; v.preload="auto"; } else { v.muted=true; } })();</script>
 <script>document.getElementById("hdr").textContent = "rig role: " + window.__role;</script>
 </body>
 </html>
