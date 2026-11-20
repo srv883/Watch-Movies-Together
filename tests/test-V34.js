@@ -3931,7 +3931,8 @@ console.log("\n--- 12e. error sweep ---");
     ok(/raw\.githubusercontent\.com\/\$Repo\/main\/latest\.json/.test(upd) && /notmatch .*\$Repo/.test(upd.replace(/\n/g, " ")), "37e: updater reads latest.json and refuses downloads outside the repo");
     ok(upd.indexOf('Copy-Item (Join-Path $x "manifest.json") $mf') > upd.indexOf("Get-ChildItem $x -Recurse -File"), "37e: updater writes manifest.json last (extension never sees a half-copied build)");
     const ins = fs.readFileSync("C:/Users/Sourav/ML Coding/watch-together-versions/tools/install-watch-together.ps1", "utf8");
-    ok(/Register-ScheduledTask -TaskName "Watch Together updater"/.test(ins) && /wscript\.exe/.test(ins), "37e: installer registers a hidden scheduled task");
+    ok(/GetFolderPath\("Startup"\)/.test(ins) && /-Quiet -Loop/.test(ins) && /--headless powershell\.exe/.test(ins), "37e: installer adds a hidden Startup-folder updater (Task Scheduler is blocked on some PCs)");
+    ok(/Local\\WatchTogetherUpdater/.test(upd) && /Start-Sleep -Seconds/.test(upd), "37e: the updater loop runs as a single copy and re-checks periodically");
   }
 
   console.log("\n============================================");

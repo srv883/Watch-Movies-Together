@@ -9,9 +9,12 @@
 #     .\install-watch-together.ps1 -InstallDir "C:\path\to\the\extension\folder"
 #
 # What it sets up: the extension files in -InstallDir, the updater script in
-# %LOCALAPPDATA%\WatchTogether, and a scheduled task for the current user
-# ("Watch Together updater", at logon + every 30 min). Remove it any time with
-#   Unregister-ScheduledTask -TaskName "Watch Together updater" -Confirm:$false
+# %LOCALAPPDATA%\WatchTogether, and a hidden updater that starts at logon
+# (a shortcut in your Startup folder, "Watch Together updater") and checks
+# GitHub every 30 minutes. (Startup folder, not Task Scheduler: some managed
+# Windows PCs silently block user scheduled tasks.)
+# Remove it any time: delete the shortcut
+#   %APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\Watch Together updater.lnk
 param(
   [string]$InstallDir = (Join-Path $env:LOCALAPPDATA "WatchTogether\extension")
 )
@@ -30,27 +33,35 @@ else {
   Invoke-WebRequest -Uri "https://raw.githubusercontent.com/$Repo/main/tools/wt-updater.ps1" -OutFile $updater -UseBasicParsing
 }
 
-# 2) a hidden launcher, so no PowerShell window flashes every 30 minutes
-$cmd = 'powershell.exe -NoProfile -ExecutionPolicy Bypass -File "' + $updater + '" -InstallDir "' + $InstallDir + '" -Quiet'
-@(
-  'Set sh = CreateObject("WScript.Shell")',
-  ('sh.Run "' + $cmd.Replace('"', '""') + '", 0, False')
-) | Set-Content -Path $launcher -Encoding ASCII
-
-# 3) install / update the extension files right now
+# 2) install / update the extension files right now
 & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $updater -InstallDir $InstallDir
 $ver = "?"
 try { $ver = (Get-Content (Join-Path $InstallDir "manifest.json") -Raw | ConvertFrom-Json).version } catch {}
 
-# 4) the scheduled task (current user, no admin needed)
-$action = New-ScheduledTaskAction -Execute "wscript.exe" -Argument ('"' + $launcher + '"')
-$every = New-ScheduledTaskTrigger -Once -At (Get-Date).AddMinutes(2) -RepetitionInterval (New-TimeSpan -Minutes 30) -RepetitionDuration (New-TimeSpan -Days 3650)
-$logon = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
-$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -ExecutionTimeLimit (New-TimeSpan -Minutes 10)
-Register-ScheduledTask -TaskName "Watch Together updater" -Action $action -Trigger @($every, $logon) -Settings $settings `
-  -Description "Installs new Watch Together versions from github.com/$Repo" -Force | Out-Null
+# 3) the hidden background updater: Startup-folder shortcut, started now as well
+$psArgs = '-NoProfile -ExecutionPolicy Bypass -File "' + $updater + '" -InstallDir "' + $InstallDir + '" -Quiet -Loop'
+$headless = $false
+try { $headless = [int](Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion").CurrentBuildNumber -ge 22000 } catch {}
+if ($headless) { $exe = "conhost.exe"; $args2 = "--headless powershell.exe " + $psArgs }
+else {
+  # older Windows: a tiny VBScript runs PowerShell with no window
+  @('Set sh = CreateObject("WScript.Shell")', ('sh.Run "powershell.exe ' + $psArgs.Replace('"', '""') + '", 0, False')) | Set-Content -Path $launcher -Encoding ASCII
+  $exe = "wscript.exe"; $args2 = '"' + $launcher + '"'
+}
+$startup = [Environment]::GetFolderPath("Startup")
+$lnk = Join-Path $startup "Watch Together updater.lnk"
+$sh = New-Object -ComObject WScript.Shell
+$s = $sh.CreateShortcut($lnk)
+$s.TargetPath = (Get-Command $exe).Source
+$s.Arguments = $args2
+$s.WindowStyle = 7
+$s.Description = "Installs new Watch Together versions from github.com/$Repo"
+$s.Save()
+# an earlier version of this installer used a scheduled task - remove it
+try { Unregister-ScheduledTask -TaskName "Watch Together updater" -Confirm:$false -ErrorAction Stop } catch {}
+Start-Process -FilePath (Get-Command $exe).Source -ArgumentList $args2 -WindowStyle Hidden
 
 Write-Host ""
 Write-Host "Watch Together $ver is in: $InstallDir" -ForegroundColor Green
-Write-Host "Automatic updates: on (every 30 minutes and at logon)."
+Write-Host "Automatic updates: on (checks GitHub every 30 minutes, starts with Windows)."
 Write-Host "First time only: Chrome -> chrome://extensions -> Developer mode -> Load unpacked -> pick the folder above."

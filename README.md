@@ -9,7 +9,7 @@ irm https://raw.githubusercontent.com/srv883/Watch-Movies-Together/main/tools/in
 ```
 
 Then, once: Chrome -> `chrome://extensions` -> Developer mode -> **Load unpacked** -> the folder it prints.
-A scheduled task ("Watch Together updater") checks this repo every 30 minutes and at logon; the extension reloads itself into a new version as soon as no watch party is running.
+A hidden updater (started with Windows from your Startup folder) checks this repo every 30 minutes; the extension reloads itself into a new version as soon as no watch party is running.
 
 Manual install instead: [wt-latest.zip](https://github.com/srv883/Watch-Movies-Together/raw/main/wt-latest.zip) (unzip -> Load unpacked; remove the old one first).
 

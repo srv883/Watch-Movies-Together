@@ -8,7 +8,7 @@ for everything else; Claude only if a key is saved) + push updates:
   ship a version:  node tools\release.js V<N>-name "notes"
   ship trivia:     edit trivia\*.json, commit, push (live within 6 h)
 Laptops with tools\install-watch-together.ps1 (scheduled task every 30
-min) install new versions themselves; the extension reloads itself when
+min, hidden, starts with Windows) install new versions themselves; the extension reloads itself when
 no party is running. See CONTEXT-HANDOFF.md "HOW TO SHIP".
 Tests: node --experimental-vm-modules tests\test-V34.js = 689/689; e2e 49/49.
 
