@@ -1,0 +1,934 @@
+{
+ "id": "mcu",
+ "title": "Marvel Cinematic Universe",
+ "note": "Written by Claude for Watch Together. Moments are approximate (fraction of the runtime, in scene order). Production facts, no spoilers beyond the moment.",
+ "entries": [
+  {
+   "names": [
+    "iron man"
+   ],
+   "title": "Iron Man (2008)",
+   "items": [
+    {
+     "p": 0.03,
+     "scene": "'Back in Black'",
+     "fact": "The film opens to AC/DC's 'Back in Black' - Iron Man's music has leaned on AC/DC ever since."
+    },
+    {
+     "p": 0.12,
+     "scene": "Casting",
+     "fact": "Robert Downey Jr. was a risky casting choice in 2008; director Jon Favreau fought for him."
+    },
+    {
+     "p": 0.25,
+     "scene": "The cave",
+     "fact": "Much of the dialogue was improvised - the script wasn't finished when filming began."
+    },
+    {
+     "p": 0.45,
+     "scene": "Happy Hogan",
+     "fact": "Director Jon Favreau also plays Tony's driver and bodyguard, Happy Hogan."
+    },
+    {
+     "p": 0.6,
+     "scene": "The party",
+     "fact": "Stan Lee's cameo: Tony mistakes him for Hugh Hefner."
+    },
+    {
+     "p": 0.97,
+     "scene": "After the credits",
+     "fact": "The post-credits scene with Samuel L. Jackson as Nick Fury launched the idea of a shared Marvel universe."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the incredible hulk",
+    "incredible hulk"
+   ],
+   "title": "The Incredible Hulk (2008)",
+   "items": [
+    {
+     "p": 0.08,
+     "scene": "Brazil",
+     "fact": "The opening was filmed in the Rocinha favela in Rio de Janeiro."
+    },
+    {
+     "p": 0.2,
+     "scene": "Bruce Banner",
+     "fact": "Edward Norton played Bruce Banner here; Mark Ruffalo took over from 'The Avengers' (2012) onward."
+    },
+    {
+     "p": 0.4,
+     "scene": "The soda",
+     "fact": "Stan Lee's cameo: he drinks a soda contaminated with Bruce's blood and gets sick."
+    },
+    {
+     "p": 0.6,
+     "scene": "The guard",
+     "fact": "Lou Ferrigno, the Hulk of the 1970s TV series, cameos as a security guard and voices the Hulk."
+    },
+    {
+     "p": 0.98,
+     "scene": "The bar",
+     "fact": "Tony Stark's surprise appearance at the end was one of the first MCU crossovers."
+    }
+   ]
+  },
+  {
+   "names": [
+    "iron man 2"
+   ],
+   "title": "Iron Man 2 (2010)",
+   "items": [
+    {
+     "p": 0.1,
+     "scene": "Rhodey",
+     "fact": "Don Cheadle replaced Terrence Howard as James 'Rhodey' Rhodes."
+    },
+    {
+     "p": 0.3,
+     "scene": "Natalie Rushman",
+     "fact": "Scarlett Johansson's first appearance as Black Widow."
+    },
+    {
+     "p": 0.6,
+     "scene": "The shield",
+     "fact": "Tony props up his particle accelerator with a prototype of Captain America's shield."
+    },
+    {
+     "p": 0.98,
+     "scene": "After the credits",
+     "fact": "The post-credits scene shows Thor's hammer in a New Mexico crater."
+    }
+   ]
+  },
+  {
+   "names": [
+    "thor"
+   ],
+   "title": "Thor (2011)",
+   "items": [
+    {
+     "p": 0.05,
+     "scene": "The director",
+     "fact": "Kenneth Branagh directed - known for Shakespeare films, which suited Asgard's royal drama."
+    },
+    {
+     "p": 0.3,
+     "scene": "Loki",
+     "fact": "Tom Hiddleston originally auditioned for Thor before being cast as Loki."
+    },
+    {
+     "p": 0.6,
+     "scene": "Hawkeye",
+     "fact": "Jeremy Renner's Clint Barton makes his first, brief appearance at the hammer site."
+    }
+   ]
+  },
+  {
+   "names": [
+    "captain america the first avenger",
+    "the first avenger",
+    "first avenger"
+   ],
+   "title": "Captain America: The First Avenger (2011)",
+   "items": [
+    {
+     "p": 0.1,
+     "scene": "Skinny Steve",
+     "fact": "'Skinny Steve' was created by digitally shrinking Chris Evans and combining him with a body double."
+    },
+    {
+     "p": 0.35,
+     "scene": "The USO show",
+     "fact": "The song 'Star Spangled Man' was written by Disney legend Alan Menken."
+    },
+    {
+     "p": 0.55,
+     "scene": "The director",
+     "fact": "Joe Johnston directed, chosen partly for his period adventure 'The Rocketeer'."
+    },
+    {
+     "p": 0.97,
+     "scene": "Times Square",
+     "fact": "The ending in modern Times Square leads straight into 'The Avengers'."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the avengers",
+    "marvels the avengers",
+    "avengers assemble"
+   ],
+   "title": "The Avengers (2012)",
+   "items": [
+    {
+     "p": 0.05,
+     "scene": "The director",
+     "fact": "Written and directed by Joss Whedon; it brought six heroes from five films together for the first time."
+    },
+    {
+     "p": 0.45,
+     "scene": "Hulk",
+     "fact": "Mark Ruffalo was the first actor to play the Hulk himself through motion capture."
+    },
+    {
+     "p": 0.75,
+     "scene": "'Puny god'",
+     "fact": "The Hulk-vs-Loki 'puny god' moment got some of the biggest laughs in cinemas."
+    },
+    {
+     "p": 0.9,
+     "scene": "Stan Lee",
+     "fact": "Stan Lee's cameo: a man on the news saying 'Superheroes in New York? Give me a break!'"
+    },
+    {
+     "p": 0.99,
+     "scene": "Shawarma",
+     "fact": "The shawarma scene was filmed after the premiere - Chris Evans wore a prosthetic jaw to hide a beard grown for another film."
+    }
+   ]
+  },
+  {
+   "names": [
+    "iron man 3"
+   ],
+   "title": "Iron Man 3 (2013)",
+   "items": [
+    {
+     "p": 0.05,
+     "scene": "Christmas",
+     "fact": "Director Shane Black sets many of his films at Christmas - this one too."
+    },
+    {
+     "p": 0.35,
+     "scene": "Tony's anxiety",
+     "fact": "Tony's panic attacks follow the events of 'The Avengers' - the MCU's first look at a hero's trauma."
+    },
+    {
+     "p": 0.7,
+     "scene": "The Mandarin",
+     "fact": "Ben Kingsley's Trevor Slattery returned years later in 'Shang-Chi'."
+    },
+    {
+     "p": 0.88,
+     "scene": "House Party Protocol",
+     "fact": "Tony's armour count reaches Mark 42 here - dozens of suits fly in for the finale."
+    }
+   ]
+  },
+  {
+   "names": [
+    "thor the dark world"
+   ],
+   "title": "Thor: The Dark World (2013)",
+   "items": [
+    {
+     "p": 0.05,
+     "scene": "The director",
+     "fact": "Alan Taylor, a Game of Thrones director, directed this film."
+    },
+    {
+     "p": 0.5,
+     "scene": "Loki's disguise",
+     "fact": "Chris Evans makes a cameo when Loki shape-shifts into Captain America."
+    },
+    {
+     "p": 0.97,
+     "scene": "The Collector",
+     "fact": "The mid-credits scene introduces Benicio del Toro's Collector and names an Infinity Stone."
+    }
+   ]
+  },
+  {
+   "names": [
+    "captain america the winter soldier"
+   ],
+   "title": "Captain America: The Winter Soldier (2014)",
+   "items": [
+    {
+     "p": 0.05,
+     "scene": "The directors",
+     "fact": "Anthony and Joe Russo's first MCU film - they went on to direct 'Civil War', 'Infinity War' and 'Endgame'."
+    },
+    {
+     "p": 0.15,
+     "scene": "Steve's notebook",
+     "fact": "Steve's catch-up list changes by country: different releases list different local pop-culture items."
+    },
+    {
+     "p": 0.4,
+     "scene": "Alexander Pierce",
+     "fact": "Robert Redford's casting nods to the 1970s political thrillers the Russos modelled the film on, like 'Three Days of the Condor'."
+    },
+    {
+     "p": 0.9,
+     "scene": "The Smithsonian",
+     "fact": "Stan Lee cameos as a Smithsonian security guard."
+    }
+   ]
+  },
+  {
+   "names": [
+    "guardians of the galaxy"
+   ],
+   "title": "Guardians of the Galaxy (2014)",
+   "items": [
+    {
+     "p": 0.05,
+     "scene": "Awesome Mix",
+     "fact": "The 'Awesome Mix Vol. 1' soundtrack topped the Billboard 200 - a first for an album made only of previously released songs."
+    },
+    {
+     "p": 0.3,
+     "scene": "Rocket",
+     "fact": "Bradley Cooper voices Rocket; director James Gunn's brother Sean Gunn did the on-set performance."
+    },
+    {
+     "p": 0.5,
+     "scene": "Groot",
+     "fact": "Vin Diesel recorded 'I am Groot' in several languages for international versions."
+    },
+    {
+     "p": 0.99,
+     "scene": "After the credits",
+     "fact": "The post-credits scene brings back Howard the Duck."
+    }
+   ]
+  },
+  {
+   "names": [
+    "avengers age of ultron",
+    "age of ultron"
+   ],
+   "title": "Avengers: Age of Ultron (2015)",
+   "items": [
+    {
+     "p": 0.2,
+     "scene": "Ultron",
+     "fact": "James Spader played Ultron through motion capture as well as voice."
+    },
+    {
+     "p": 0.45,
+     "scene": "Seoul",
+     "fact": "Part of the film was shot in Seoul, South Korea; Sokovia scenes used Italy's Aosta Valley."
+    },
+    {
+     "p": 0.65,
+     "scene": "Vision",
+     "fact": "Paul Bettany, the voice of JARVIS since 2008, finally appears on screen as Vision."
+    },
+    {
+     "p": 0.99,
+     "scene": "Thanos",
+     "fact": "Mid-credits: 'Fine, I'll do it myself.'"
+    }
+   ]
+  },
+  {
+   "names": [
+    "ant man"
+   ],
+   "title": "Ant-Man (2015)",
+   "items": [
+    {
+     "p": 0.02,
+     "scene": "1989",
+     "fact": "The opening de-ages Michael Douglas to 1989 - an early showcase of the de-aging effects Marvel used later."
+    },
+    {
+     "p": 0.2,
+     "scene": "The production",
+     "fact": "Edgar Wright developed the film for years before leaving; Peyton Reed directed and Paul Rudd co-wrote."
+    },
+    {
+     "p": 0.85,
+     "scene": "Thomas the Tank Engine",
+     "fact": "The finale's fight on a toy train set plays the scale joke to the full."
+    }
+   ]
+  },
+  {
+   "names": [
+    "captain america civil war"
+   ],
+   "title": "Captain America: Civil War (2016)",
+   "items": [
+    {
+     "p": 0.2,
+     "scene": "Black Panther",
+     "fact": "Chadwick Boseman's first appearance as T'Challa / Black Panther."
+    },
+    {
+     "p": 0.45,
+     "scene": "Spider-Man",
+     "fact": "Tom Holland debuts as Spider-Man, after a deal between Marvel Studios and Sony."
+    },
+    {
+     "p": 0.6,
+     "scene": "The airport",
+     "fact": "The airport battle was the first scene shot with the IMAX version of the Arri Alexa digital camera."
+    }
+   ]
+  },
+  {
+   "names": [
+    "doctor strange"
+   ],
+   "title": "Doctor Strange (2016)",
+   "items": [
+    {
+     "p": 0.25,
+     "scene": "The Ancient One",
+     "fact": "Tilda Swinton plays the Ancient One; Benedict Cumberbatch's schedule was moved so he could do the film."
+    },
+    {
+     "p": 0.55,
+     "scene": "The bus",
+     "fact": "Stan Lee's cameo: reading Aldous Huxley's 'The Doors of Perception' on a bus."
+    }
+   ]
+  },
+  {
+   "names": [
+    "guardians of the galaxy vol 2",
+    "guardians of the galaxy volume 2"
+   ],
+   "title": "Guardians of the Galaxy Vol. 2 (2017)",
+   "items": [
+    {
+     "p": 0.03,
+     "scene": "Baby Groot",
+     "fact": "The opening dance by Baby Groot is set to ELO's 'Mr. Blue Sky'."
+    },
+    {
+     "p": 0.4,
+     "scene": "Ego",
+     "fact": "Kurt Russell plays Ego; Sylvester Stallone appears as Stakar Ogord."
+    },
+    {
+     "p": 0.97,
+     "scene": "The credits",
+     "fact": "The film has five mid- and post-credits scenes."
+    }
+   ]
+  },
+  {
+   "names": [
+    "spider man homecoming"
+   ],
+   "title": "Spider-Man: Homecoming (2017)",
+   "items": [
+    {
+     "p": 0.2,
+     "scene": "The Vulture",
+     "fact": "Michael Keaton - Batman in 1989 and 'Birdman' - plays the Vulture."
+    },
+    {
+     "p": 0.4,
+     "scene": "The PSA videos",
+     "fact": "Captain America's cheesy school PSA videos are a running gag through the film."
+    },
+    {
+     "p": 0.99,
+     "scene": "After the credits",
+     "fact": "The final post-credits scene is a joke about patience."
+    }
+   ]
+  },
+  {
+   "names": [
+    "thor ragnarok"
+   ],
+   "title": "Thor: Ragnarok (2017)",
+   "items": [
+    {
+     "p": 0.05,
+     "scene": "'Immigrant Song'",
+     "fact": "Led Zeppelin's 'Immigrant Song', with its lyrics about Valhalla, plays in two fight scenes."
+    },
+    {
+     "p": 0.3,
+     "scene": "Korg",
+     "fact": "Director Taika Waititi also plays Korg through motion capture."
+    },
+    {
+     "p": 0.4,
+     "scene": "'Friend from work'",
+     "fact": "'He's a friend from work!' was suggested by a Make-A-Wish child visiting the set."
+    },
+    {
+     "p": 0.5,
+     "scene": "The Grandmaster",
+     "fact": "Jeff Goldblum improvised much of the Grandmaster's dialogue."
+    }
+   ]
+  },
+  {
+   "names": [
+    "black panther"
+   ],
+   "title": "Black Panther (2018)",
+   "items": [
+    {
+     "p": 0.05,
+     "scene": "The director",
+     "fact": "Ryan Coogler directed; it was the first superhero film nominated for Best Picture."
+    },
+    {
+     "p": 0.3,
+     "scene": "Wakanda",
+     "fact": "The film won Oscars for costume design, production design and Ludwig Göransson's score."
+    },
+    {
+     "p": 0.6,
+     "scene": "The soundtrack",
+     "fact": "Kendrick Lamar curated the companion album 'Black Panther: The Album'."
+    }
+   ]
+  },
+  {
+   "names": [
+    "avengers infinity war",
+    "infinity war"
+   ],
+   "title": "Avengers: Infinity War (2018)",
+   "items": [
+    {
+     "p": 0.1,
+     "scene": "Thanos",
+     "fact": "Josh Brolin played Thanos through performance capture; the film is built around him as the main character."
+    },
+    {
+     "p": 0.4,
+     "scene": "Eitri",
+     "fact": "The giant dwarf Eitri is played by Peter Dinklage."
+    },
+    {
+     "p": 0.6,
+     "scene": "Secrecy",
+     "fact": "Most actors got fake scripts or only their own pages to prevent leaks."
+    },
+    {
+     "p": 0.8,
+     "scene": "Back to back",
+     "fact": "Infinity War and Endgame were filmed largely back to back."
+    }
+   ]
+  },
+  {
+   "names": [
+    "ant man and the wasp"
+   ],
+   "title": "Ant-Man and the Wasp (2018)",
+   "items": [
+    {
+     "p": 0.2,
+     "scene": "Janet",
+     "fact": "Michelle Pfeiffer joins as Janet van Dyne, the original Wasp."
+    },
+    {
+     "p": 0.6,
+     "scene": "Luis",
+     "fact": "Michael Peña's Luis 'truth serum' story became a fan-favourite running gag."
+    }
+   ]
+  },
+  {
+   "names": [
+    "captain marvel"
+   ],
+   "title": "Captain Marvel (2019)",
+   "items": [
+    {
+     "p": 0.01,
+     "scene": "The Marvel logo",
+     "fact": "The opening Marvel logo was redone as a tribute to Stan Lee, who died months before release."
+    },
+    {
+     "p": 0.25,
+     "scene": "Blockbuster",
+     "fact": "Set in 1995 - Carol crash-lands into a Blockbuster Video store."
+    },
+    {
+     "p": 0.4,
+     "scene": "Young Fury",
+     "fact": "Samuel L. Jackson was digitally de-aged for the entire film."
+    },
+    {
+     "p": 0.55,
+     "scene": "Goose",
+     "fact": "Goose the 'cat' was played by several cats."
+    },
+    {
+     "p": 0.7,
+     "scene": "The train",
+     "fact": "Stan Lee's cameo: reading the script of 'Mallrats' on a train."
+    }
+   ]
+  },
+  {
+   "names": [
+    "avengers endgame"
+   ],
+   "title": "Avengers: Endgame (2019)",
+   "items": [
+    {
+     "p": 0.1,
+     "scene": "Five years later",
+     "fact": "Endgame briefly became the highest-grossing film of all time, before an 'Avatar' re-release took the record back."
+    },
+    {
+     "p": 0.35,
+     "scene": "'I love you 3000'",
+     "fact": "The line came from Robert Downey Jr.'s own children."
+    },
+    {
+     "p": 0.88,
+     "scene": "'Avengers assemble'",
+     "fact": "The first time the full 'Avengers, assemble' line is said in an MCU film."
+    }
+   ]
+  },
+  {
+   "names": [
+    "spider man far from home"
+   ],
+   "title": "Spider-Man: Far From Home (2019)",
+   "items": [
+    {
+     "p": 0.3,
+     "scene": "Europe",
+     "fact": "Filmed in Venice, Prague and London."
+    },
+    {
+     "p": 0.5,
+     "scene": "Mysterio",
+     "fact": "Jake Gyllenhaal plays Mysterio; his illusion sequences were built with heavy VFX."
+    },
+    {
+     "p": 0.99,
+     "scene": "After the credits",
+     "fact": "J.K. Simmons returns as J. Jonah Jameson - the role he played in Sam Raimi's Spider-Man films."
+    }
+   ]
+  },
+  {
+   "names": [
+    "black widow"
+   ],
+   "title": "Black Widow (2021)",
+   "items": [
+    {
+     "p": 0.1,
+     "scene": "Yelena",
+     "fact": "Florence Pugh's Yelena Belova debuts here."
+    },
+    {
+     "p": 0.4,
+     "scene": "'Posing'",
+     "fact": "Yelena's teasing about Natasha's 'superhero landing' pose pokes fun at Marvel's own action clichés."
+    },
+    {
+     "p": 0.6,
+     "scene": "The director",
+     "fact": "Cate Shortland directed; the story is set between 'Civil War' and 'Infinity War'."
+    }
+   ]
+  },
+  {
+   "names": [
+    "shang chi and the legend of the ten rings",
+    "shang chi"
+   ],
+   "title": "Shang-Chi and the Legend of the Ten Rings (2021)",
+   "items": [
+    {
+     "p": 0.2,
+     "scene": "The bus fight",
+     "fact": "The bus fight was choreographed by the late Brad Allan, a longtime member of Jackie Chan's stunt team."
+    },
+    {
+     "p": 0.4,
+     "scene": "Wenwu",
+     "fact": "Hong Kong legend Tony Leung plays Wenwu."
+    },
+    {
+     "p": 0.6,
+     "scene": "Trevor",
+     "fact": "Ben Kingsley returns as Trevor Slattery from 'Iron Man 3'."
+    }
+   ]
+  },
+  {
+   "names": [
+    "eternals"
+   ],
+   "title": "Eternals (2021)",
+   "items": [
+    {
+     "p": 0.05,
+     "scene": "The director",
+     "fact": "Chloé Zhao directed right after winning the Oscar for 'Nomadland'."
+    },
+    {
+     "p": 0.4,
+     "scene": "On location",
+     "fact": "Zhao filmed much on real locations, including the Canary Islands, instead of green screen."
+    },
+    {
+     "p": 0.99,
+     "scene": "Eros",
+     "fact": "Harry Styles appears as Eros in the mid-credits scene."
+    }
+   ]
+  },
+  {
+   "names": [
+    "spider man no way home",
+    "no way home"
+   ],
+   "title": "Spider-Man: No Way Home (2021)",
+   "items": [
+    {
+     "p": 0.2,
+     "scene": "Matt Murdock",
+     "fact": "Charlie Cox appears as Matt Murdock - his first MCU film appearance after Netflix's Daredevil."
+    },
+    {
+     "p": 0.6,
+     "scene": "The secret",
+     "fact": "Andrew Garfield publicly denied being in the film for months before release."
+    },
+    {
+     "p": 0.75,
+     "scene": "The villains",
+     "fact": "Willem Dafoe and Alfred Molina returned to their Sam Raimi-era roles."
+    }
+   ]
+  },
+  {
+   "names": [
+    "doctor strange in the multiverse of madness",
+    "multiverse of madness"
+   ],
+   "title": "Doctor Strange in the Multiverse of Madness (2022)",
+   "items": [
+    {
+     "p": 0.05,
+     "scene": "The director",
+     "fact": "Sam Raimi, director of the 2000s Spider-Man trilogy and Evil Dead, returned to superhero films."
+    },
+    {
+     "p": 0.4,
+     "scene": "Pizza Poppa",
+     "fact": "Bruce Campbell - a Raimi regular - cameos as the street vendor Pizza Poppa."
+    },
+    {
+     "p": 0.55,
+     "scene": "The Illuminati",
+     "fact": "Patrick Stewart returns as Professor X in the Illuminati scene."
+    }
+   ]
+  },
+  {
+   "names": [
+    "thor love and thunder",
+    "love and thunder"
+   ],
+   "title": "Thor: Love and Thunder (2022)",
+   "items": [
+    {
+     "p": 0.3,
+     "scene": "The goats",
+     "fact": "Thor's goats Toothgnasher and Toothgrinder come straight from Norse myth, where they pull Thor's chariot."
+    },
+    {
+     "p": 0.5,
+     "scene": "Gorr",
+     "fact": "Christian Bale - Batman in The Dark Knight trilogy - plays Gorr the God Butcher."
+    },
+    {
+     "p": 0.7,
+     "scene": "Guns N' Roses",
+     "fact": "The soundtrack leans heavily on Guns N' Roses, including 'Sweet Child o' Mine'."
+    }
+   ]
+  },
+  {
+   "names": [
+    "black panther wakanda forever",
+    "wakanda forever"
+   ],
+   "title": "Black Panther: Wakanda Forever (2022)",
+   "items": [
+    {
+     "p": 0.03,
+     "scene": "The logo",
+     "fact": "The silent Marvel logo is a tribute to Chadwick Boseman, who died in 2020."
+    },
+    {
+     "p": 0.4,
+     "scene": "Talokan",
+     "fact": "Namor's underwater kingdom Talokan was redesigned with Mesoamerican (Maya and Aztec) influences."
+    },
+    {
+     "p": 0.95,
+     "scene": "'Lift Me Up'",
+     "fact": "Rihanna's 'Lift Me Up' was written as a tribute to Boseman."
+    }
+   ]
+  },
+  {
+   "names": [
+    "ant man and the wasp quantumania",
+    "quantumania"
+   ],
+   "title": "Ant-Man and the Wasp: Quantumania (2023)",
+   "items": [
+    {
+     "p": 0.3,
+     "scene": "The Quantum Realm",
+     "fact": "Much of the Quantum Realm was filmed on an LED 'Volume' stage, like the one used for The Mandalorian."
+    },
+    {
+     "p": 0.5,
+     "scene": "Lord Krylar",
+     "fact": "Bill Murray cameos as Lord Krylar."
+    }
+   ]
+  },
+  {
+   "names": [
+    "guardians of the galaxy vol 3",
+    "guardians of the galaxy volume 3"
+   ],
+   "title": "Guardians of the Galaxy Vol. 3 (2023)",
+   "items": [
+    {
+     "p": 0.02,
+     "scene": "'Creep'",
+     "fact": "The film opens with an acoustic version of Radiohead's 'Creep'."
+    },
+    {
+     "p": 0.8,
+     "scene": "The hallway",
+     "fact": "The hallway fight is presented as one continuous shot, set to the Beastie Boys' 'No Sleep till Brooklyn'."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the marvels"
+   ],
+   "title": "The Marvels (2023)",
+   "items": [
+    {
+     "p": 0.1,
+     "scene": "Ms. Marvel",
+     "fact": "Iman Vellani continues as Kamala Khan from the Ms. Marvel series."
+    },
+    {
+     "p": 0.5,
+     "scene": "The flerkens",
+     "fact": "The flerken rescue is set to 'Memory' from the musical 'Cats'."
+    },
+    {
+     "p": 0.97,
+     "scene": "The length",
+     "fact": "At about 105 minutes it is the shortest MCU film."
+    }
+   ]
+  },
+  {
+   "names": [
+    "deadpool and wolverine"
+   ],
+   "title": "Deadpool & Wolverine (2024)",
+   "items": [
+    {
+     "p": 0.03,
+     "scene": "'Bye Bye Bye'",
+     "fact": "The opening fight is set to *NSYNC's 'Bye Bye Bye'."
+    },
+    {
+     "p": 0.3,
+     "scene": "Rated R",
+     "fact": "It is the first R-rated film of the MCU and became the highest-grossing R-rated film ever."
+    },
+    {
+     "p": 0.6,
+     "scene": "The Void",
+     "fact": "Hugh Jackman finally wears the classic yellow-and-blue Wolverine suit."
+    }
+   ]
+  },
+  {
+   "names": [
+    "captain america brave new world"
+   ],
+   "title": "Captain America: Brave New World (2025)",
+   "items": [
+    {
+     "p": 0.05,
+     "scene": "The new Cap",
+     "fact": "Anthony Mackie's Sam Wilson headlines his first film as Captain America."
+    },
+    {
+     "p": 0.3,
+     "scene": "President Ross",
+     "fact": "Harrison Ford took over Thaddeus Ross after William Hurt's death in 2022."
+    }
+   ]
+  },
+  {
+   "names": [
+    "thunderbolts"
+   ],
+   "title": "Thunderbolts* (2025)",
+   "items": [
+    {
+     "p": 0.05,
+     "scene": "The jump",
+     "fact": "Florence Pugh performed the opening jump from Kuala Lumpur's Merdeka 118, one of the world's tallest buildings, on a rig."
+    },
+    {
+     "p": 0.5,
+     "scene": "Bob",
+     "fact": "Lewis Pullman plays Bob, a mysterious man the team keeps running into."
+    },
+    {
+     "p": 0.97,
+     "scene": "The asterisk",
+     "fact": "The asterisk in the title is a joke the film pays off at the end."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the fantastic four first steps",
+    "fantastic four first steps"
+   ],
+   "title": "The Fantastic Four: First Steps (2025)",
+   "items": [
+    {
+     "p": 0.05,
+     "scene": "Earth-828",
+     "fact": "Set in a retro-futurist 1960s on 'Earth-828' - a nod to Jack Kirby's birthday, 28 August."
+    },
+    {
+     "p": 0.3,
+     "scene": "The family",
+     "fact": "Pedro Pascal, Vanessa Kirby, Joseph Quinn and Ebon Moss-Bachrach play the Fantastic Four."
+    },
+    {
+     "p": 0.5,
+     "scene": "The director",
+     "fact": "Matt Shakman, director of 'WandaVision', directed; Michael Giacchino composed the score."
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,1026 @@
+{
+ "id": "game-of-thrones",
+ "title": "Game of Thrones",
+ "note": "Written by Claude for Watch Together. Moments are approximate (fraction of the runtime, in scene order). Production facts only - no spoilers beyond the episode.",
+ "entries": [
+  {
+   "names": [
+    "winter is coming"
+   ],
+   "title": "Game of Thrones – Winter Is Coming (S1E1)",
+   "items": [
+    {
+     "p": 0.04,
+     "scene": "Beyond the Wall",
+     "fact": "The first pilot was largely reshot - several roles were recast, including Catelyn and Daenerys."
+    },
+    {
+     "p": 0.2,
+     "scene": "Winterfell",
+     "fact": "Winterfell's courtyard in Season 1 was filmed at Castle Ward in Northern Ireland."
+    },
+    {
+     "p": 0.35,
+     "scene": "The direwolf pups",
+     "fact": "The direwolf pups were played by Northern Inuit dogs in the early seasons; Sophie Turner later adopted the dog who played Lady."
+    },
+    {
+     "p": 0.97,
+     "scene": "The tower",
+     "fact": "'The things I do for love' - the ending shocked viewers who hadn't read George R. R. Martin's book."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the kingsroad",
+    "kingsroad"
+   ],
+   "title": "Game of Thrones – The Kingsroad (S1E2)",
+   "items": [
+    {
+     "p": 0.3,
+     "scene": "Tyrion and Jon",
+     "fact": "Peter Dinklage was Benioff and Weiss's first and only choice for Tyrion."
+    },
+    {
+     "p": 0.85,
+     "scene": "Lady",
+     "fact": "Sophie Turner liked the dog who played Lady so much that her family adopted her after filming."
+    }
+   ]
+  },
+  {
+   "names": [
+    "lord snow"
+   ],
+   "title": "Game of Thrones – Lord Snow (S1E3)",
+   "items": [
+    {
+     "p": 0.3,
+     "scene": "Castle Black",
+     "fact": "Castle Black and the base of the Wall were built in a disused quarry at Magheramorne, Northern Ireland."
+    },
+    {
+     "p": 0.85,
+     "scene": "Syrio's lesson",
+     "fact": "Syrio Forel's 'water dancing' lessons were choreographed to look like Braavosi fencing - Miltos Yerolemou trained for weeks."
+    }
+   ]
+  },
+  {
+   "names": [
+    "cripples bastards and broken things",
+    "cripples bastards"
+   ],
+   "title": "Game of Thrones – Cripples, Bastards, and Broken Things (S1E4)",
+   "items": [
+    {
+     "p": 0.3,
+     "scene": "Tyrion's saddle",
+     "fact": "Tyrion designs a special saddle so Bran can ride again - a small kindness the show kept from the book."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the wolf and the lion"
+   ],
+   "title": "Game of Thrones – The Wolf and the Lion (S1E5)",
+   "items": [
+    {
+     "p": 0.6,
+     "scene": "The Small Council",
+     "fact": "Several scenes between Robert and Cersei were written for the show - they have no direct counterpart in the book."
+    },
+    {
+     "p": 0.9,
+     "scene": "Ned vs. Jaime",
+     "fact": "The street fight between Ned and Jaime was filmed in Malta, which stood in for King's Landing in Season 1."
+    }
+   ]
+  },
+  {
+   "names": [
+    "a golden crown",
+    "golden crown"
+   ],
+   "title": "Game of Thrones – A Golden Crown (S1E6)",
+   "items": [
+    {
+     "p": 0.9,
+     "scene": "The crown",
+     "fact": "Viserys's 'golden crown' was created with practical make-up and visual effects; Harry Lloyd played Viserys."
+    }
+   ]
+  },
+  {
+   "names": [
+    "you win or you die"
+   ],
+   "title": "Game of Thrones – You Win or You Die (S1E7)",
+   "items": [
+    {
+     "p": 0.35,
+     "scene": "Littlefinger's monologue",
+     "fact": "Critic Myles McNutt coined the word 'sexposition' about scenes like this one, where backstory is told during a brothel scene."
+    },
+    {
+     "p": 0.6,
+     "scene": "The title",
+     "fact": "'When you play the game of thrones, you win or you die' - Cersei's line gave the episode its title."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the pointy end",
+    "pointy end"
+   ],
+   "title": "Game of Thrones – The Pointy End (S1E8)",
+   "items": [
+    {
+     "p": 0.15,
+     "scene": "Syrio's stand",
+     "fact": "'The first sword of Braavos does not run' - Syrio's last stand happens off-screen in the book as well."
+    }
+   ]
+  },
+  {
+   "names": [
+    "baelor"
+   ],
+   "title": "Game of Thrones – Baelor (S1E9)",
+   "items": [
+    {
+     "p": 0.1,
+     "scene": "The title",
+     "fact": "The episode is named after the Great Sept of Baelor in King's Landing."
+    },
+    {
+     "p": 0.95,
+     "scene": "The steps of the Sept",
+     "fact": "Killing the main star in episode 9 became the show's signature: the penultimate episode of each season is usually the biggest."
+    }
+   ]
+  },
+  {
+   "names": [
+    "fire and blood"
+   ],
+   "title": "Game of Thrones – Fire and Blood (S1E10)",
+   "items": [
+    {
+     "p": 0.97,
+     "scene": "The dragons",
+     "fact": "The final image of Daenerys with three baby dragons was one of the most expensive VFX shots of Season 1."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the north remembers"
+   ],
+   "title": "Game of Thrones – The North Remembers (S2E1)",
+   "items": [
+    {
+     "p": 0.15,
+     "scene": "King's Landing",
+     "fact": "From Season 2, King's Landing was filmed mainly in Dubrovnik, Croatia, instead of Malta."
+    },
+    {
+     "p": 0.5,
+     "scene": "Dragonstone",
+     "fact": "Stephen Dillane joins as Stannis Baratheon, with Carice van Houten as Melisandre."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the night lands",
+    "night lands"
+   ],
+   "title": "Game of Thrones – The Night Lands (S2E2)",
+   "items": [
+    {
+     "p": 0.5,
+     "scene": "Pyke",
+     "fact": "The Iron Islands were filmed at Ballintoy harbour in Northern Ireland."
+    }
+   ]
+  },
+  {
+   "names": [
+    "what is dead may never die"
+   ],
+   "title": "Game of Thrones – What Is Dead May Never Die (S2E3)",
+   "items": [
+    {
+     "p": 0.4,
+     "scene": "Brienne",
+     "fact": "Gwendoline Christie trained for months for Brienne of Tarth - she gained muscle and cut her hair for the role."
+    }
+   ]
+  },
+  {
+   "names": [
+    "garden of bones"
+   ],
+   "title": "Game of Thrones – Garden of Bones (S2E4)",
+   "items": [
+    {
+     "p": 0.7,
+     "scene": "Qarth",
+     "fact": "Qarth's exteriors were filmed in Croatia, around Dubrovnik and the island of Lokrum."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the ghost of harrenhal",
+    "ghost of harrenhal"
+   ],
+   "title": "Game of Thrones – The Ghost of Harrenhal (S2E5)",
+   "items": [
+    {
+     "p": 0.6,
+     "scene": "Harrenhal",
+     "fact": "Charles Dance's scenes with Maisie Williams at Harrenhal were invented for the show - in the book Arya serves Roose Bolton instead."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the old gods and the new"
+   ],
+   "title": "Game of Thrones – The Old Gods and the New (S2E6)",
+   "items": [
+    {
+     "p": 0.75,
+     "scene": "Beyond the Wall",
+     "fact": "The snowy scenes beyond the Wall were filmed in Iceland from Season 2 onwards."
+    }
+   ]
+  },
+  {
+   "names": [
+    "a man without honor",
+    "man without honor"
+   ],
+   "title": "Game of Thrones – A Man Without Honor (S2E7)",
+   "items": [
+    {
+     "p": 0.5,
+     "scene": "Jaime and his cousin",
+     "fact": "Nikolaj Coster-Waldau's chained Jaime scenes were a showcase that convinced many viewers the character was more than a villain."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the prince of winterfell",
+    "prince of winterfell"
+   ],
+   "title": "Game of Thrones – The Prince of Winterfell (S2E8)",
+   "items": [
+    {
+     "p": 0.5,
+     "scene": "Preparing for battle",
+     "fact": "This episode sets up 'Blackwater', the show's first full battle episode."
+    }
+   ]
+  },
+  {
+   "names": [
+    "blackwater"
+   ],
+   "title": "Game of Thrones – Blackwater (S2E9)",
+   "items": [
+    {
+     "p": 0.05,
+     "scene": "The writer",
+     "fact": "'Blackwater' was written by George R. R. Martin himself and directed by Neil Marshall (The Descent)."
+    },
+    {
+     "p": 0.2,
+     "scene": "Bronn's song",
+     "fact": "Bronn and the soldiers sing 'The Rains of Castamere'; the indie band The National recorded a version that plays over the end credits."
+    },
+    {
+     "p": 0.45,
+     "scene": "Wildfire",
+     "fact": "HBO gave the battle extra budget - it was the first episode the whole hour was set in one place."
+    }
+   ]
+  },
+  {
+   "names": [
+    "valar morghulis"
+   ],
+   "title": "Game of Thrones – Valar Morghulis (S2E10)",
+   "items": [
+    {
+     "p": 0.6,
+     "scene": "Jaqen's coin",
+     "fact": "'Valar morghulis' - 'all men must die' in High Valyrian. The language was expanded for the show by linguist David J. Peterson."
+    },
+    {
+     "p": 0.97,
+     "scene": "The army of the dead",
+     "fact": "The season ends on the first big reveal of the White Walkers' army, filmed in Iceland."
+    }
+   ]
+  },
+  {
+   "names": [
+    "valar dohaeris"
+   ],
+   "title": "Game of Thrones – Valar Dohaeris (S3E1)",
+   "items": [
+    {
+     "p": 0.2,
+     "scene": "The title",
+     "fact": "'Valar dohaeris' - 'all men must serve' - is the traditional reply to 'valar morghulis'."
+    },
+    {
+     "p": 0.8,
+     "scene": "Astapor",
+     "fact": "Astapor's slave city was filmed in Essaouira, Morocco."
+    }
+   ]
+  },
+  {
+   "names": [
+    "dark wings dark words"
+   ],
+   "title": "Game of Thrones – Dark Wings, Dark Words (S3E2)",
+   "items": [
+    {
+     "p": 0.4,
+     "scene": "Lady Olenna",
+     "fact": "Diana Rigg (Emma Peel in 'The Avengers' TV series) joins as Olenna Tyrell, the Queen of Thorns."
+    }
+   ]
+  },
+  {
+   "names": [
+    "walk of punishment"
+   ],
+   "title": "Game of Thrones – Walk of Punishment (S3E3)",
+   "items": [
+    {
+     "p": 0.97,
+     "scene": "The end credits",
+     "fact": "The end credits play 'The Bear and the Maiden Fair' by the rock band The Hold Steady."
+    }
+   ]
+  },
+  {
+   "names": [
+    "and now his watch is ended"
+   ],
+   "title": "Game of Thrones – And Now His Watch Is Ended (S3E4)",
+   "items": [
+    {
+     "p": 0.9,
+     "scene": "Dracarys",
+     "fact": "Emilia Clarke learned her High Valyrian speech phonetically; the reveal that Daenerys speaks it was kept from viewers until this moment."
+    }
+   ]
+  },
+  {
+   "names": [
+    "kissed by fire"
+   ],
+   "title": "Game of Thrones – Kissed by Fire (S3E5)",
+   "items": [
+    {
+     "p": 0.6,
+     "scene": "The bath",
+     "fact": "Jaime's bath confession to Brienne is one of Nikolaj Coster-Waldau's most praised scenes."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the bear and the maiden fair"
+   ],
+   "title": "Game of Thrones – The Bear and the Maiden Fair (S3E7)",
+   "items": [
+    {
+     "p": 0.05,
+     "scene": "The writer",
+     "fact": "This episode was written by George R. R. Martin."
+    },
+    {
+     "p": 0.9,
+     "scene": "The bear pit",
+     "fact": "The bear was a real trained bear named Bart the Bear 2, filmed separately in the US and composited into the scene."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the rains of castamere",
+    "rains of castamere"
+   ],
+   "title": "Game of Thrones – The Rains of Castamere (S3E9)",
+   "items": [
+    {
+     "p": 0.5,
+     "scene": "The Twins",
+     "fact": "George R. R. Martin based this storyline on two real Scottish massacres: the Black Dinner (1440) and the Glencoe massacre (1692)."
+    },
+    {
+     "p": 0.75,
+     "scene": "The song",
+     "fact": "Benioff and Weiss said this was the scene that made them want to adapt the books in the first place."
+    }
+   ]
+  },
+  {
+   "names": [
+    "mhysa"
+   ],
+   "title": "Game of Thrones – Mhysa (S3E10)",
+   "items": [
+    {
+     "p": 0.95,
+     "scene": "Mhysa",
+     "fact": "'Mhysa' means 'mother' in Ghiscari; the closing crowd scene was filmed in Morocco with hundreds of extras."
+    }
+   ]
+  },
+  {
+   "names": [
+    "two swords"
+   ],
+   "title": "Game of Thrones – Two Swords (S4E1)",
+   "items": [
+    {
+     "p": 0.03,
+     "scene": "Ice",
+     "fact": "The wordless cold open shows Ned's sword Ice melted down into two new swords - set to 'The Rains of Castamere'."
+    },
+    {
+     "p": 0.5,
+     "scene": "Oberyn",
+     "fact": "Pedro Pascal joins as Oberyn Martell, years before The Mandalorian and The Last of Us."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the lion and the rose",
+    "lion and the rose"
+   ],
+   "title": "Game of Thrones – The Lion and the Rose (S4E2)",
+   "items": [
+    {
+     "p": 0.05,
+     "scene": "The writer",
+     "fact": "This episode was written by George R. R. Martin."
+    },
+    {
+     "p": 0.6,
+     "scene": "The wedding feast",
+     "fact": "The royal wedding set was one of the largest in the series; the 'Purple Wedding' nickname comes from the wine."
+    }
+   ]
+  },
+  {
+   "names": [
+    "breaker of chains"
+   ],
+   "title": "Game of Thrones – Breaker of Chains (S4E3)",
+   "items": [
+    {
+     "p": 0.8,
+     "scene": "Meereen",
+     "fact": "The siege of Meereen's exterior was filmed in Croatia (Klis Fortress) and Morocco."
+    }
+   ]
+  },
+  {
+   "names": [
+    "oathkeeper"
+   ],
+   "title": "Game of Thrones – Oathkeeper (S4E4)",
+   "items": [
+    {
+     "p": 0.6,
+     "scene": "The sword",
+     "fact": "Jaime names the Valyrian steel sword he gives Brienne 'Oathkeeper'."
+    }
+   ]
+  },
+  {
+   "names": [
+    "first of his name"
+   ],
+   "title": "Game of Thrones – First of His Name (S4E5)",
+   "items": [
+    {
+     "p": 0.2,
+     "scene": "Tommen",
+     "fact": "Dean-Charles Chapman took over Tommen in Season 4; he had earlier played a minor Lannister role."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the laws of gods and men",
+    "laws of gods and men"
+   ],
+   "title": "Game of Thrones – The Laws of Gods and Men (S4E6)",
+   "items": [
+    {
+     "p": 0.85,
+     "scene": "The trial speech",
+     "fact": "Peter Dinklage's trial speech ('I wish I was the monster you think I am') was filmed in a few takes and is a fan favourite."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the mountain and the viper",
+    "mountain and the viper"
+   ],
+   "title": "Game of Thrones – The Mountain and the Viper (S4E8)",
+   "items": [
+    {
+     "p": 0.75,
+     "scene": "The duel",
+     "fact": "Hafþór Júlíus Björnsson, who plays the Mountain, later won the World's Strongest Man title (2018)."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the watchers on the wall",
+    "watchers on the wall"
+   ],
+   "title": "Game of Thrones – The Watchers on the Wall (S4E9)",
+   "items": [
+    {
+     "p": 0.1,
+     "scene": "The director",
+     "fact": "Neil Marshall, who directed 'Blackwater', returned for this full-episode battle at Castle Black."
+    },
+    {
+     "p": 0.6,
+     "scene": "The scythe",
+     "fact": "The giant scythe on the Wall was the show's own addition - it isn't in the book."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the wars to come",
+    "wars to come"
+   ],
+   "title": "Game of Thrones – The Wars to Come (S5E1)",
+   "items": [
+    {
+     "p": 0.03,
+     "scene": "The flashback",
+     "fact": "This is the series' first flashback - young Cersei meets the witch Maggy."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the house of black and white",
+    "house of black and white"
+   ],
+   "title": "Game of Thrones – The House of Black and White (S5E2)",
+   "items": [
+    {
+     "p": 0.15,
+     "scene": "Braavos",
+     "fact": "The Titan of Braavos was created with VFX; the Braavos streets were filmed in Šibenik, Croatia."
+    },
+    {
+     "p": 0.6,
+     "scene": "Dorne",
+     "fact": "Dorne's Water Gardens were filmed at the Alcázar of Seville in Spain."
+    }
+   ]
+  },
+  {
+   "names": [
+    "high sparrow"
+   ],
+   "title": "Game of Thrones – High Sparrow (S5E3)",
+   "items": [
+    {
+     "p": 0.5,
+     "scene": "The High Sparrow",
+     "fact": "Jonathan Pryce (Brazil, Evita) joins as the High Sparrow."
+    }
+   ]
+  },
+  {
+   "names": [
+    "sons of the harpy"
+   ],
+   "title": "Game of Thrones – Sons of the Harpy (S5E4)",
+   "items": [
+    {
+     "p": 0.5,
+     "scene": "The Sand Snakes",
+     "fact": "The Sand Snakes are introduced in Dorne; their scenes were filmed in Spain."
+    }
+   ]
+  },
+  {
+   "names": [
+    "unbowed unbent unbroken"
+   ],
+   "title": "Game of Thrones – Unbowed, Unbent, Unbroken (S5E6)",
+   "items": [
+    {
+     "p": 0.1,
+     "scene": "The title",
+     "fact": "'Unbowed, Unbent, Unbroken' are the words of House Martell."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the gift"
+   ],
+   "title": "Game of Thrones – The Gift (S5E7)",
+   "items": [
+    {
+     "p": 0.6,
+     "scene": "Tyrion meets Daenerys",
+     "fact": "The first meeting of Tyrion and Daenerys - fans had waited five seasons; it hasn't happened yet in the books."
+    }
+   ]
+  },
+  {
+   "names": [
+    "hardhome"
+   ],
+   "title": "Game of Thrones – Hardhome (S5E8)",
+   "items": [
+    {
+     "p": 0.05,
+     "scene": "The director",
+     "fact": "Directed by Miguel Sapochnik, whose work here led to him directing 'Battle of the Bastards' and 'The Long Night'."
+    },
+    {
+     "p": 0.75,
+     "scene": "The attack",
+     "fact": "The Hardhome battle was filmed over several weeks in a quarry in Northern Ireland."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the dance of dragons",
+    "dance of dragons"
+   ],
+   "title": "Game of Thrones – The Dance of Dragons (S5E9)",
+   "items": [
+    {
+     "p": 0.8,
+     "scene": "Daznak's Pit",
+     "fact": "The fighting pit scenes were filmed at the Plaza de toros in Osuna, Spain."
+    }
+   ]
+  },
+  {
+   "names": [
+    "mothers mercy"
+   ],
+   "title": "Game of Thrones – Mother's Mercy (S5E10)",
+   "items": [
+    {
+     "p": 0.7,
+     "scene": "The walk",
+     "fact": "Lena Headey's walk of atonement used a body double, Rebecca Van Cleave, for the full-body shots; filmed in Dubrovnik."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the red woman",
+    "red woman"
+   ],
+   "title": "Game of Thrones – The Red Woman (S6E1)",
+   "items": [
+    {
+     "p": 0.97,
+     "scene": "The reveal",
+     "fact": "Carice van Houten's final reveal used prosthetics and VFX; Season 6 was the first to go beyond the published books."
+    }
+   ]
+  },
+  {
+   "names": [
+    "home"
+   ],
+   "title": "Game of Thrones – Home (S6E2)",
+   "items": [
+    {
+     "p": 0.2,
+     "scene": "Young Ned",
+     "fact": "Sebastian Croft plays young Ned Stark in Bran's visions; Max von Sydow plays the Three-Eyed Raven."
+    }
+   ]
+  },
+  {
+   "names": [
+    "oathbreaker"
+   ],
+   "title": "Game of Thrones – Oathbreaker (S6E3)",
+   "items": [
+    {
+     "p": 0.4,
+     "scene": "The Tower of Joy",
+     "fact": "The Tower of Joy fight was filmed in Spain; young Ned is played by Robert Aramayo."
+    }
+   ]
+  },
+  {
+   "names": [
+    "book of the stranger"
+   ],
+   "title": "Game of Thrones – Book of the Stranger (S6E4)",
+   "items": [
+    {
+     "p": 0.15,
+     "scene": "Reunion",
+     "fact": "The reunion at Castle Black is the first time two Stark children meet on screen since Season 1."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the door"
+   ],
+   "title": "Game of Thrones – The Door (S6E5)",
+   "items": [
+    {
+     "p": 0.97,
+     "scene": "Hodor",
+     "fact": "'Hold the door' - George R. R. Martin told the showrunners Hodor's origin years earlier; Kristian Nairn played Hodor."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the broken man",
+    "broken man"
+   ],
+   "title": "Game of Thrones – The Broken Man (S6E7)",
+   "items": [
+    {
+     "p": 0.05,
+     "scene": "The cold open",
+     "fact": "Ian McShane plays Septon Ray in this episode - the first cold open before the opening credits in the series."
+    },
+    {
+     "p": 0.4,
+     "scene": "Lyanna Mormont",
+     "fact": "Bella Ramsey's Lyanna Mormont became a fan favourite after this one scene; Ramsey later starred in The Last of Us."
+    }
+   ]
+  },
+  {
+   "names": [
+    "no one"
+   ],
+   "title": "Game of Thrones – No One (S6E8)",
+   "items": [
+    {
+     "p": 0.6,
+     "scene": "Braavos chase",
+     "fact": "The chase through Braavos was filmed in Girona, Spain."
+    }
+   ]
+  },
+  {
+   "names": [
+    "battle of the bastards"
+   ],
+   "title": "Game of Thrones – Battle of the Bastards (S6E9)",
+   "items": [
+    {
+     "p": 0.05,
+     "scene": "The director",
+     "fact": "Miguel Sapochnik directed; the battle took 25 days to film with around 500 extras and 70 horses."
+    },
+    {
+     "p": 0.5,
+     "scene": "The pile of bodies",
+     "fact": "The famous 'pile of bodies' shots mixed stunt performers, dummies and digital doubles."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the winds of winter",
+    "winds of winter"
+   ],
+   "title": "Game of Thrones – The Winds of Winter (S6E10)",
+   "items": [
+    {
+     "p": 0.05,
+     "scene": "Light of the Seven",
+     "fact": "The opening is scored by Ramin Djawadi's 'Light of the Seven' - the first time the show used a piano."
+    },
+    {
+     "p": 0.5,
+     "scene": "The title",
+     "fact": "The episode is named after Martin's long-awaited sixth book, still unpublished when it aired."
+    }
+   ]
+  },
+  {
+   "names": [
+    "dragonstone"
+   ],
+   "title": "Game of Thrones – Dragonstone (S7E1)",
+   "items": [
+    {
+     "p": 0.35,
+     "scene": "Ed Sheeran",
+     "fact": "The singing Lannister soldier is Ed Sheeran - a cameo arranged because Maisie Williams is a fan."
+    },
+    {
+     "p": 0.8,
+     "scene": "Dragonstone",
+     "fact": "Dragonstone's exteriors were filmed at Gaztelugatxe and Zumaia in Spain's Basque Country."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the queens justice",
+    "queens justice"
+   ],
+   "title": "Game of Thrones – The Queen's Justice (S7E3)",
+   "items": [
+    {
+     "p": 0.2,
+     "scene": "Jon meets Daenerys",
+     "fact": "Kit Harington and Emilia Clarke's first scene together - fans had waited seven seasons."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the spoils of war",
+    "spoils of war"
+   ],
+   "title": "Game of Thrones – The Spoils of War (S7E4)",
+   "items": [
+    {
+     "p": 0.75,
+     "scene": "The loot train",
+     "fact": "The loot train battle was filmed in Spain and is one of the few times the show put its dragon against a full army in daylight."
+    }
+   ]
+  },
+  {
+   "names": [
+    "eastwatch"
+   ],
+   "title": "Game of Thrones – Eastwatch (S7E5)",
+   "items": [
+    {
+     "p": 0.5,
+     "scene": "Gendry returns",
+     "fact": "Joe Dempsie returns as Gendry, who had been 'rowing' since Season 3 - a running fan joke."
+    }
+   ]
+  },
+  {
+   "names": [
+    "beyond the wall"
+   ],
+   "title": "Game of Thrones – Beyond the Wall (S7E6)",
+   "items": [
+    {
+     "p": 0.5,
+     "scene": "The frozen lake",
+     "fact": "The frozen lake island was filmed in Iceland and on a huge Belfast stage."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the dragon and the wolf",
+    "dragon and the wolf"
+   ],
+   "title": "Game of Thrones – The Dragon and the Wolf (S7E7)",
+   "items": [
+    {
+     "p": 0.2,
+     "scene": "The Dragonpit",
+     "fact": "At about 80 minutes, this was the longest episode of the series up to that point."
+    },
+    {
+     "p": 0.4,
+     "scene": "The Dragonpit set",
+     "fact": "The Dragonpit was filmed at the Roman amphitheatre ruins of Itálica near Seville, Spain."
+    }
+   ]
+  },
+  {
+   "names": [
+    "winterfell"
+   ],
+   "title": "Game of Thrones – Winterfell (S8E1)",
+   "items": [
+    {
+     "p": 0.05,
+     "scene": "New titles",
+     "fact": "The final season got a reworked opening title sequence that shows the Wall breached."
+    }
+   ]
+  },
+  {
+   "names": [
+    "a knight of the seven kingdoms",
+    "knight of the seven kingdoms"
+   ],
+   "title": "Game of Thrones – A Knight of the Seven Kingdoms (S8E2)",
+   "items": [
+    {
+     "p": 0.75,
+     "scene": "Podrick's song",
+     "fact": "Podrick's song 'Jenny of Oldstones' was set to music for the show; Florence + the Machine recorded it for the end credits."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the long night",
+    "long night"
+   ],
+   "title": "Game of Thrones – The Long Night (S8E3)",
+   "items": [
+    {
+     "p": 0.05,
+     "scene": "The shoot",
+     "fact": "The battle of Winterfell took 55 consecutive night shoots to film, directed by Miguel Sapochnik."
+    },
+    {
+     "p": 0.5,
+     "scene": "The darkness",
+     "fact": "Many viewers complained the episode was too dark to see - the cinematographer said it was meant to be watched in a dark room."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the last of the starks",
+    "last of the starks"
+   ],
+   "title": "Game of Thrones – The Last of the Starks (S8E4)",
+   "items": [
+    {
+     "p": 0.2,
+     "scene": "The feast",
+     "fact": "A disposable coffee cup left on the table during the feast made headlines; HBO digitally removed it days after airing."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the bells"
+   ],
+   "title": "Game of Thrones – The Bells (S8E5)",
+   "items": [
+    {
+     "p": 0.6,
+     "scene": "King's Landing",
+     "fact": "The destruction of King's Landing was filmed on a large backlot set in Northern Ireland plus Dubrovnik."
+    }
+   ]
+  },
+  {
+   "names": [
+    "the iron throne",
+    "iron throne"
+   ],
+   "title": "Game of Thrones – The Iron Throne (S8E6)",
+   "items": [
+    {
+     "p": 0.05,
+     "scene": "The finale",
+     "fact": "The series finale was written and directed by David Benioff and D. B. Weiss."
+    },
+    {
+     "p": 0.55,
+     "scene": "The throne",
+     "fact": "The Iron Throne prop is said to be made of swords - the show's version is far smaller than the one described in the books."
+    }
+   ]
+  }
+ ]
+}

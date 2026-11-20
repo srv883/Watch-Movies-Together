@@ -1,7 +1,18 @@
 WATCH TOGETHER - DETAILED CONTEXT HANDOFF
 ==========================================
 As of: 15 Nov 2026
-Current version: V33 (manifest 1.33.0), folder V33-trivia
+Current version: V34 (manifest 1.34.0), folder V34-packs
+V34 = V33 + trivia with no key (hand-written packs in trivia\ on GitHub:
+The Office S4-S5, Game of Thrones, Breaking Bad, Marvel films; Wikipedia
+for everything else; Claude only if a key is saved) + push updates:
+  ship a version:  node tools\release.js V<N>-name "notes"
+  ship trivia:     edit trivia\*.json, commit, push (live within 6 h)
+Laptops with tools\install-watch-together.ps1 (scheduled task every 30
+min) install new versions themselves; the extension reloads itself when
+no party is running. See CONTEXT-HANDOFF.md "HOW TO SHIP".
+Tests: node --experimental-vm-modules tests\test-V34.js = 689/689; e2e 49/49.
+
+(previous:)
 V33 = V32 + AI scene trivia (background.js = bundled @anthropic-ai/sdk,
 Claude Opus 5.5, the user's own key from the popup, one request per episode,
 cached, shared with the friend; cards float in at the matching moments) +

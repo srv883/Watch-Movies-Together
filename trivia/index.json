@@ -1,0 +1,11 @@
+{
+ "v": 1,
+ "updated": "2026-11-20",
+ "note": "Trivia packs for Watch Together. Add a pack here and push - every installed extension picks it up within 6 hours (no reinstall).",
+ "packs": [
+  { "id": "the-office-us", "kind": "show", "names": ["the office"], "file": "the-office-us.json" },
+  { "id": "game-of-thrones", "kind": "show", "names": ["game of thrones"], "file": "game-of-thrones.json" },
+  { "id": "breaking-bad", "kind": "show", "names": ["breaking bad"], "file": "breaking-bad.json" },
+  { "id": "mcu", "kind": "films", "file": "mcu.json" }
+ ]
+}

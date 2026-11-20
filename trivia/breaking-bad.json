@@ -1,0 +1,811 @@
+{
+ "id": "breaking-bad",
+ "title": "Breaking Bad",
+ "note": "Written by Claude for Watch Together. Moments are approximate (fraction of the runtime, in scene order).",
+ "entries": [
+  {
+   "names": [
+    "pilot"
+   ],
+   "title": "Breaking Bad – Pilot (S1E1)",
+   "items": [
+    {
+     "p": 0.04,
+     "scene": "The RV in the desert",
+     "fact": "Vince Gilligan first set the show in Riverside, California; it moved to Albuquerque, New Mexico, because of the state's filming incentives."
+    },
+    {
+     "p": 0.2,
+     "scene": "Walt's birthday",
+     "fact": "Gilligan cast Bryan Cranston after working with him on 'Drive', an episode of The X-Files - the network had wanted a bigger star."
+    },
+    {
+     "p": 0.5,
+     "scene": "The first cook",
+     "fact": "Before this, Cranston was best known as the goofy dad Hal in 'Malcolm in the Middle'."
+    },
+    {
+     "p": 0.9,
+     "scene": "The gun",
+     "fact": "Gilligan pitched the show as turning 'Mr. Chips into Scarface'."
+    }
+   ]
+  },
+  {
+   "names": [
+    "cats in the bag"
+   ],
+   "title": "Breaking Bad – Cat's in the Bag... (S1E2)",
+   "items": [
+    {
+     "p": 0.85,
+     "scene": "The bathtub",
+     "fact": "The bathtub scene was later tested on MythBusters - they found hydrofluoric acid would not eat through a tub and floor like that."
+    }
+   ]
+  },
+  {
+   "names": [
+    "and the bags in the river",
+    "bags in the river"
+   ],
+   "title": "Breaking Bad – ...And the Bag's in the River (S1E3)",
+   "items": [
+    {
+     "p": 0.4,
+     "scene": "The list",
+     "fact": "Walt's pros-and-cons list about killing Krazy-8 is one of the show's early signs of who Walt will become."
+    }
+   ]
+  },
+  {
+   "names": [
+    "cancer man"
+   ],
+   "title": "Breaking Bad – Cancer Man (S1E4)",
+   "items": [
+    {
+     "p": 0.6,
+     "scene": "Jesse's family",
+     "fact": "Aaron Paul's character was originally meant to die at the end of Season 1; Gilligan changed his mind after seeing Paul's work."
+    }
+   ]
+  },
+  {
+   "names": [
+    "gray matter"
+   ],
+   "title": "Breaking Bad – Gray Matter (S1E5)",
+   "items": [
+    {
+     "p": 0.3,
+     "scene": "Elliott's party",
+     "fact": "Gray Matter Technologies - the company Walt co-founded and left - is the root of his resentment toward Elliott and Gretchen."
+    }
+   ]
+  },
+  {
+   "names": [
+    "crazy handful of nothin",
+    "crazy handful of nothing"
+   ],
+   "title": "Breaking Bad – Crazy Handful of Nothin' (S1E6)",
+   "items": [
+    {
+     "p": 0.6,
+     "scene": "The shaved head",
+     "fact": "Walt's alias 'Heisenberg' refers to physicist Werner Heisenberg, known for the uncertainty principle."
+    },
+    {
+     "p": 0.9,
+     "scene": "Tuco's office",
+     "fact": "MythBusters later tested the 'fulminated mercury' explosion and found it couldn't be thrown like that without going off."
+    }
+   ]
+  },
+  {
+   "names": [
+    "a no rough stuff type deal",
+    "no rough stuff type deal"
+   ],
+   "title": "Breaking Bad – A No-Rough-Stuff-Type Deal (S1E7)",
+   "items": [
+    {
+     "p": 0.5,
+     "scene": "Season 1 ends",
+     "fact": "Season 1 had only seven episodes because of the 2007–08 Writers Guild strike."
+    }
+   ]
+  },
+  {
+   "names": [
+    "seven thirty seven"
+   ],
+   "title": "Breaking Bad – Seven Thirty-Seven (S2E1)",
+   "items": [
+    {
+     "p": 0.02,
+     "scene": "The pink teddy bear",
+     "fact": "The titles of four Season 2 episodes - 'Seven Thirty-Seven', 'Down', 'Over', 'ABQ' - form a hidden sentence that foreshadows the season finale."
+    }
+   ]
+  },
+  {
+   "names": [
+    "grilled"
+   ],
+   "title": "Breaking Bad – Grilled (S2E2)",
+   "items": [
+    {
+     "p": 0.5,
+     "scene": "Tio Salamanca",
+     "fact": "Mark Margolis plays Hector 'Tio' Salamanca, who communicates only with a bell - he later reprised the role in Better Call Saul."
+    }
+   ]
+  },
+  {
+   "names": [
+    "bit by a dead bee"
+   ],
+   "title": "Breaking Bad – Bit by a Dead Bee (S2E3)",
+   "items": [
+    {
+     "p": 0.4,
+     "scene": "The fugue state",
+     "fact": "Walt fakes a 'fugue state' to explain his disappearance - one of his first big lies to his family."
+    }
+   ]
+  },
+  {
+   "names": [
+    "down"
+   ],
+   "title": "Breaking Bad – Down (S2E4)",
+   "items": [
+    {
+     "p": 0.03,
+     "scene": "The pool",
+     "fact": "'Down' is the second word of the hidden Season 2 sentence: Seven Thirty-Seven / Down / Over / ABQ."
+    }
+   ]
+  },
+  {
+   "names": [
+    "breakage"
+   ],
+   "title": "Breaking Bad – Breakage (S2E5)",
+   "items": [
+    {
+     "p": 0.5,
+     "scene": "Hank's panic",
+     "fact": "Hank's anxiety after the shootout is one of the first looks at Dean Norris's dramatic range in the role."
+    }
+   ]
+  },
+  {
+   "names": [
+    "peekaboo"
+   ],
+   "title": "Breaking Bad – Peekaboo (S2E6)",
+   "items": [
+    {
+     "p": 0.5,
+     "scene": "The ATM",
+     "fact": "Many critics call Aaron Paul's scenes with the little boy in this episode his breakout performance."
+    }
+   ]
+  },
+  {
+   "names": [
+    "negro y azul"
+   ],
+   "title": "Breaking Bad – Negro y Azul (S2E7)",
+   "items": [
+    {
+     "p": 0.03,
+     "scene": "The narcocorrido",
+     "fact": "The opening music video is a real narcocorrido by Los Cuates de Sinaloa written for the show, about the legend of Heisenberg."
+    }
+   ]
+  },
+  {
+   "names": [
+    "better call saul"
+   ],
+   "title": "Breaking Bad – Better Call Saul (S2E8)",
+   "items": [
+    {
+     "p": 0.05,
+     "scene": "Saul's ad",
+     "fact": "Bob Odenkirk's Saul Goodman was planned as a small role - he later got his own prequel series, 'Better Call Saul'."
+    },
+    {
+     "p": 0.5,
+     "scene": "The name",
+     "fact": "'Saul Goodman' is a play on 'S'all good, man'."
+    }
+   ]
+  },
+  {
+   "names": [
+    "4 days out",
+    "four days out"
+   ],
+   "title": "Breaking Bad – 4 Days Out (S2E9)",
+   "items": [
+    {
+     "p": 0.6,
+     "scene": "Stranded",
+     "fact": "Walt builds a battery from scraps when the RV dies in the desert - the episode was mostly shot with just two actors."
+    }
+   ]
+  },
+  {
+   "names": [
+    "over"
+   ],
+   "title": "Breaking Bad – Over (S2E10)",
+   "items": [
+    {
+     "p": 0.03,
+     "scene": "The pool",
+     "fact": "'Over' is the third word of the hidden Season 2 sentence."
+    }
+   ]
+  },
+  {
+   "names": [
+    "mandala"
+   ],
+   "title": "Breaking Bad – Mandala (S2E11)",
+   "items": [
+    {
+     "p": 0.6,
+     "scene": "Gus Fring",
+     "fact": "Gus Fring makes his first appearance here - Giancarlo Esposito later reprised the role in Better Call Saul."
+    }
+   ]
+  },
+  {
+   "names": [
+    "phoenix"
+   ],
+   "title": "Breaking Bad – Phoenix (S2E12)",
+   "items": [
+    {
+     "p": 0.6,
+     "scene": "Jane's father",
+     "fact": "Jane's father Donald is played by John de Lancie - Q from Star Trek: The Next Generation."
+    }
+   ]
+  },
+  {
+   "names": [
+    "abq"
+   ],
+   "title": "Breaking Bad – ABQ (S2E13)",
+   "items": [
+    {
+     "p": 0.03,
+     "scene": "The full sentence",
+     "fact": "'ABQ' completes the hidden sentence: 'Seven thirty-seven down over ABQ' - the season's mid-air collision."
+    }
+   ]
+  },
+  {
+   "names": [
+    "no mas"
+   ],
+   "title": "Breaking Bad – No Más (S3E1)",
+   "items": [
+    {
+     "p": 0.05,
+     "scene": "The crawl",
+     "fact": "The Cousins are played by real-life brothers Luis and Daniel Moncada."
+    }
+   ]
+  },
+  {
+   "names": [
+    "caballo sin nombre"
+   ],
+   "title": "Breaking Bad – Caballo sin Nombre (S3E2)",
+   "items": [
+    {
+     "p": 0.2,
+     "scene": "'A Horse with No Name'",
+     "fact": "The episode title means 'Horse with No Name' - Walt sings along to the America song in the car."
+    }
+   ]
+  },
+  {
+   "names": [
+    "ift",
+    "i f t"
+   ],
+   "title": "Breaking Bad – I.F.T. (S3E3)",
+   "items": [
+    {
+     "p": 0.6,
+     "scene": "The title",
+     "fact": "Skyler's three words to Walt give the episode its abbreviated title."
+    }
+   ]
+  },
+  {
+   "names": [
+    "green light"
+   ],
+   "title": "Breaking Bad – Green Light (S3E4)",
+   "items": [
+    {
+     "p": 0.5,
+     "scene": "Ted",
+     "fact": "Skyler's affair with her boss Ted Beneke drives much of Season 3's family drama."
+    }
+   ]
+  },
+  {
+   "names": [
+    "mas"
+   ],
+   "title": "Breaking Bad – Más (S3E5)",
+   "items": [
+    {
+     "p": 0.5,
+     "scene": "The superlab",
+     "fact": "The superlab set under the laundromat was one of the show's biggest builds."
+    }
+   ]
+  },
+  {
+   "names": [
+    "sunset"
+   ],
+   "title": "Breaking Bad – Sunset (S3E6)",
+   "items": [
+    {
+     "p": 0.6,
+     "scene": "The RV",
+     "fact": "Hank finally corners the RV in a junkyard - the end of the show's most famous vehicle."
+    }
+   ]
+  },
+  {
+   "names": [
+    "one minute"
+   ],
+   "title": "Breaking Bad – One Minute (S3E7)",
+   "items": [
+    {
+     "p": 0.85,
+     "scene": "The parking lot",
+     "fact": "Hank's parking-lot shootout with the Cousins is considered one of the show's best action sequences."
+    }
+   ]
+  },
+  {
+   "names": [
+    "i see you"
+   ],
+   "title": "Breaking Bad – I See You (S3E8)",
+   "items": [
+    {
+     "p": 0.5,
+     "scene": "The hospital",
+     "fact": "Gus's hospital visit is a turning point: the first time Walt sees how far Gus's reach goes."
+    }
+   ]
+  },
+  {
+   "names": [
+    "kafkaesque"
+   ],
+   "title": "Breaking Bad – Kafkaesque (S3E9)",
+   "items": [
+    {
+     "p": 0.5,
+     "scene": "Group therapy",
+     "fact": "Jesse's 'Kafkaesque' description of the lab is a callback to his support-group sessions."
+    }
+   ]
+  },
+  {
+   "names": [
+    "fly"
+   ],
+   "title": "Breaking Bad – Fly (S3E10)",
+   "items": [
+    {
+     "p": 0.05,
+     "scene": "The director",
+     "fact": "'Fly' was directed by Rian Johnson, who later made 'Star Wars: The Last Jedi' and 'Knives Out'."
+    },
+    {
+     "p": 0.5,
+     "scene": "The bottle episode",
+     "fact": "It's a 'bottle episode' set almost entirely in the lab - made partly to save money, now one of the most debated episodes."
+    }
+   ]
+  },
+  {
+   "names": [
+    "abiquiu"
+   ],
+   "title": "Breaking Bad – Abiquiú (S3E11)",
+   "items": [
+    {
+     "p": 0.03,
+     "scene": "Jane's art",
+     "fact": "Abiquiú is the New Mexico town where painter Georgia O'Keeffe lived - Jane's favourite artist."
+    }
+   ]
+  },
+  {
+   "names": [
+    "half measures"
+   ],
+   "title": "Breaking Bad – Half Measures (S3E12)",
+   "items": [
+    {
+     "p": 0.6,
+     "scene": "Mike's story",
+     "fact": "Jonathan Banks's 'no more half measures' monologue is one of Mike Ehrmantraut's best-known scenes."
+    }
+   ]
+  },
+  {
+   "names": [
+    "full measure"
+   ],
+   "title": "Breaking Bad – Full Measure (S3E13)",
+   "items": [
+    {
+     "p": 0.4,
+     "scene": "Gale",
+     "fact": "Gale Boetticher is played by David Costabile; Gilligan left the ending's outcome ambiguous for the whole summer break."
+    }
+   ]
+  },
+  {
+   "names": [
+    "box cutter"
+   ],
+   "title": "Breaking Bad – Box Cutter (S4E1)",
+   "items": [
+    {
+     "p": 0.6,
+     "scene": "Gus",
+     "fact": "Giancarlo Esposito's wordless scene with the box cutter is often named the moment Gus became one of TV's great villains."
+    }
+   ]
+  },
+  {
+   "names": [
+    "thirty eight snub",
+    "38 snub"
+   ],
+   "title": "Breaking Bad – Thirty-Eight Snub (S4E2)",
+   "items": [
+    {
+     "p": 0.3,
+     "scene": "The gun",
+     "fact": "A '.38 snub' is a short-barrelled revolver - Walt buys it to deal with Gus."
+    }
+   ]
+  },
+  {
+   "names": [
+    "open house"
+   ],
+   "title": "Breaking Bad – Open House (S4E3)",
+   "items": [
+    {
+     "p": 0.5,
+     "scene": "Marie's open houses",
+     "fact": "Marie's habit of stealing from open houses under fake names is a running thread of her kleptomania."
+    }
+   ]
+  },
+  {
+   "names": [
+    "bullet points"
+   ],
+   "title": "Breaking Bad – Bullet Points (S4E4)",
+   "items": [
+    {
+     "p": 0.5,
+     "scene": "Gale's karaoke",
+     "fact": "Gale's karaoke video is set to 'Major Tom (Coming Home)' by Peter Schilling."
+    }
+   ]
+  },
+  {
+   "names": [
+    "cornered"
+   ],
+   "title": "Breaking Bad – Cornered (S4E6)",
+   "items": [
+    {
+     "p": 0.3,
+     "scene": "'I am the one who knocks'",
+     "fact": "'I am the one who knocks' - Walt's speech to Skyler became one of the show's signature lines."
+    }
+   ]
+  },
+  {
+   "names": [
+    "problem dog"
+   ],
+   "title": "Breaking Bad – Problem Dog (S4E7)",
+   "items": [
+    {
+     "p": 0.5,
+     "scene": "Group session",
+     "fact": "Jesse's veiled 'problem dog' story in group therapy gives the episode its name."
+    }
+   ]
+  },
+  {
+   "names": [
+    "hermanos"
+   ],
+   "title": "Breaking Bad – Hermanos (S4E8)",
+   "items": [
+    {
+     "p": 0.7,
+     "scene": "The flashback",
+     "fact": "The flashback reveals Gus's past with his partner Max and why 'Los Pollos Hermanos' means 'the chicken brothers'."
+    }
+   ]
+  },
+  {
+   "names": [
+    "crawl space"
+   ],
+   "title": "Breaking Bad – Crawl Space (S4E11)",
+   "items": [
+    {
+     "p": 0.95,
+     "scene": "The laugh",
+     "fact": "The overhead shot of Walt laughing in the crawl space is one of the most iconic images of the series."
+    }
+   ]
+  },
+  {
+   "names": [
+    "face off"
+   ],
+   "title": "Breaking Bad – Face Off (S4E13)",
+   "items": [
+    {
+     "p": 0.8,
+     "scene": "The reveal",
+     "fact": "The famous reveal was created with prosthetic make-up combined with digital effects."
+    },
+    {
+     "p": 0.97,
+     "scene": "The plant",
+     "fact": "The last shot shows a Lily of the Valley plant - the answer to the season's mystery."
+    }
+   ]
+  },
+  {
+   "names": [
+    "live free or die"
+   ],
+   "title": "Breaking Bad – Live Free or Die (S5E1)",
+   "items": [
+    {
+     "p": 0.05,
+     "scene": "52nd birthday",
+     "fact": "The flash-forward to Walt's 52nd birthday at a Denny's set up the final season's mystery."
+    }
+   ]
+  },
+  {
+   "names": [
+    "madrigal"
+   ],
+   "title": "Breaking Bad – Madrigal (S5E2)",
+   "items": [
+    {
+     "p": 0.05,
+     "scene": "Madrigal",
+     "fact": "Madrigal Electromotive, a German conglomerate, owns Los Pollos Hermanos; Laura Fraser joins as Lydia."
+    }
+   ]
+  },
+  {
+   "names": [
+    "hazard pay"
+   ],
+   "title": "Breaking Bad – Hazard Pay (S5E3)",
+   "items": [
+    {
+     "p": 0.5,
+     "scene": "Scarface",
+     "fact": "Walt Jr. watches 'Scarface' with Walt - a nod to Gilligan's 'Mr. Chips to Scarface' pitch."
+    }
+   ]
+  },
+  {
+   "names": [
+    "fifty one",
+    "51"
+   ],
+   "title": "Breaking Bad – Fifty-One (S5E4)",
+   "items": [
+    {
+     "p": 0.5,
+     "scene": "The pool",
+     "fact": "Anna Gunn's pool scene on Walt's 51st birthday is one of her most praised performances; she won two Emmys for the role."
+    }
+   ]
+  },
+  {
+   "names": [
+    "buyout"
+   ],
+   "title": "Breaking Bad – Buyout (S5E6)",
+   "items": [
+    {
+     "p": 0.5,
+     "scene": "The dinner",
+     "fact": "The deeply awkward dinner with Walt, Skyler and Jesse is often called the show's funniest dark scene."
+    }
+   ]
+  },
+  {
+   "names": [
+    "say my name"
+   ],
+   "title": "Breaking Bad – Say My Name (S5E7)",
+   "items": [
+    {
+     "p": 0.15,
+     "scene": "In the desert",
+     "fact": "'Say my name.' 'Heisenberg.' 'You're goddamn right.' - one of the most quoted exchanges in TV history."
+    }
+   ]
+  },
+  {
+   "names": [
+    "gliding over all"
+   ],
+   "title": "Breaking Bad – Gliding Over All (S5E8)",
+   "items": [
+    {
+     "p": 0.55,
+     "scene": "The prison montage",
+     "fact": "The prison montage is set to Nat King Cole's 'Pick Yourself Up'."
+    },
+    {
+     "p": 0.95,
+     "scene": "The bathroom",
+     "fact": "The book Hank picks up is Walt Whitman's 'Leaves of Grass', inscribed by Gale."
+    }
+   ]
+  },
+  {
+   "names": [
+    "blood money"
+   ],
+   "title": "Breaking Bad – Blood Money (S5E9)",
+   "items": [
+    {
+     "p": 0.9,
+     "scene": "The garage",
+     "fact": "The final eight episodes aired in 2013 and drew the series' biggest audiences."
+    }
+   ]
+  },
+  {
+   "names": [
+    "buried"
+   ],
+   "title": "Breaking Bad – Buried (S5E10)",
+   "items": [
+    {
+     "p": 0.4,
+     "scene": "The barrels",
+     "fact": "The desert burial location becomes crucial to the series' last episodes."
+    }
+   ]
+  },
+  {
+   "names": [
+    "confessions"
+   ],
+   "title": "Breaking Bad – Confessions (S5E11)",
+   "items": [
+    {
+     "p": 0.6,
+     "scene": "The DVD",
+     "fact": "Walt's 'confession' video is one of the most chilling things he does in the series."
+    }
+   ]
+  },
+  {
+   "names": [
+    "rabid dog"
+   ],
+   "title": "Breaking Bad – Rabid Dog (S5E12)",
+   "items": [
+    {
+     "p": 0.5,
+     "scene": "Hank's house",
+     "fact": "The episode leaves Jesse with Hank and Marie - an alliance fans never expected."
+    }
+   ]
+  },
+  {
+   "names": [
+    "tohajiilee",
+    "to hajiilee"
+   ],
+   "title": "Breaking Bad – To'hajiilee (S5E13)",
+   "items": [
+    {
+     "p": 0.1,
+     "scene": "The title",
+     "fact": "To'hajiilee is a real Navajo community in New Mexico - near where Walt and Jesse cooked their very first batch."
+    }
+   ]
+  },
+  {
+   "names": [
+    "ozymandias"
+   ],
+   "title": "Breaking Bad – Ozymandias (S5E14)",
+   "items": [
+    {
+     "p": 0.05,
+     "scene": "The director",
+     "fact": "Directed by Rian Johnson; it is often ranked as the greatest TV episode ever made and was rated 10/10 on IMDb."
+    },
+    {
+     "p": 0.3,
+     "scene": "The poem",
+     "fact": "The title is Percy Shelley's sonnet about a fallen king; Bryan Cranston recited it in a teaser for the final season."
+    }
+   ]
+  },
+  {
+   "names": [
+    "granite state"
+   ],
+   "title": "Breaking Bad – Granite State (S5E15)",
+   "items": [
+    {
+     "p": 0.1,
+     "scene": "The disappearer",
+     "fact": "Robert Forster plays Ed, the vacuum-repair man who 'disappears' people; he returned in the film 'El Camino'."
+    },
+    {
+     "p": 0.6,
+     "scene": "New Hampshire",
+     "fact": "'Granite State' is New Hampshire's nickname."
+    }
+   ]
+  },
+  {
+   "names": [
+    "felina"
+   ],
+   "title": "Breaking Bad – Felina (S5E16)",
+   "items": [
+    {
+     "p": 0.05,
+     "scene": "The title",
+     "fact": "'Felina' is an anagram of 'finale' and a nod to Feleena in Marty Robbins' song 'El Paso', which Walt hums."
+    },
+    {
+     "p": 0.95,
+     "scene": "The last song",
+     "fact": "The final scene plays Badfinger's 'Baby Blue' - Walt's 'blue' meth is the joke."
+    }
+   ]
+  }
+ ]
+}

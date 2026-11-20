@@ -442,11 +442,11 @@ const chat = (text) => `(() => { const i = document.querySelector("#wt-input"); 
       if (r1.ok) {
         // runtime must be >= 10 min for trivia: stretch what the page reports (the clip is 60 s)
         for (const P of [H, G]) await P.eval(`(() => { const v = document.getElementById("vid"); Object.defineProperty(v, "duration", { get: () => 1320, configurable: true }); return true; })()`);
-        const ready = await waitFor(G, J.msgs, ms => ms.some(x => /AI trivia ready/.test(x)), 12000);
-        rec("S15a", "host's trivia is shared with the friend (who has no key)", ready.ok, { ms: ready.ms, line: (ready.v || []).find(x => /AI trivia/.test(x)) });
+        const ready = await waitFor(G, J.msgs, ms => ms.some(x => /Trivia ready/.test(x)), 12000);
+        rec("S15a", "host's trivia is shared with the friend (who has no key)", ready.ok, { ms: ready.ms, line: (ready.v || []).find(x => /Trivia ready/.test(x)) });
         const hAsk = await H.eval(`(window.__rtMsgs || []).filter(m => m.t === "wt-trivia").length`);
         const gAsk = await G.eval(`(window.__rtMsgs || []).filter(m => m.t === "wt-trivia").length`);
-        rec("S15b", "only the side with a key asks for trivia", hAsk === 1 && gAsk === 0, { hostAsks: hAsk, guestAsks: gAsk });
+        rec("S15b", "each side asks its own background once (packs/Wikipedia need no key)", hAsk === 1 && gAsk === 1, { hostAsks: hAsk, guestAsks: gAsk });
         await H.eval(user(`document.getElementById("vid").play().then(() => true)`), true);
         const card = `[...document.querySelectorAll(".wt-trivia")].map(c => ({ text: c.textContent, left: Math.round(c.getBoundingClientRect().left), top: Math.round(c.getBoundingClientRect().top), w: Math.round(c.getBoundingClientRect().width), op: getComputedStyle(c).opacity }))`;
         const c1 = await waitFor(H, card, cs => cs.some(c => /RIG-FACT-ONE/.test(c.text)), 9000);

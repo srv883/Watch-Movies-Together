@@ -1,5 +1,5 @@
 {
-  "version": "1.33.0",
-  "zip": "https://github.com/srv883/Watch-Movies-Together/raw/main/wt-V33.zip",
-  "notes": "AI scene trivia floats in at the matching moments (add a Claude API key in the popup; one of you is enough). Unpacked installs now update themselves."
+  "version": "1.34.0",
+  "zip": "https://github.com/srv883/Watch-Movies-Together/raw/main/wt-V34.zip",
+  "notes": "Trivia with no key needed: packs for The Office, Game of Thrones, Breaking Bad and every Marvel film, Wikipedia for everything else. Updates now install themselves."
 }
