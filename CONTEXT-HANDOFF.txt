@@ -1,7 +1,16 @@
 WATCH TOGETHER - DETAILED CONTEXT HANDOFF
 ==========================================
 As of: 15 Nov 2026
-Current version: V32 (manifest 1.32.0, EXT_VER "1.32.0"), folder V32-sametitle
+Current version: V33 (manifest 1.33.0), folder V33-trivia
+V33 = V32 + AI scene trivia (background.js = bundled @anthropic-ai/sdk,
+Claude Opus 5.5, the user's own key from the popup, one request per episode,
+cached, shared with the friend; cards float in at the matching moments) +
+self-update of the unpacked install (alarms every minute; reloads itself
+when newer files are on disk, never during a live party). Installed folder
+on this laptop: C:\Users\Sourav\Downloads\wt-V32 (do not rename it).
+Tests: node --experimental-vm-modules tests\test-V33.js = 667/667;
+e2e 49/49 (S15 = trivia). The live Claude API was never called from here
+(no key). Full detail: CONTEXT-HANDOFF.md.
 (Sections below describe V31 and earlier in detail; V32 = V31 + section 0.)
 
 
