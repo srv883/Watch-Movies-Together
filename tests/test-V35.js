@@ -80,7 +80,7 @@ class Clock {
   clear(id) { this.timers.delete(id); }
   advance(ms) {
     const end = this.now + ms;
-    for (let guard = 0; guard < 20000; guard++) {
+    for (let guard = 0; guard < 400000; guard++) {
       let pick = null, pickId = null;
       for (const [id, t] of this.timers) {
         if (t.at <= end && (pick === null || t.at < pick.at)) { pick = t; pickId = id; }
@@ -691,6 +691,7 @@ function makeInstance(env, name, preset, host, src) {
     onChanged: { addListener: f => { ownStorageListeners.push(f); chromeStub.storage.onChanged.addListener((ch, area) => { if (life.alive || life.closing) f(ch, area); }); } } }) });
   // v33: chrome.runtime.sendMessage to the background worker (env.onRuntime decides the answer)
   chromeForTab.runtime = {
+    id: "wt-test",   // v35: a reachable extension (a reload removes it -> stale-tab banner)
     lastError: undefined,
     sendMessage: (msg, cb) => {
       const m = JSON.parse(JSON.stringify(msg));
@@ -771,7 +772,8 @@ function makeInstance(env, name, preset, host, src) {
           getFloatTimeDomainData(arr) {
             const remote = this._srcStream && this._srcStream.__remote;
             if (!(remote && env.remoteRms != null)) { arr.fill(env.rms); return; }
-            const k = this._n++;
+            // v35: time-based like a real analyser (the gate reads it every 20 ms too)
+            const k = Math.floor(env.clock.now / 100); this._n++;
             if (env.remotePattern === "noise") { arr.fill(env.remoteRms * (1 + 0.3 * Math.sin(k * 1.7))); return; }
             const pause = env.remotePause != null ? env.remotePause : env.remoteRms * 0.01;
             arr.fill(k % 10 < 7 ? env.remoteRms : pause);
@@ -3988,6 +3990,116 @@ console.log("\n--- 12e. error sweep ---");
     ok(zm.content_scripts[0].matches.length === 6 && !zm.content_scripts[0].matches.some(m => /<all_urls>|\*:\/\/\*\//.test(m)), "38d: runs on the 6 streaming sites only");
     const p = fs.readFileSync("C:/Users/Sourav/ML Coding/watch-together-versions/PRIVACY.md", "utf8");
     ok(/0\.peerjs\.com/.test(p) && /broker\.emqx\.io/.test(p) && /en\.wikipedia\.org/.test(p) && /api\.anthropic\.com/.test(p) && /raw\.githubusercontent\.com/.test(p), "38d: privacy policy names every outside service the extension talks to");
+  }
+
+  console.log("\n--- 39. v35: noise gate, stale-tab banner, no update mid-movie, trivia status ---");
+  {
+    const dbg = (I) => I.__ctx.__wtVoiceDbg();
+    const banners = (I) => allByClass(I.doc.documentElement, "wt-banner").map(b => b.textContent);
+    // 39a: noise gate - gaps are turned down, speech opens it at once
+    env.remoteRms = 0.004; env.remotePattern = null; env.remotePause = 0.00006;  // quiet voice, quiet room
+    const P = await (async () => {
+      const H = makeInstance(env, "hG39"), G = makeInstance(env, "gG39");
+      await step(clock, 60);
+      H.fire({ wt_party: { id: "GAT39", role: "host", name: "Sourav" } });
+      await step(clock, 60);
+      G.fire({ wt_party: { id: "GAT39", role: "guest", name: "Megha" } });
+      await waitFor(clock, () => /Synced with/.test(H.st("#wt-status-text") || ""), 5000);
+      H.q("#wt-mic").click(); await step(clock, 60);
+      G.q("#wt-mic").click();
+      await waitFor(clock, () => !!(dbg(H).boost), 5000);
+      return { H, G };
+    })();
+    await step(clock, 8000);
+    ok(dbg(P.H).boost && dbg(P.H).boost.auto > 3, "39a: quiet friend is boosted (x" + (dbg(P.H).boost && dbg(P.H).boost.auto) + ")");
+    env.remoteRms = 0.00006; env.remotePause = 0.00006;   // friend stops talking: only room noise
+    await step(clock, 1500);
+    const g1 = dbg(P.H).boost.gate;
+    ok(g1 < 0.35, "39a: in a pause the gate turns the boosted noise down (gate x" + g1 + ", boost x" + dbg(P.H).boost.gain + ", net x" + (g1 * dbg(P.H).boost.gain).toFixed(2) + ")");
+    ok(g1 * dbg(P.H).boost.gain <= 0.36, "39a: net gain on the gaps is below x0.36 - noise is never boosted");
+    env.remoteRms = 0.004; env.remotePause = 0.00006;     // talking again
+    let opened = -1;
+    for (let t = 0; t <= 1000; t += 20) { if (dbg(P.H).boost.gate === 1) { opened = t; break; } await step(clock, 20); }
+    ok(opened >= 0, "39a: speech opens the gate at its first syllable (" + opened + " ms into the fake 700/300 ms speech pattern)");
+    env.remotePattern = "noise"; env.remoteRms = 0.004;  // a loud but STEADY noise (fan / TV hiss)
+    await step(clock, 2000);
+    ok(dbg(P.H).boost.gate < 0.35, "39a: steady noise does not open the gate (gate x" + dbg(P.H).boost.gate + ")");
+    P.H.doc.hidden = true; env.remotePattern = null; env.remoteRms = 0.00006;
+    await step(clock, 600);
+    ok(dbg(P.H).boost.gate === 1, "39a: background tab (throttled timers) -> gate stays open, never muffles speech");
+    P.H.doc.hidden = false;
+    ok(/function gateTick\(vb\)/.test(SRC) && /gain\.connect\(gate\)/.test(SRC), "39a: gate sits after the boost in the voice chain");
+    P.H.fire({ wt_party: null }); P.G.fire({ wt_party: null });
+    await step(clock, 300);
+    env.remoteRms = null; env.remotePause = null; env.remotePattern = null;
+
+    // 39b: stale tab after an update -> banner with Refresh
+    const O = makeInstance(env, "orph39");
+    await step(clock, 200);
+    O.fire({ wt_party: { id: "ORP39", role: "host", name: "Sourav" } });
+    await step(clock, 3500);
+    ok(!banners(O).some(b => /was updated/.test(b)), "39b: no banner while the extension is reachable");
+    delete O.__ctx.chrome.runtime.id;                          // what an extension reload does to an open tab
+    await step(clock, 3500);
+    ok(banners(O).some(b => /was updated .* refresh this page/.test(b)), "39b: stale tab shows 'Watch Together was updated - refresh this page' (" + JSON.stringify(banners(O)) + ")");
+    const rb = allByClass(O.doc.documentElement, "wt-banner-btn").find(b => b.textContent === "Refresh");
+    let reloaded = 0; O.__ctx.location.reload = () => { reloaded++; };
+    if (rb) rb.click();
+    ok(reloaded === 1, "39b: Refresh reloads the page");
+    O.fire({ wt_party: null });
+    await step(clock, 300);
+
+    // 39c: a playing video tells the background "watching" (no self-update mid-movie)
+    const W = makeInstance(env, "watch39");
+    await step(clock, 2000);
+    W.video.paused = false; W.video.currentTime = 100;
+    delete W.storage.wt_watching;
+    await step(clock, 21000);
+    ok(W.storage.wt_watching && clock.now - W.storage.wt_watching.at < 21000, "39c: a playing video reports 'watching' every 20 s");
+    W.video.paused = true; const at = W.storage.wt_watching.at;
+    await step(clock, 41000);
+    ok(W.storage.wt_watching.at === at, "39c: a paused video stops reporting");
+
+    // 39d: the trivia button explains itself
+    const T = makeInstance(env, "triv39");
+    await step(clock, 2000);
+    T.video.duration = 1320; T.video.paused = false; T.video.currentTime = 30; T.video.readyState = 4;
+    env.onRuntime = (name, msg, reply) => { if (msg.t === "wt-trivia") reply({ items: [{ t: 400, scene: "x", fact: "Fact one about this episode." }, { t: 900, scene: "y", fact: "Fact two about this episode." }], title: "Night Out", source: "pack" }); else reply({ ok: true }); };
+    await step(clock, 2500);
+    T.fire({ wt_party: { id: "TRV39", role: "host", name: "Sourav" } });
+    await step(clock, 2000);
+    const tb = T.q("#wt-trivia-btn");
+    tb.click(); await step(clock, 50); tb.click(); await step(clock, 50);  // off, then on
+    ok(T.toasts().some(t => /Trivia ON – 2 facts for Night Out \(trivia pack\) – next in \d+ min/.test(t)), "39d: 🧠 says how many facts and when the next one comes (" + JSON.stringify(T.toasts().slice(-1)) + ")");
+    T.fire({ wt_party: null });
+    await step(clock, 300);
+    env.onRuntime = null;
+
+    // 39e: background - waits while a movie plays (party or not), then updates
+    const BG = fs.readFileSync(DIR12 + "/background.js", "utf8");
+    const store = {};
+    let reloads = 0, alarmFn = null, disk = "1.36.0";
+    const chromeBg = {
+      storage: { local: { get: async (k) => { const r = {}; (Array.isArray(k) ? k : [k]).forEach(x => { if (x in store) r[x] = store[x]; }); return r; }, set: async (o) => Object.assign(store, o) } },
+      runtime: { onMessage: { addListener() {} }, getManifest: () => ({ version: "1.35.0" }), getURL: (p) => "chrome-extension://wt/" + p, reload: () => { reloads++; } },
+      alarms: { create() {}, onAlarm: { addListener: (f) => { alarmFn = f; } } },
+    };
+    store.wt_watching = { at: Date.now() };
+    const ctx = { chrome: chromeBg, fetch: async () => new Response(JSON.stringify({ version: disk }), { status: 200 }),
+      Response, Headers, Request, AbortController, AbortSignal, URL, URLSearchParams, TextEncoder, TextDecoder, ReadableStream, Blob, FormData,
+      setTimeout, clearTimeout, setInterval, clearInterval, console, navigator: { userAgent: "Chrome" }, crypto: require("crypto").webcrypto,
+      performance, queueMicrotask, structuredClone, Event, EventTarget };
+    ctx.globalThis = ctx; ctx.self = ctx; ctx.window = undefined;
+    vm.createContext(ctx);
+    const mod = new vm.SourceTextModule(BG, { context: ctx, identifier: "bg39.js" });
+    await mod.link(() => { throw new Error("self-contained"); });
+    await mod.evaluate();
+    for (let i = 0; i < 30; i++) await new Promise(r => setImmediate(r));
+    ok(reloads === 0, "39e: newer files on disk while a movie is playing (no party) -> waits");
+    store.wt_watching = { at: Date.now() - 120000 };
+    alarmFn({ name: "wt-self-update" });
+    for (let i = 0; i < 30; i++) await new Promise(r => setImmediate(r));
+    ok(reloads === 1, "39e: movie stopped -> updates itself");
   }
 
   console.log("\n============================================");

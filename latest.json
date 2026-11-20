@@ -1,5 +1,5 @@
 {
-  "version": "1.34.0",
-  "zip": "https://github.com/srv883/Watch-Movies-Together/raw/main/wt-V34.zip",
-  "notes": "Trivia with no key needed: packs for The Office, Game of Thrones, Breaking Bad and every Marvel film, Wikipedia for everything else. Updates now install themselves."
+  "version": "1.35.0",
+  "zip": "https://github.com/srv883/Watch-Movies-Together/raw/main/wt-V35.zip",
+  "notes": "Background noise is no longer boosted between words; trivia keeps working after updates (refresh banner), never updates in the middle of a movie; the trivia button says what it has."
 }

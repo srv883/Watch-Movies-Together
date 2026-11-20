@@ -155,10 +155,18 @@ function score(rx, srcWav, label) {
   bc /= NB;
   const hfR = R.reduce((a, f) => a + f.hf, 0) / R.reduce((a, f) => a + f.tot, 1e-30);
   const hfS = Sb.reduce((a, f) => a + f.hf, 0) / Sb.reduce((a, f) => a + f.tot, 1e-30);
-  // level of the received signal while the source is SILENT (pauses / tail)
-  const quiet = []; for (let i = 0; i < n; i++) { const j = (i + best.lag) % L; if (envS[j] < Math.max(...envS) - 6) quiet.push(R[i].tot); }
+  // level of the received signal while the source is SILENT (pauses / tail);
+  // envS is log10 energy, so 2.5 = 25 dB below the loudest source moment
+  const quiet = []; for (let i = 0; i < n; i++) { const j = (i + best.lag) % L; if (envS[j] < Math.max(...envS) - 2.5) quiet.push(R[i].tot); }
   const qs = quiet.slice().sort((a, b) => a - b); const quietDb = qs.length ? 10 * Math.log10(qs[Math.floor(qs.length / 2)] / (FR * FR / 4) + 1e-12) : null;
+  // v35: noise in LONG silences (>= 0.6 s, after the first 0.35 s) - what a listener notices
+  const longQ = [];
+  { let run = []; const thrQ = Math.max(...envS) - 2.5;
+    const flush = () => { if (run.length >= 60) for (const k of run.slice(35)) longQ.push(R[k].tot); run = []; };
+    for (let i = 0; i < n; i++) { const j = (i + best.lag) % L; if (envS[j] < thrQ) run.push(i); else flush(); } flush(); }
+  const lq = longQ.slice().sort((a, b) => a - b); const gapDb = lq.length ? 10 * Math.log10(lq[Math.floor(lq.length / 2)] / (FR * FR / 4) + 1e-12) : null;
   return {
+    gapDbfs: gapDb != null ? +gapDb.toFixed(1) : null,
     label, speechDbfs: +lv.dbfs.toFixed(1), peak: +peak.toFixed(3), clipSamples: clip,
     envCorr: +best.c.toFixed(3), bandCorr: +bc.toFixed(3), hfRatio: +(hfR / (hfS + 1e-12)).toFixed(2),
     pauseDbfs: quietDb != null ? +quietDb.toFixed(1) : null,

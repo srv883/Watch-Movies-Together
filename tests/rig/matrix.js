@@ -9,6 +9,7 @@ const scen = [
   { label: "quiet_nc0", args: ["--guest", "guest_quiet.wav", "--nc", "0"] },
   { label: "vquiet_nc0", args: ["--guest", "guest_vquiet.wav", "--nc", "0"] },
   { label: "noise", args: ["--guest", "guest_noise.wav"] },
+  { label: "noisy", args: ["--guest", "guest_noisy.wav"] },
   { label: "movie", args: ["--guest", "guest_normal.wav", "--movie", "1"] },
 ];
 const only = process.env.ONLY ? process.env.ONLY.split(",") : null;
@@ -27,7 +28,7 @@ for (const b of builds) {
     const tl = r && r.duckTimeline || [];
     rows.push({
       build: b.replace(/-.*/, ""), scen: s.label, ok: !!(r && r.connected && !r.error),
-      rawDb: raw && raw.speechDbfs, heardDb: y && y.speechDbfs, peak: y && y.peak, clip: y && y.clipSamples,
+      rawDb: raw && raw.speechDbfs, heardDb: y && y.speechDbfs, pauseDb: y && y.pauseDbfs, rawPauseDb: raw && raw.pauseDbfs, gapDb: y && y.gapDbfs, rawGapDb: raw && raw.gapDbfs, peak: y && y.peak, clip: y && y.clipSamples,
       envHeard: y && y.envCorr, envRaw: raw && raw.envCorr, bandHeard: y && y.bandCorr,
       friendHearsDb: f && f.speechDbfs, friendEnv: f && f.envCorr,
       auto: hs && hs.dbg && hs.dbg.boost && hs.dbg.boost.auto,
@@ -42,4 +43,4 @@ for (const b of builds) {
   }
 }
 fs.writeFileSync(path.join(__dirname, "matrix-" + builds.join("+") + ".json"), JSON.stringify(rows, null, 1));
-console.table(rows.map(r => ({ b: r.build, scen: r.scen, rawDb: r.rawDb, heardDb: r.heardDb, peak: r.peak, envH: r.envHeard, envR: r.envRaw, fHearsDb: r.friendHearsDb, auto: r.auto, ec: r.ec, kbps: r.kbps, jb: r.jbMs, duckMin: r.duckMin, duckEnd: r.duckEnd, err: r.err })));
+console.table(rows.map(r => ({ b: r.build, scen: r.scen, rawDb: r.rawDb, heardDb: r.heardDb, gapDb: r.gapDb, rawGap: r.rawGapDb, peak: r.peak, envH: r.envHeard, envR: r.envRaw, fHearsDb: r.friendHearsDb, auto: r.auto, ec: r.ec, kbps: r.kbps, jb: r.jbMs, duckMin: r.duckMin, duckEnd: r.duckEnd, err: r.err })));

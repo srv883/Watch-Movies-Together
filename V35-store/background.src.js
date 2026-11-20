@@ -345,6 +345,7 @@ export async function checkKey(apiKey) {
 // been copied into the folder, we reload ourselves - but never while a party
 // is live in some tab (that would cut the call); then we wait until it ends.
 const PARTY_FRESH_MS = 20000;
+const WATCHING_FRESH_MS = 60000; // content scripts report every 20 s while a video plays
 
 export async function checkSelfUpdate() {
   let disk = null;
@@ -354,8 +355,10 @@ export async function checkSelfUpdate() {
   } catch (_) { return "unreadable"; }
   const running = chrome.runtime.getManifest().version;
   if (!disk || disk === running) return "current";
-  const { wt_party: party, wt_live: live } = await chrome.storage.local.get(["wt_party", "wt_live"]);
-  const busy = !!party && !!live && Date.now() - (live.at || 0) < PARTY_FRESH_MS;
+  const { wt_party: party, wt_live: live, wt_watching: watching } = await chrome.storage.local.get(["wt_party", "wt_live", "wt_watching"]);
+  // v35: never in the middle of a party OR a movie (a reload strands the open tab on the old script)
+  const busy = (!!party && !!live && Date.now() - (live.at || 0) < PARTY_FRESH_MS) ||
+    (!!watching && Date.now() - (watching.at || 0) < WATCHING_FRESH_MS);
   if (busy) return "deferred";
   await chrome.storage.local.set({ wt_updated: { from: running, to: disk, at: Date.now() } });
   chrome.runtime.reload();

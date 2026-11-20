@@ -75,3 +75,15 @@ side with a key asks, cards appear at their moments on both screens, leave
 after ~12 s, alternate sides. Writes `trivia-card.png` (1280x720 screenshot).
 The real background.js (bundled Anthropic SDK) is covered by test-V33.js
 section 36 against a fake API (run with `node --experimental-vm-modules`).
+
+V35:
+- `ext-real.js --build <folder>` loads the REAL extension (manifest, background
+  service worker) into headless branded Chrome via CDP `Extensions.loadUnpacked`
+  (`--remote-debugging-pipe --enable-unsafe-extension-debugging`) and asks the
+  worker for trivia the way the page does (pack, Office, live Wikipedia). The
+  rig pages never load the background worker - run this whenever background.js changes.
+- `store-shots.js` renders the Chrome Web Store screenshots (1280x800).
+- matrix: new `noisy` scenario (`node make-variants.js --noisy`: quiet speech +
+  fan + TV bursts) and `gapDb`/`rawGap` columns = level heard in LONG silences
+  (>= 0.6 s, after 0.35 s) vs what arrived. V34 played those 6-8 dB LOUDER than
+  they arrived (+21.6 dB with NC off); V35's gate plays them 8-9 dB quieter.

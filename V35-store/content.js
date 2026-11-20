@@ -1256,6 +1256,18 @@
   // reduction it would apply to a 0 dBFS input - undo it so normal voices pass
   // at unity
   const LIM_MAKEUP_UNDO = Math.pow(10, -(0.6 * -LIM_THRESHOLD * (1 - 1 / LIM_RATIO)) / 20);
+  // v35: noise gate on the friend's voice. Every 20 ms: their level over
+  // (floor x GATE_OPEN_OVER) -> open at once; quiet for GATE_HOLD_MS -> fade the
+  // gaps down so the boosted chain plays them at half their arriving level
+  // (never louder). Hidden tab (timers throttled) -> gate stays open.
+  const GATE_TICK_MS = 20;
+  const GATE_OPEN_OVER = 4;        // +12 dB over their noise floor counts as voice
+  const GATE_HOLD_MS = 250;        // keep open through short pauses inside words
+  const GATE_GAP_LEVEL = 0.35;     // gaps end up at x0.35 of what arrived (-9 dB)
+  const GATE_MIN = 0.02;           // (x16 boost x 0.02 = x0.32: even maximum boost never lifts the gaps)
+  const GATE_SPREAD_FRAMES = 15;   // ~300 ms of 20 ms levels
+  const GATE_SPEECH_SPREAD_DB = 5; // speech varies >= 4 dB frame to frame; steady noise ~1-2 dB
+  const GATE_LOUD_OVER = 8;        // anything 18 dB over the open threshold opens anyway (shouting)
   const DUCK_LEVEL = 0.4;          // movie at 40% of its volume while they talk
   const DUCK_HOLD_MS = 900;        // back up after this much friend silence
 
@@ -1305,7 +1317,8 @@
     showTalking(false);
     if (!vb) return;
     clearInterval(vb.timer);
-    for (const n of [vb.src, vb.analyser, vb.gain, vb.comp, vb.fix, vb.post]) {
+    clearInterval(vb.gateTimer);
+    for (const n of [vb.src, vb.analyser, vb.gain, vb.gate, vb.comp, vb.fix, vb.post]) {
       try { if (n) n.disconnect(); } catch (_) {}
     }
     vbRouting();
@@ -1349,6 +1362,46 @@
     if (target === 1 && d.f > 0.985) { unduck(); return; }
     const nv = Math.max(0, Math.min(1, d.base * d.f));
     try { v.volume = nv; d.set = v.volume; } catch (_) {}
+  }
+
+  function gateTick(vb) {
+    if (S.vb !== vb || !vb.gate) return;
+    const now = Date.now();
+    let target = 1;
+    let hidden = false;
+    try { hidden = !!document.hidden; } catch (_) {}
+    if (!hidden) {
+      let rms = 0;
+      try {
+        vb.analyser.getFloatTimeDomainData(vb.gateBuf);
+        let s = 0;
+        for (let i = 0; i < vb.gateBuf.length; i++) s += vb.gateBuf[i] * vb.gateBuf[i];
+        rms = Math.sqrt(s / vb.gateBuf.length);
+      } catch (_) { rms = 1; }
+      const thr = Math.max(VB_SPEECH_MIN * 0.7, (vb.floor || 0) * GATE_OPEN_OVER);
+      // speech flickers syllable by syllable; a fan / TV hiss / traffic is steady.
+      // Spread of the last ~300 ms of 20 ms levels (dB) tells them apart.
+      const db = 20 * Math.log10(rms + 1e-9);
+      const L = vb.gateLev || (vb.gateLev = []);
+      L.push(db); if (L.length > GATE_SPREAD_FRAMES) L.shift();
+      let mean = 0; for (const x of L) mean += x; mean /= L.length;
+      let v = 0; for (const x of L) v += (x - mean) * (x - mean);
+      const spread = Math.sqrt(v / L.length);
+      const loud = rms >= thr;
+      if (loud && (spread >= GATE_SPEECH_SPREAD_DB || rms >= thr * GATE_LOUD_OVER)) vb.gateOpenAt = now;
+      if (now - (vb.gateOpenAt || 0) > GATE_HOLD_MS) {
+        // the boosted chain plays the gap at GATE_GAP_LEVEL of what arrived
+        target = Math.max(GATE_MIN, Math.min(1, GATE_GAP_LEVEL / Math.max(1, vb.applied || 1)));
+      }
+    }
+    if (target === vb.gateTarget) return;
+    const opening = target > vb.gateTarget;
+    vb.gateTarget = target;
+    try {
+      const t = vb.ctx.currentTime;
+      vb.gate.gain.cancelScheduledValues(t);
+      vb.gate.gain.setTargetAtTime(target, t, opening ? 0.004 : 0.06); // open in ~10 ms, fade over ~150 ms
+    } catch (_) { try { vb.gate.gain.value = target; } catch (__) {} }
   }
 
   function vbTick(vb) {
@@ -1404,20 +1457,27 @@
       }
       const post = ctx.createAnalyser();
       post.fftSize = 1024;
+      // v35: noise gate after the boost - the gaps between words (fan, TV,
+      // traffic) are turned DOWN instead of being boosted along with the voice
+      const gate = ctx.createGain();
+      gate.gain.value = 1;
       src.connect(analyser);
       src.connect(gain);
-      let out = gain;
-      if (comp) { gain.connect(comp); comp.connect(fix); out = fix; }
+      gain.connect(gate);
+      let out = gate;
+      if (comp) { gate.connect(comp); comp.connect(fix); out = fix; }
       out.connect(ctx.destination);
       out.connect(post);
       const vb = {
-        ctx, src, analyser, gain, comp, fix, post,
+        ctx, src, analyser, gain, gate, comp, fix, post,
         auto: 1, level: 0, floor: 0, hist: [], run: 0, speaking: false, applied: 1, told: false, lastState: ctx.state,
-        buf: new Float32Array(analyser.fftSize), timer: null
+        buf: new Float32Array(analyser.fftSize), timer: null,
+        gateBuf: new Float32Array(512), gateOpenAt: 0, gateTarget: 1, gateTimer: null
       };
       S.vb = vb;
       applyVbGain();
       vb.timer = setInterval(() => vbTick(vb), 100);
+      vb.gateTimer = setInterval(() => gateTick(vb), GATE_TICK_MS);
       if (ctx.state !== "running") {
         try { Promise.resolve(ctx.resume()).then(vbRouting, () => {}); } catch (_) {}
       }
@@ -3212,7 +3272,7 @@
     ui.root.querySelector("#wt-trivia-btn").addEventListener("click", (e) => {
       e.stopPropagation();
       setTriviaOn(!TV.on, true);
-      toast(TV.on ? "🧠 Trivia ON" : "🧠 Trivia OFF");
+      toast(TV.on ? "🧠 Trivia ON – " + triviaStatus() : "🧠 Trivia OFF");
     });
     ui.root.querySelector("#wt-hist-back").addEventListener("click", (e) => {
       e.stopPropagation();
@@ -4622,11 +4682,52 @@ function toast(text) {
       return;
     }
     const err = resp.error;
-    if (err === "no-key" || err === "unknown") return; // nothing for this title (a friend may still share)
+    if (err === "no-key" || err === "unknown") { TV.unknown = key; return; } // nothing for this title (a friend may still share)
     if (err === "bad-key") { triviaTellOnce("badkey", "🧠 AI trivia: the API key was rejected – check it in the extension popup"); return; }
     if (err === "declined") return;
     // busy / offline / failed: try again later
     setTimeout(() => { delete TV.asked[key]; }, TRIVIA_RETRY_MS);
+  }
+
+  // v35: what the 🧠 button says - so "no trivia" is never a mystery
+  function triviaStatus() {
+    const v = S.video;
+    if (!v) return "start a video";
+    if (orphaned()) return "refresh this page to finish the update";
+    if (!triviaKey()) {
+      if (browsingNow()) return "open an episode or film";
+      return v.duration === Infinity ? "no trivia for live TV" : "waiting for the video to load";
+    }
+    if (TV.items && TV.items.length) {
+      const t = v.currentTime;
+      const next = TV.items.find((it) => it.t > t && !TV.shown[it.t]);
+      const src = { pack: "trivia pack", wikipedia: "Wikipedia", claude: "Claude" }[TV.source] || "";
+      return TV.items.length + " facts" + (TV.title ? " for " + TV.title : "") + (src ? " (" + src + ")" : "") +
+        (next ? " – next in " + Math.max(1, Math.round((next.t - t) / 60)) + " min" : " – no more after this point");
+    }
+    if (TV.unknown === TV.key) return "nothing found for this title";
+    return "looking up this title…";
+  }
+
+  // v35: an extension reload (update) leaves this page running the OLD script,
+  // which can no longer reach the extension (no trivia, nothing saved).
+  function orphaned() {
+    try { return !(chrome && chrome.runtime && chrome.runtime.id); } catch (_) { return true; }
+  }
+  function orphanTick() {
+    if (S.orphanTold || !orphaned()) return;
+    S.orphanTold = true;
+    showBanner("orphan", "✨ Watch Together was updated – refresh this page to finish (the party rejoins where your friend is)", [
+      { label: "Refresh", act: () => { try { location.reload(); } catch (_) {} } },
+      { label: "×", act: () => hideBanner("orphan") },
+    ]);
+  }
+  // v35: tell the background a video is playing, so it never reloads itself
+  // (self-update) in the middle of a movie - party or not
+  function watchingTick() {
+    const v = S.video;
+    if (!v || v.paused || orphaned() || browsingNow()) return;
+    try { chrome.storage.local.set({ wt_watching: { at: Date.now() } }); } catch (_) {}
   }
 
   function triviaTick() {
@@ -4749,7 +4850,7 @@ function toast(text) {
       route: isOpen() ? (S.directMode ? "direct" : "peerjs") : null, relays: AL.socks.filter((x) => x.ok).length,
       gotStream: !!S.voiceGotStream, friendVer: S.friendVer,
       boost: S.vb ? { ctx: S.vb.ctx.state, auto: +S.vb.auto.toFixed(2), gain: +S.vb.applied.toFixed(2), inRms: +S.vb.level.toFixed(4),
-        floor: +S.vb.floor.toFixed(5), speaking: !!S.vb.speaking, duck: S.duck ? { base: S.duck.base, vol: S.video ? +S.video.volume.toFixed(3) : null } : null,
+        floor: +S.vb.floor.toFixed(5), speaking: !!S.vb.speaking, gate: +(S.vb.gateTarget || 1).toFixed(3), duck: S.duck ? { base: S.duck.base, vol: S.video ? +S.video.volume.toFixed(3) : null } : null,
         outRms: (() => { try { return +rmsOf(S.vb.post, new Float32Array(S.vb.post.fftSize)).toFixed(4); } catch (_) { return null; } })() } : null,
       gate: !!S.gateTimer, gateMuted: !!S.gateMuted,
       histEntries: S.hist.length,
@@ -4776,6 +4877,8 @@ function toast(text) {
     setInterval(navTick, 1000);
     setInterval(liveTick, 1000); // v32: stand by while another tab has the party
     setInterval(triviaTick, 1000); // v33
+    setInterval(orphanTick, 3000); // v35: refresh banner after an update
+    setInterval(watchingTick, 20000); // v35: no self-update mid-movie
     startWatchdog();
     // instant recovery when a slept PC / background tab wakes up
     document.addEventListener("visibilitychange", () => {
