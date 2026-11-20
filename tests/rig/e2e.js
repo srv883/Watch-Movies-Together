@@ -433,6 +433,39 @@ const chat = (text) => `(() => { const i = document.querySelector("#wt-input"); 
         rec("S14d", "the reloaded guest rejoins at the host's position (<1.5 s)", r3.ok && !g3.paused && Math.abs(h3.t - g3.t) < 1.5, { ms: r3.ms, host: h3, guest: g3 });
       } else rec("S14a", "reload scenario connects", false, {});
     }
+
+    // ---------------- S15: AI trivia cards in the real player (fake background) ----------------
+    if (want("S15")) {
+      await boot("&mic=0&trivia=1&stall=th&at=999", "&mic=0&stall=tg&at=999");
+      const r1 = await waitFor(H, J.status, synced, 30000);
+      await waitFor(G, J.status, synced, 5000);
+      if (r1.ok) {
+        // runtime must be >= 10 min for trivia: stretch what the page reports (the clip is 60 s)
+        for (const P of [H, G]) await P.eval(`(() => { const v = document.getElementById("vid"); Object.defineProperty(v, "duration", { get: () => 1320, configurable: true }); return true; })()`);
+        const ready = await waitFor(G, J.msgs, ms => ms.some(x => /AI trivia ready/.test(x)), 12000);
+        rec("S15a", "host's trivia is shared with the friend (who has no key)", ready.ok, { ms: ready.ms, line: (ready.v || []).find(x => /AI trivia/.test(x)) });
+        const hAsk = await H.eval(`(window.__rtMsgs || []).filter(m => m.t === "wt-trivia").length`);
+        const gAsk = await G.eval(`(window.__rtMsgs || []).filter(m => m.t === "wt-trivia").length`);
+        rec("S15b", "only the side with a key asks for trivia", hAsk === 1 && gAsk === 0, { hostAsks: hAsk, guestAsks: gAsk });
+        await H.eval(user(`document.getElementById("vid").play().then(() => true)`), true);
+        const card = `[...document.querySelectorAll(".wt-trivia")].map(c => ({ text: c.textContent, left: Math.round(c.getBoundingClientRect().left), top: Math.round(c.getBoundingClientRect().top), w: Math.round(c.getBoundingClientRect().width), op: getComputedStyle(c).opacity }))`;
+        const c1 = await waitFor(H, card, cs => cs.some(c => /RIG-FACT-ONE/.test(c.text)), 9000);
+        const g1 = await waitFor(G, card, cs => cs.some(c => /RIG-FACT-ONE/.test(c.text)), 3000);
+        const t1 = await H.eval(J.vid);
+        rec("S15c", "first card appears at its moment (4 s) on both screens", c1.ok && g1.ok && t1.t < 9, { at: t1.t, host: c1.v, guest: g1.v });
+        try {
+          await H.send("Emulation.setDeviceMetricsOverride", { width: 1280, height: 720, deviceScaleFactor: 1, mobile: false });
+          await H.eval(`(() => { const v = document.getElementById("vid"); v.style.width = "100vw"; v.style.height = "100vh"; v.style.position = "fixed"; v.style.left = "0"; v.style.top = "0"; return true; })()`);
+          await sleep(500);
+          const shot = await H.send("Page.captureScreenshot", { format: "png" });
+          fs.writeFileSync(path.join(__dirname, "trivia-card.png"), Buffer.from(shot.data, "base64"));
+        } catch (_) {}
+        const gone = await waitFor(H, card, cs => !cs.some(c => /RIG-FACT-ONE/.test(c.text)), 16000);
+        rec("S15d", "the card leaves by itself after ~12 s", gone.ok, { ms: gone.ms });
+        const c2 = await waitFor(H, card, cs => cs.some(c => /RIG-FACT-TWO/.test(c.text)), 15000);
+        rec("S15e", "second card at its moment (24 s), on the other side", c2.ok && c1.ok && c2.v.find(c => /TWO/.test(c.text)).left !== c1.v.find(c => /ONE/.test(c.text)).left, { first: c1.v && c1.v[0], second: c2.v && c2.v[0] });
+      } else rec("S15a", "trivia scenario connects", false, {});
+    }
   } catch (e) {
     rec("X", "harness", false, String(e && e.message || e));
   } finally {

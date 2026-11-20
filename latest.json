@@ -1,5 +1,5 @@
 {
-  "version": "1.32.0",
-  "zip": "https://github.com/srv883/Watch-Movies-Together/raw/main/wt-V32.zip",
-  "notes": "Trailers and other episodes no longer disturb your video, a reloaded tab rejoins where the party is, a second tab no longer starts its own party."
+  "version": "1.33.0",
+  "zip": "https://github.com/srv883/Watch-Movies-Together/raw/main/wt-V33.zip",
+  "notes": "AI scene trivia floats in at the matching moments (add a Claude API key in the popup; one of you is enough). Unpacked installs now update themselves."
 }

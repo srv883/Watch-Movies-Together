@@ -31,6 +31,7 @@
   if (qs.get("mic") === "1") store.wt_mic_state = true;
   if (qs.has("nc")) store.wt_nc = qs.get("nc") === "1";
   if (qs.has("vol")) store.wt_voice_vol = Number(qs.get("vol"));
+  if (qs.get("trivia") === "1") store.wt_anthropic_key = "sk-ant-rig";
   const listeners = [];
   window.chrome = {
     storage: {
@@ -40,7 +41,20 @@
       },
       onChanged: { addListener: f => listeners.push(f) },
     },
-    runtime: { id: "rig", getManifest: () => ({ version: "rig" }) },
+    runtime: { id: "rig", getManifest: () => ({ version: "rig" }),
+      // v33: stand-in for the background worker (no real API in the rig).
+      // &trivia=1 -> this tab "has a key" and gets fixed items; otherwise "no-key".
+      sendMessage: (msg, cb) => {
+        window.__rtMsgs = (window.__rtMsgs || []).concat([msg]);
+        setTimeout(() => {
+          if (msg && msg.t === "wt-trivia") {
+            cb && cb(qs.get("trivia") === "1"
+              ? { items: [ { t: 4, scene: "Cold open", fact: "RIG-FACT-ONE: the cold open was improvised on set." },
+                           { t: 24, scene: "Dinner party", fact: "RIG-FACT-TWO: the dinner scene took two weeks to film." } ], title: "Rig Episode" }
+              : { error: "no-key" });
+          } else cb && cb({ ok: true });
+        }, 300);
+      } },
   };
 
   // optional: kill PeerJS signaling

@@ -66,3 +66,12 @@ when a real gesture came first.
   streaming site. Host tab reloads -> guest must never be pulled back and the
   host rejoins at the guest's position; then the same with the guest. V31: the
   guest was pulled from 8 s back to 4.7 s.
+
+V33 adds S15 (49 checks, ~5 min): AI trivia cards in the real player. rig.html
+stubs `chrome.runtime.sendMessage` as the background worker (`&trivia=1` = this
+tab "has a key" and gets two fixed items at 4 s and 24 s; otherwise `no-key`).
+Checks: the keyless friend receives the host's trivia over the link, only the
+side with a key asks, cards appear at their moments on both screens, leave
+after ~12 s, alternate sides. Writes `trivia-card.png` (1280x720 screenshot).
+The real background.js (bundled Anthropic SDK) is covered by test-V33.js
+section 36 against a fake API (run with `node --experimental-vm-modules`).
