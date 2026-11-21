@@ -11,63 +11,14 @@
    "title": "The Office – Fun Run (Part 1)",
    "items": [
     {
-     "p": 0.06,
-     "scene": "Michael hits Meredith",
-     "fact": "Season 4 opened with an hour-long episode, often split into two parts on streaming services."
-    },
-    {
      "p": 0.35,
+     "w": 0.5,
+     "cue": [
+      "im not superstitious but i am a little stitious",
+      "a little stitious"
+     ],
      "scene": "Michael's 'curse'",
-     "fact": "Michael convinces himself the office is cursed after hitting Meredith with his car in the parking lot."
-    },
-    {
-     "p": 0.7,
-     "scene": "Hospital visit",
-     "fact": "At the hospital it turns out Meredith has rabies, which inspires Michael's charity race."
-    }
-   ]
-  },
-  {
-   "names": [
-    "fun run pt 2",
-    "fun run 2",
-    "fun run"
-   ],
-   "title": "The Office – Fun Run (Part 2)",
-   "items": [
-    {
-     "p": 0.15,
-     "scene": "The race's name",
-     "fact": "The full name of Michael's race is 'Michael Scott's Dunder Mifflin Scranton Meredith Palmer Memorial Celebrity Rabies Awareness Pro-Am Fun Run Race for the Cure'."
-    },
-    {
-     "p": 0.45,
-     "scene": "Sprinkles",
-     "fact": "Angela's cat Sprinkles dies because Dwight froze it – a sore point that fuels their break-up later in the season."
-    },
-    {
-     "p": 0.8,
-     "scene": "Jim and Pam on camera",
-     "fact": "This is the episode where Jim and Pam finally admit to the documentary crew that they are dating."
-    }
-   ]
-  },
-  {
-   "names": [
-    "dunder mifflin infinity pt 1",
-    "dunder mifflin infinity 1"
-   ],
-   "title": "The Office – Dunder Mifflin Infinity (Part 1)",
-   "items": [
-    {
-     "p": 0.2,
-     "scene": "Ryan returns",
-     "fact": "Ryan comes back to Scranton as Michael's boss, pitching the company's new website, Dunder Mifflin Infinity."
-    },
-    {
-     "p": 0.65,
-     "scene": "Michael's baskets",
-     "fact": "Michael tries to win back clients by delivering gift baskets in person – old-school sales versus Ryan's web strategy."
+     "fact": "'I'm not superstitious, but I am a little stitious' - one of the most-quoted Michael lines of the whole series."
     }
    ]
   },
@@ -81,71 +32,12 @@
    "items": [
     {
      "p": 0.3,
-     "scene": "The GPS",
-     "fact": "'The machine knows!' – Michael follows his GPS straight into a lake while Dwight shouts that it's a lake. It is one of the show's most quoted scenes."
-    },
-    {
-     "p": 0.7,
-     "scene": "Ryan's new look",
-     "fact": "Ryan's stubble-and-dark-clothes makeover marks his slide into the 'Wunderkind' arc that ends with his arrest later this season."
-    }
-   ]
-  },
-  {
-   "names": [
-    "launch party pt 1",
-    "launch party 1"
-   ],
-   "title": "The Office – Launch Party (Part 1)",
-   "items": [
-    {
-     "p": 0.25,
-     "scene": "The website launch",
-     "fact": "The office watches the website launch over a video feed, assuming they're invited to the New York party."
-    },
-    {
-     "p": 0.6,
-     "scene": "Dwight vs. the website",
-     "fact": "Dwight challenges the website to a sales race – man against machine."
-    }
-   ]
-  },
-  {
-   "names": [
-    "launch party pt 2",
-    "launch party 2",
-    "launch party"
-   ],
-   "title": "The Office – Launch Party (Part 2)",
-   "items": [
-    {
-     "p": 0.35,
-     "scene": "The pizza boy",
-     "fact": "Michael keeps the pizza delivery boy hostage over a coupon dispute – a scene fans still quote as 'the pizza hostage'."
-    },
-    {
-     "p": 0.7,
-     "scene": "Alfredo's",
-     "fact": "The running joke: everyone knows to order from Alfredo's Pizza Cafe, never Pizza by Alfredo."
-    }
-   ]
-  },
-  {
-   "names": [
-    "money pt 1",
-    "money 1"
-   ],
-   "title": "The Office – Money (Part 1)",
-   "items": [
-    {
-     "p": 0.3,
-     "scene": "Michael's debts",
-     "fact": "Jan's spending has buried Michael in debt, so he takes a night job as a telemarketer."
-    },
-    {
-     "p": 0.7,
-     "scene": "Schrute Farms",
-     "fact": "Jim and Pam stay at Dwight's beet farm, now a bed and breakfast (agritourism) listed on travel sites."
+     "w": 0.5,
+     "cue": [
+      "the machine knows"
+     ],
+     "scene": "The GPS and the lake",
+     "fact": "'The machine knows!' - Michael trusts the GPS over his own eyes and Dwight's screaming. One of the show's most quoted scenes."
     }
    ]
   },
@@ -158,14 +50,13 @@
    "title": "The Office – Money (Part 2)",
    "items": [
     {
-     "p": 0.4,
-     "scene": "The stairs",
-     "fact": "Jim tells Pam that whenever he feels down he goes to the stairwell – a sweet callback that fans love."
-    },
-    {
      "p": 0.75,
-     "scene": "Michael declares bankruptcy",
-     "fact": "'I DECLARE BANKRUPTCY!' – Michael's shouted declaration is one of the show's best-known lines."
+     "w": 0.5,
+     "cue": [
+      "i declare bankruptcy"
+     ],
+     "scene": "Michael's money talk",
+     "fact": "Oscar explains that you can't just declare bankruptcy by shouting it - the scene is a fan favourite and a much-used meme."
     }
    ]
   },
@@ -176,42 +67,13 @@
    "title": "The Office – Local Ad",
    "items": [
     {
-     "p": 0.12,
-     "scene": "The corporate ad",
-     "fact": "This episode was directed by film director Jason Reitman (Juno, Up in the Air)."
-    },
-    {
      "p": 0.45,
+     "w": 0.5,
+     "cue": [
+      "second life"
+     ],
      "scene": "Dwight's Second Life",
-     "fact": "Dwight plays the online world Second Life – and inside it he plays a game called 'Second Second Life'."
-    },
-    {
-     "p": 0.8,
-     "scene": "Michael's commercial",
-     "fact": "Michael's homemade ad replaces the professional one; the whole office ends up cheering for it."
-    }
-   ]
-  },
-  {
-   "names": [
-    "branch wars"
-   ],
-   "title": "The Office – Branch Wars",
-   "items": [
-    {
-     "p": 0.25,
-     "scene": "Karen in Utica",
-     "fact": "Karen is now regional manager in Utica and tries to poach Stanley."
-    },
-    {
-     "p": 0.55,
-     "scene": "The Finer Things Club",
-     "fact": "Pam, Oscar and Toby's Finer Things Club bans talk of work and TV – and refuses to let Jim join."
-    },
-    {
-     "p": 0.8,
-     "scene": "The stolen copier",
-     "fact": "Michael, Dwight and Jim break into the Utica branch in disguise and steal a copier."
+     "fact": "Second Life was a real online world, huge in 2007 - and inside it Dwight plays a game called 'Second Second Life'."
     }
    ]
   },
@@ -222,43 +84,13 @@
    "title": "The Office – Survivor Man",
    "items": [
     {
-     "p": 0.2,
-     "scene": "Left out",
-     "fact": "Michael wasn't invited to Ryan's executive wilderness retreat, so he stages his own survival trip."
-    },
-    {
-     "p": 0.5,
-     "scene": "Birthdays",
-     "fact": "Meanwhile Jim tries to merge all the office birthday parties into one – and learns how hard Michael's job is."
-    },
-    {
-     "p": 0.8,
-     "scene": "Dwight in the woods",
-     "fact": "Dwight secretly watches over Michael in the woods to make sure he survives."
-    }
-   ]
-  },
-  {
-   "names": [
-    "the deposition",
-    "deposition"
-   ],
-   "title": "The Office – The Deposition",
-   "items": [
-    {
-     "p": 0.2,
-     "scene": "Jan's lawsuit",
-     "fact": "Jan is suing Dunder Mifflin for wrongful termination and expects Michael to support her."
-    },
-    {
-     "p": 0.5,
-     "scene": "Michael's diary",
-     "fact": "Jan's lawyer reads Michael's private diary out loud during the deposition."
-    },
-    {
-     "p": 0.75,
-     "scene": "Ping pong",
-     "fact": "Back in the office, Kevin and Darryl get into a fierce ping-pong rivalry."
+     "p": 0.4,
+     "w": 0.5,
+     "cue": [
+      "adapt react readapt apt"
+     ],
+     "scene": "Michael in the woods",
+     "fact": "'Adapt, react, readapt, apt' - Michael's survival motto, one of his best mangled phrases."
     }
    ]
   },
@@ -269,52 +101,31 @@
    "title": "The Office – Dinner Party",
    "items": [
     {
-     "p": 0.06,
-     "scene": "The writers' strike",
-     "fact": "'Dinner Party' was the first new episode after the 2007–08 Writers Guild strike."
-    },
-    {
-     "p": 0.22,
-     "scene": "Michael's tiny TV",
-     "fact": "Michael's prized plasma TV is famously tiny – the camera keeps catching it."
-    },
-    {
-     "p": 0.38,
-     "scene": "Serenity by Jan",
-     "fact": "Jan's candle company 'Serenity by Jan' makes the condo smell overwhelming."
+     "p": 0.3,
+     "w": 0.4,
+     "cue": [
+      "serenity by jan"
+     ],
+     "scene": "Jan's candles",
+     "fact": "Jan's candle business 'Serenity by Jan' is why the condo smells so strong - she's spending Michael's money on it."
     },
     {
      "p": 0.55,
-     "scene": "Snip snap",
-     "fact": "'Snip snap, snip snap' – Michael reveals he's had three vasectomies (and reversals)."
+     "w": 0.4,
+     "cue": [
+      "snip snap snip snap"
+     ],
+     "scene": "The vasectomies",
+     "fact": "'Snip snap, snip snap' - Michael has had three vasectomies (and reversals). The episode is regularly ranked among the best of the whole series."
     },
     {
      "p": 0.72,
+     "w": 0.4,
+     "cue": [
+      "that one night"
+     ],
      "scene": "Hunter's song",
-     "fact": "Jan plays 'That One Night', a song by her former assistant Hunter, to make Michael jealous."
-    },
-    {
-     "p": 0.88,
-     "scene": "The Dundie",
-     "fact": "Jan throws one of Michael's Dundie awards at his TV; the episode is regularly ranked among the best in the series."
-    }
-   ]
-  },
-  {
-   "names": [
-    "chair model"
-   ],
-   "title": "The Office – Chair Model",
-   "items": [
-    {
-     "p": 0.3,
-     "scene": "The catalog",
-     "fact": "Michael falls for the model in an office-chair catalog and tries to find her."
-    },
-    {
-     "p": 0.7,
-     "scene": "Dwight's legal advice",
-     "fact": "Meanwhile Dwight gives questionable legal advice to Andy about his car."
+     "fact": "'That One Night' was written for the show as Hunter's song - and Jan plays it to wind Michael up."
     }
    ]
   },
@@ -325,24 +136,13 @@
    "title": "The Office – Night Out",
    "items": [
     {
-     "p": 0.12,
-     "scene": "Writer",
-     "fact": "This episode was written by Mindy Kaling, who plays Kelly Kapoor."
-    },
-    {
-     "p": 0.35,
-     "scene": "New York",
-     "fact": "Michael and Dwight visit Ryan in New York and see how far his party lifestyle has gone."
-    },
-    {
-     "p": 0.6,
-     "scene": "Locked in",
-     "fact": "The Scranton crew gets locked inside the office building's gate overnight."
-    },
-    {
      "p": 0.82,
-     "scene": "Toby's moment",
-     "fact": "Toby puts his hand on Pam's knee – then announces he's moving to Costa Rica and runs out."
+     "w": 0.3,
+     "cue": [
+      "costa rica"
+     ],
+     "scene": "Toby's escape",
+     "fact": "Toby's knee touch and 'I'm moving to Costa Rica' set up his exit at the end of the season - this episode was written by Mindy Kaling."
     }
    ]
   },
@@ -354,227 +154,12 @@
    "items": [
     {
      "p": 0.2,
+     "w": 0.5,
+     "cue": [
+      "did i stutter"
+     ],
      "scene": "Stanley snaps",
-     "fact": "Stanley's 'Did I stutter?' at a meeting is one of the rare times the quiet salesman openly defies Michael."
-    },
-    {
-     "p": 0.6,
-     "scene": "Respect",
-     "fact": "Michael is torn between being liked and being respected – a central theme of his character."
-    }
-   ]
-  },
-  {
-   "names": [
-    "job fair"
-   ],
-   "title": "The Office – Job Fair",
-   "items": [
-    {
-     "p": 0.3,
-     "scene": "The job fair",
-     "fact": "Michael and Pam staff a job fair at Michael's old high school with almost no candidates."
-    },
-    {
-     "p": 0.6,
-     "scene": "Golf",
-     "fact": "Jim, Andy and Kevin play golf to win a client – Andy's preppy confidence goes badly."
-    },
-    {
-     "p": 0.85,
-     "scene": "Pratt",
-     "fact": "Pam decides to apply to art school – the Pratt Institute in New York."
-    }
-   ]
-  },
-  {
-   "names": [
-    "goodbye toby pt 1",
-    "goodbye toby 1"
-   ],
-   "title": "The Office – Goodbye, Toby (Part 1)",
-   "items": [
-    {
-     "p": 0.15,
-     "scene": "Toby's leaving",
-     "fact": "The Season 4 finale was an hour long, split into two parts on streaming."
-    },
-    {
-     "p": 0.5,
-     "scene": "The party",
-     "fact": "Michael plans a lavish farewell party for Toby – mostly because he's thrilled Toby is leaving."
-    },
-    {
-     "p": 0.85,
-     "scene": "Holly",
-     "fact": "Holly Flax arrives: Amy Ryan joined the show the same season she earned an Oscar nomination for 'Gone Baby Gone'."
-    }
-   ]
-  },
-  {
-   "names": [
-    "goodbye toby pt 2",
-    "goodbye toby 2",
-    "goodbye toby"
-   ],
-   "title": "The Office – Goodbye, Toby (Part 2)",
-   "items": [
-    {
-     "p": 0.2,
-     "scene": "Kevin",
-     "fact": "Michael convinces Holly that Kevin has a mental disability, leading to one of the season's most awkward running gags."
-    },
-    {
-     "p": 0.55,
-     "scene": "Andy proposes",
-     "fact": "Jim was planning to propose to Pam that night, but Andy proposes to Angela first and Jim backs off."
-    },
-    {
-     "p": 0.85,
-     "scene": "Ryan's arrest",
-     "fact": "Ryan is arrested for fraud over the Dunder Mifflin Infinity website."
-    }
-   ]
-  },
-  {
-   "names": [
-    "weight loss pt 1",
-    "weight loss 1"
-   ],
-   "title": "The Office – Weight Loss (Part 1)",
-   "items": [
-    {
-     "p": 0.2,
-     "scene": "Summer contest",
-     "fact": "Season 5 starts with a summer-long weight-loss competition between the branches."
-    },
-    {
-     "p": 0.6,
-     "scene": "Pam in New York",
-     "fact": "Pam leaves for art school in New York, putting her and Jim into a long-distance relationship."
-    }
-   ]
-  },
-  {
-   "names": [
-    "weight loss pt 2",
-    "weight loss 2",
-    "weight loss"
-   ],
-   "title": "The Office – Weight Loss (Part 2)",
-   "items": [
-    {
-     "p": 0.35,
-     "scene": "Holly and Michael",
-     "fact": "Michael and Holly's romance begins in earnest in this episode."
-    },
-    {
-     "p": 0.78,
-     "scene": "The proposal",
-     "fact": "Jim proposes to Pam at a highway rest stop in the rain – the production built a full replica rest stop, reportedly about $250,000, the show's most expensive shot."
-    }
-   ]
-  },
-  {
-   "names": [
-    "business ethics"
-   ],
-   "title": "The Office – Business Ethics",
-   "items": [
-    {
-     "p": 0.25,
-     "scene": "Ethics seminar",
-     "fact": "Holly runs a business-ethics seminar, and Meredith admits she slept with a supplier for discounts."
-    },
-    {
-     "p": 0.6,
-     "scene": "Dwight's time",
-     "fact": "Jim times how long Dwight spends on personal stuff at work and confronts him with the total."
-    }
-   ]
-  },
-  {
-   "names": [
-    "baby shower"
-   ],
-   "title": "The Office – Baby Shower",
-   "items": [
-    {
-     "p": 0.3,
-     "scene": "Jan's baby",
-     "fact": "Jan's baby shower is held at the office even though she isn't sure Michael is involved at all."
-    },
-    {
-     "p": 0.7,
-     "scene": "Practice",
-     "fact": "Michael practises driving to the hospital with Dwight – it goes badly."
-    }
-   ]
-  },
-  {
-   "names": [
-    "crime aid"
-   ],
-   "title": "The Office – Crime Aid",
-   "items": [
-    {
-     "p": 0.3,
-     "scene": "The break-in",
-     "fact": "After a burglary, Michael throws a charity auction to replace what was stolen."
-    }
-   ]
-  },
-  {
-   "names": [
-    "employee transfer"
-   ],
-   "title": "The Office – Employee Transfer",
-   "items": [
-    {
-     "p": 0.3,
-     "scene": "Holly transferred",
-     "fact": "Corporate transfers Holly to the Nashua branch after learning about her relationship with Michael."
-    },
-    {
-     "p": 0.7,
-     "scene": "Road trip",
-     "fact": "Michael and Dwight drive Holly to Nashua; the goodbye is one of the show's saddest moments."
-    }
-   ]
-  },
-  {
-   "names": [
-    "customer survey"
-   ],
-   "title": "The Office – Customer Survey",
-   "items": [
-    {
-     "p": 0.4,
-     "scene": "Bad reviews",
-     "fact": "Jim and Dwight get low customer-satisfaction scores, which threatens their bonuses."
-    },
-    {
-     "p": 0.8,
-     "scene": "The culprit",
-     "fact": "It turns out Kelly and Ryan changed the scores – Kelly as payback for Jim missing her party."
-    }
-   ]
-  },
-  {
-   "names": [
-    "business trip"
-   ],
-   "title": "The Office – Business Trip",
-   "items": [
-    {
-     "p": 0.3,
-     "scene": "Winnipeg",
-     "fact": "Michael, Andy and Oscar go on a sales trip to Winnipeg, Canada."
-    },
-    {
-     "p": 0.75,
-     "scene": "Pam's grade",
-     "fact": "Pam admits to Jim that she failed a course and will be stuck in New York another term."
+     "fact": "Leslie David Baker's 'Did I stutter?' gave the episode its title - a rare moment of Stanley openly defying Michael."
     }
    ]
   },
@@ -586,37 +171,13 @@
    "items": [
     {
      "p": 0.15,
+     "w": 0.4,
+     "cue": [
+      "no god please no",
+      "no god no god please no"
+     ],
      "scene": "Toby is back",
-     "fact": "Toby returns from Costa Rica, to Michael's horror."
-    },
-    {
-     "p": 0.55,
-     "scene": "The 'drugs'",
-     "fact": "Michael tries to frame Toby by planting what he thinks is marijuana – it's actually a caprese salad."
-    },
-    {
-     "p": 0.85,
-     "scene": "The house",
-     "fact": "Jim buys his parents' house as a surprise for Pam."
-    }
-   ]
-  },
-  {
-   "names": [
-    "the surplus",
-    "surplus"
-   ],
-   "title": "The Office – The Surplus",
-   "items": [
-    {
-     "p": 0.4,
-     "scene": "Copier or chairs",
-     "fact": "Michael must choose how to spend a $4,300 budget surplus: a new copier or new chairs."
-    },
-    {
-     "p": 0.75,
-     "scene": "The bonus",
-     "fact": "He finally learns that whatever he doesn't spend, he gets a percentage of as a bonus."
+     "fact": "Michael's 'No, God! No, God, please, no!' when Toby returns became one of the internet's most-used reaction clips."
     }
    ]
   },
@@ -628,55 +189,12 @@
    "items": [
     {
      "p": 0.25,
-     "scene": "The doll",
-     "fact": "Dwight corners the market on a hit doll, Princess Unicorn, and resells it at a markup."
-    },
-    {
-     "p": 0.5,
-     "scene": "Meredith's hair",
-     "fact": "Meredith's hair catches fire at the party – the start of Michael's 'intervention'."
-    },
-    {
-     "p": 0.8,
-     "scene": "Phyllis's revenge",
-     "fact": "Phyllis reveals Angela and Dwight's affair to get back at Angela for taking over the party."
-    }
-   ]
-  },
-  {
-   "names": [
-    "the duel",
-    "duel"
-   ],
-   "title": "The Office – The Duel",
-   "items": [
-    {
-     "p": 0.35,
-     "scene": "The secret is out",
-     "fact": "Andy learns about Angela and Dwight – and challenges Dwight to a duel."
-    },
-    {
-     "p": 0.75,
-     "scene": "The parking lot",
-     "fact": "The 'duel' becomes a slow-speed car fight in a parking lot with a tiny Prius."
-    }
-   ]
-  },
-  {
-   "names": [
-    "prince family paper"
-   ],
-   "title": "The Office – Prince Family Paper",
-   "items": [
-    {
-     "p": 0.4,
-     "scene": "Undercover",
-     "fact": "Michael and Dwight go undercover to get client names from a small family-run paper company."
-    },
-    {
-     "p": 0.8,
-     "scene": "Guilt",
-     "fact": "Michael regrets it when he meets the friendly family he's about to put out of business."
+     "w": 0.5,
+     "cue": [
+      "princess unicorn"
+     ],
+     "scene": "Dwight's doll scheme",
+     "fact": "Princess Unicorn is a nod to real holiday toy crazes like Tickle Me Elmo - Dwight corners the market and resells them."
     }
    ]
   },
@@ -689,85 +207,23 @@
    "items": [
     {
      "p": 0.05,
-     "scene": "Super Bowl",
-     "fact": "This hour-long episode aired right after Super Bowl XLIII in 2009."
-    },
-    {
-     "p": 0.15,
+     "w": 0.15,
+     "cue": [
+      "today smoking is going to save lives",
+      "smoking is going to save lives"
+     ],
      "scene": "The fire drill",
-     "fact": "Dwight's fake fire drill – including throwing Angela's cat into the ceiling – is one of the most celebrated cold opens in TV."
+     "fact": "This cold open aired right after Super Bowl XLIII and is regularly named the best cold open in the show."
     },
     {
      "p": 0.7,
+     "w": 0.4,
+     "cue": [
+      "stayin alive",
+      "staying alive"
+     ],
      "scene": "CPR training",
-     "fact": "The CPR class turns into chaos; the dummy ends up wearing Dwight's face."
-    }
-   ]
-  },
-  {
-   "names": [
-    "stress relief pt 2",
-    "stress relief 2",
-    "stress relief"
-   ],
-   "title": "The Office – Stress Relief (Part 2)",
-   "items": [
-    {
-     "p": 0.3,
-     "scene": "The movie",
-     "fact": "Jim and Pam watch a bootleg film starring Jack Black, Jessica Alba and Cloris Leachman – cameos shot for the episode."
-    },
-    {
-     "p": 0.7,
-     "scene": "The roast",
-     "fact": "Michael asks the office to roast him to relieve stress – and takes it far too personally."
-    }
-   ]
-  },
-  {
-   "names": [
-    "lecture circuit pt 1",
-    "lecture circuit 1"
-   ],
-   "title": "The Office – Lecture Circuit (Part 1)",
-   "items": [
-    {
-     "p": 0.4,
-     "scene": "On tour",
-     "fact": "Michael tours other branches to give motivational talks about Scranton's success."
-    }
-   ]
-  },
-  {
-   "names": [
-    "lecture circuit pt 2",
-    "lecture circuit 2",
-    "lecture circuit"
-   ],
-   "title": "The Office – Lecture Circuit (Part 2)",
-   "items": [
-    {
-     "p": 0.5,
-     "scene": "Nashua",
-     "fact": "Michael insists on stopping in Nashua to see Holly – and learns she has a new boyfriend."
-    }
-   ]
-  },
-  {
-   "names": [
-    "golden ticket"
-   ],
-   "title": "The Office – Golden Ticket",
-   "items": [
-    {
-     "p": 0.3,
-     "scene": "Wonka",
-     "fact": "Michael hides 'golden tickets' in paper boxes, Willy Wonka style – and it goes very wrong."
-    },
-    {
-     "p": 0.75,
-     "scene": "Credit",
-     "fact": "When it turns out to be a success, Dwight takes the credit."
+     "fact": "'Stayin' Alive' really is the beat first-aid trainers use for chest compressions - about 100 beats a minute."
     }
    ]
   },
@@ -779,119 +235,12 @@
    "items": [
     {
      "p": 0.2,
-     "scene": "Charles Miner",
-     "fact": "Idris Elba guest-stars as the strict new VP Charles Miner."
-    },
-    {
-     "p": 0.8,
-     "scene": "Michael quits",
-     "fact": "Michael quits after 15 years at Dunder Mifflin, setting up the Michael Scott Paper Company arc."
-    }
-   ]
-  },
-  {
-   "names": [
-    "two weeks"
-   ],
-   "title": "The Office – Two Weeks",
-   "items": [
-    {
-     "p": 0.5,
-     "scene": "Recruiting",
-     "fact": "Michael tries to recruit people for his new company during his two weeks' notice."
-    },
-    {
-     "p": 0.85,
-     "scene": "Pam",
-     "fact": "Pam quits to join him as a saleswoman – a big turn for her character."
-    }
-   ]
-  },
-  {
-   "names": [
-    "dream team"
-   ],
-   "title": "The Office – Dream Team",
-   "items": [
-    {
-     "p": 0.5,
-     "scene": "The new office",
-     "fact": "The Michael Scott Paper Company starts in a tiny office space in the same building."
-    }
-   ]
-  },
-  {
-   "names": [
-    "heavy competition"
-   ],
-   "title": "The Office – Heavy Competition",
-   "items": [
-    {
-     "p": 0.5,
-     "scene": "Client war",
-     "fact": "Michael and Dwight compete to steal each other's clients."
-    }
-   ]
-  },
-  {
-   "names": [
-    "broke"
-   ],
-   "title": "The Office – Broke",
-   "items": [
-    {
-     "p": 0.4,
-     "scene": "Low prices",
-     "fact": "The MSPC's prices are so low that every sale loses money."
-    },
-    {
-     "p": 0.8,
-     "scene": "The buyout",
-     "fact": "Dunder Mifflin buys the company back and Michael negotiates jobs for Pam and Ryan as salespeople."
-    }
-   ]
-  },
-  {
-   "names": [
-    "casual friday"
-   ],
-   "title": "The Office – Casual Friday",
-   "items": [
-    {
-     "p": 0.5,
-     "scene": "Dress code",
-     "fact": "Casual Friday turns ugly when Meredith takes it too far."
-    }
-   ]
-  },
-  {
-   "names": [
-    "cafe disco"
-   ],
-   "title": "The Office – Cafe Disco",
-   "items": [
-    {
-     "p": 0.5,
-     "scene": "The disco",
-     "fact": "Michael turns the MSPC's old office into an espresso-and-disco bar."
-    }
-   ]
-  },
-  {
-   "names": [
-    "company picnic"
-   ],
-   "title": "The Office – Company Picnic",
-   "items": [
-    {
-     "p": 0.4,
-     "scene": "The sketch",
-     "fact": "Michael and Holly perform a sketch based on 'Slumdog Millionaire' – and accidentally announce branch closings."
-    },
-    {
-     "p": 0.85,
-     "scene": "The doctor",
-     "fact": "Season 5 ends with a cut-off scene at a doctor's office: Pam is pregnant."
+     "w": 0.5,
+     "cue": [
+      "charles miner"
+     ],
+     "scene": "Meet Charles",
+     "fact": "Charles Miner is Idris Elba, between The Wire and Luther - Michael's worst nightmare of a boss."
     }
    ]
   }

@@ -19,4 +19,4 @@ Manual install instead: [wt-latest.zip](https://github.com/srv883/Watch-Movies-T
 - **New trivia:** add or edit a pack in `trivia/` (listed in `trivia/index.json`) and push - every extension picks it up within 6 hours, no new version needed.
 
 ## Trivia
-Trivia cards float in at the matching moments of an episode or film. Sources, in order: the hand-written packs in `trivia/` (The Office S4-S5, Game of Thrones, Breaking Bad, the Marvel films), Claude (if a Claude API key is saved in the popup), then Wikipedia for anything else.
+Trivia cards pop up the moment the line of dialogue they are about appears in the subtitles (turn on English subtitles). Sources: the hand-written packs in `trivia/` (each fact has a `cue` line), or Claude if a Claude API key is saved in the popup.

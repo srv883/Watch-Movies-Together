@@ -48,7 +48,11 @@
         window.__rtMsgs = (window.__rtMsgs || []).concat([msg]);
         setTimeout(() => {
           if (msg && msg.t === "wt-trivia") {
-            cb && cb(qs.get("trivia") === "1"
+            cb && cb(qs.get("trivia") === "2"
+              ? { items: [ { t: 10, cue: ["bring me thanos"], scene: "Thor arrives", fact: "CUE-FACT-THOR: Stormbreaker comes from the comics." },
+                           { t: 30, cue: ["i dont feel so good"], scene: "Peter and Tony", fact: "CUE-FACT-PETER: Tom Holland improvised much of this moment." },
+                           { t: 45, cue: ["wakanda forever"], scene: "Never said", fact: "CUE-FACT-NEVER: this line never appears in the subtitles." } ], title: "Rig Cue Episode", source: "pack" }
+              : qs.get("trivia") === "1"
               ? { items: [ { t: 4, scene: "Cold open", fact: "RIG-FACT-ONE: the cold open was improvised on set." },
                            { t: 24, scene: "Dinner party", fact: "RIG-FACT-TWO: the dinner scene took two weeks to film." } ], title: "Rig Episode" }
               : { error: "no-key" });
@@ -181,5 +185,19 @@
 <body><h3 id="hdr"></h3><video id="vid" playsinline loop style="width:320px;height:180px;background:#000"></video>
 <script>(function(){ const q=window.__qs||new URLSearchParams(location.search); const v=document.getElementById("vid"); if(q.get("stall")){ v.src="stall.wav?id="+q.get("stall")+"&at="+(q.get("at")||"8")+"&n="+Date.now(); v.loop=false; v.volume=0.8; v.preload="auto"; } else if(q.get("movie")==="1"){ v.src="movie.wav"; v.volume=0.8; v.play().catch(()=>{}); } else if(q.get("vid")==="1"){ v.src="movie.wav"; v.loop=false; v.volume=0.8; v.preload="auto"; } else { v.muted=true; } if(q.get("auto")==="1"){ v.play().catch(()=>{}); } })();</script>
 <script>document.getElementById("hdr").textContent = "rig role: " + window.__role;</script>
+<script>(function () {
+  const q = window.__qs || new URLSearchParams(location.search);
+  if (q.get("subs") !== "1") return;
+  const v = document.getElementById("vid");
+  const box = document.createElement("div");
+  box.className = "shaka-text-container";
+  box.style.cssText = "position:absolute;left:0;top:140px;width:320px;text-align:center;color:#fff;font:14px sans-serif";
+  document.body.appendChild(box);
+  const lines = [[6, 9, "Where's Banner?"], [11, 14, "BRING ME... THANOS!"], [20, 23, "Evacuate the city."]];
+  setInterval(() => { const t = v.currentTime; const l = lines.find(x => t >= x[0] && t < x[1]); const s = l ? l[2] : ""; if (box.textContent !== s) box.innerHTML = s ? "<span>" + s + "</span>" : ""; }, 150);
+  const tr = v.addTextTrack("subtitles", "English", "en");
+  tr.addCue(new VTTCue(33, 36, "Mr. Stark... I don’t feel so good."));
+  tr.mode = "hidden";
+})();</script>
 </body>
 </html>

@@ -466,6 +466,36 @@ const chat = (text) => `(() => { const i = document.querySelector("#wt-input"); 
         rec("S15e", "second card at its moment (24 s), on the other side", c2.ok && c1.ok && c2.v.find(c => /TWO/.test(c.text)).left !== c1.v.find(c => /ONE/.test(c.text)).left, { first: c1.v && c1.v[0], second: c2.v && c2.v[0] });
       } else rec("S15a", "trivia scenario connects", false, {});
     }
+
+    // ---------------- S16: trivia pops up on the line it is about (subtitles) ----------------
+    if (want("S16")) {
+      await boot("&mic=0&trivia=2&subs=1&stall=ch&at=999", "&mic=0&subs=1&stall=cg&at=999");
+      const r1 = await waitFor(H, J.status, synced, 30000);
+      await waitFor(G, J.status, synced, 5000);
+      if (r1.ok) {
+        for (const P of [H, G]) await P.eval(`(() => { const v = document.getElementById("vid"); Object.defineProperty(v, "duration", { get: () => 1320, configurable: true }); return true; })()`);
+        await waitFor(G, J.msgs, ms => ms.some(x => /Trivia ready/.test(x)), 12000);
+        await H.eval(user(`document.getElementById("vid").play().then(() => true)`), true);
+        const card = `[...document.querySelectorAll(".wt-trivia")].map(c => c.textContent)`;
+        const vt = async (P) => (await P.eval(J.vid)).t;
+        // before the line: nothing (the old version would have shown the 10 s fact at 10 s)
+        const early = await waitFor(H, J.vid, v => v.t >= 10.5, 15000);
+        const c0 = await H.eval(card);
+        rec("S16a", "no card before its line is on screen", early.ok && !c0.some(c => /CUE-FACT-THOR/.test(c)), { at: early.v && early.v.t, cards: c0 });
+        const c1 = await waitFor(H, card, cs => cs.some(c => /CUE-FACT-THOR/.test(c)), 6000);
+        const t1 = await vt(H);
+        const g1 = await waitFor(G, card, cs => cs.some(c => /CUE-FACT-THOR/.test(c)), 3000);
+        rec("S16b", "card pops up as 'BRING ME... THANOS!' is shown (case/punctuation ignored), on both screens", c1.ok && g1.ok && t1 >= 11 && t1 < 14.5, { at: t1, host: c1.v, guest: g1.v });
+        const c2 = await waitFor(H, card, cs => cs.some(c => /CUE-FACT-PETER/.test(c)), 30000);
+        const t2 = await vt(H);
+        rec("S16c", "a line from the video's own text track works too ('I don't feel so good' at 33 s)", c2.ok && t2 >= 33 && t2 < 37, { at: t2 });
+        await sleep(9000);
+        const all = await H.eval(card);
+        rec("S16d", "a line that never appears never shows its fact", !all.some(c => /CUE-FACT-NEVER/.test(c)), { cards: all });
+        const hint = await H.eval(`(() => { document.querySelector("#wt-trivia-btn").click(); document.querySelector("#wt-trivia-btn").click(); return [...document.querySelectorAll(".wt-toast")].map(t => t.textContent).pop(); })()`);
+        rec("S16e", "🧠 says the facts are line-anchored and that subtitles were found", /scene facts.*each pops up on its line · subtitles found/.test(hint || ""), { toast: hint });
+      } else rec("S16a", "cue scenario connects", false, {});
+    }
   } catch (e) {
     rec("X", "harness", false, String(e && e.message || e));
   } finally {

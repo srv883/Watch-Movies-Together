@@ -53,11 +53,11 @@ const rec = (name, pass, detail) => { results.push({ name, pass }); console.log(
     const r1 = await ask({ t: "wt-trivia", key: "hotstar:1660010677", duration: 8940,
       hints: ["Avengers: Infinity War - Disney+ Hotstar", "Avengers: Infinity War", "in movies avengers infinity war watch"],
       title: "Avengers: Infinity War", pageTitle: "Avengers: Infinity War - Disney+ Hotstar", slug: "Avengers Infinity War", site: "www.hotstar.com" });
-    rec("Infinity War (Hotstar) -> trivia from the pack", r1 && r1.source === "pack" && r1.items && r1.items.length >= 10, { source: r1 && r1.source, title: r1 && r1.title, n: r1 && r1.items && r1.items.length, err: r1 && (r1.error || r1.lastError || r1.timeout) });
+    rec("Infinity War (Hotstar) -> line-anchored trivia from the pack", r1 && r1.source === "pack" && r1.items && r1.items.length >= 10 && r1.items.every(i => i.cue && i.cue.length), { source: r1 && r1.source, title: r1 && r1.title, n: r1 && r1.items && r1.items.length, err: r1 && (r1.error || r1.lastError || r1.timeout) });
     const r2 = await ask({ t: "wt-trivia", key: "hotstar:1260023466", duration: 1300, hints: ["The Office · Night Out", "in shows the office night out watch"], slug: "The Office · Night Out" });
     rec("The Office - Night Out -> pack", r2 && r2.source === "pack", { source: r2 && r2.source, title: r2 && r2.title, err: r2 && r2.error });
     const r3 = await ask({ t: "wt-trivia", key: "netflix:80057281", duration: 2900, hints: ["Stranger Things"], slug: "Stranger Things · Chapter One The Vanishing Of Will Byers" });
-    rec("Stranger Things -> Wikipedia (live)", r3 && r3.source === "wikipedia" && r3.items.length >= 3, { source: r3 && r3.source, title: r3 && r3.title, first: r3 && r3.items && r3.items[0] && r3.items[0].fact, err: r3 && r3.error });
+    rec("Stranger Things (no pack, no key) -> nothing (Wikipedia no longer used)", r3 && r3.error === "unknown", { source: r3 && r3.source, title: r3 && r3.title, first: r3 && r3.items && r3.items[0] && r3.items[0].fact, err: r3 && r3.error });
     const logs = await ev(`(async () => { const s = await chrome.storage.local.get(null); return Object.keys(s); })()`);
     rec("worker stored its caches", logs.indexOf("wt_pack_cache") !== -1, { keys: logs });
   } catch (e) {

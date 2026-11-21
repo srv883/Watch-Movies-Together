@@ -498,63 +498,112 @@
    "items": [
     {
      "p": 0.03,
-     "scene": "IMAX",
-     "fact": "Infinity War was the first Hollywood feature shot entirely with IMAX digital cameras (the Arri Alexa 65 IMAX)."
+     "cue": [
+      "hear me and rejoice"
+     ],
+     "scene": "Ebony Maw on the Asgardian ship",
+     "fact": "Ebony Maw is Irish actor Tom Vaughan-Lawlor, performing through motion capture - the creepy voice is his own."
     },
     {
-     "p": 0.1,
-     "scene": "Thanos",
-     "fact": "Josh Brolin played Thanos through performance capture; the film is built around him as the main character."
+     "p": 0.07,
+     "cue": [
+      "thanos is coming"
+     ],
+     "scene": "Bruce crashes into the Sanctum",
+     "fact": "Mark Ruffalo was given fake script pages for this film - a year earlier he'd accidentally livestreamed the start of Thor: Ragnarok from his pocket."
     },
     {
-     "p": 0.13,
-     "scene": "Ebony Maw",
-     "fact": "Ebony Maw is played by Tom Vaughan-Lawlor; Proxima Midnight is voiced by Carrie Coon (The Leftovers)."
+     "p": 0.15,
+     "cue": [
+      "never seen a spaceship before"
+     ],
+     "scene": "Stan Lee's bus",
+     "fact": "That's Stan Lee as the bus driver - his cameo in every Marvel film was a tradition until his death in 2018."
     },
     {
-     "p": 0.17,
-     "scene": "Stan Lee",
-     "fact": "Stan Lee's cameo is the school-bus driver: \"What's the matter with you kids? You've never seen a spaceship before?\""
+     "p": 0.36,
+     "cue": [
+      "perfectly balanced as all things should be",
+      "perfectly balanced"
+     ],
+     "scene": "Thanos gives young Gamora a knife",
+     "fact": "The double-bladed knife is Thanos's whole philosophy in one prop: perfectly balanced. Young Gamora is played by Ariana Greenblatt."
     },
     {
-     "p": 0.24,
-     "scene": "The Iron Spider",
-     "fact": "Peter's new Iron Spider suit, with its spider legs, comes from the comics of the 2000s Civil War era."
-    },
-    {
-     "p": 0.4,
-     "scene": "Eitri",
-     "fact": "The giant dwarf Eitri is played by Peter Dinklage."
+     "p": 0.42,
+     "cue": [
+      "the hardest choices require the strongest wills",
+      "strongest wills"
+     ],
+     "scene": "Thanos explains himself",
+     "fact": "Josh Brolin played Thanos on set in a motion-capture suit with a head-mounted camera; the effects teams turned every twitch of his face into Thanos."
     },
     {
      "p": 0.5,
-     "scene": "Vormir",
-     "fact": "The Stonekeeper is the Red Skull - now played by Ross Marquand, replacing Hugo Weaving from The First Avenger."
+     "cue": [
+      "son of alars"
+     ],
+     "scene": "The Stonekeeper on Vormir",
+     "fact": "The Stonekeeper is the Red Skull, last seen in The First Avenger - now played by Ross Marquand (Aaron in The Walking Dead), not Hugo Weaving."
     },
     {
-     "p": 0.6,
-     "scene": "Secrecy",
-     "fact": "Most actors got fake scripts or only their own pages to prevent leaks."
+     "p": 0.58,
+     "cue": [
+      "we dont trade lives"
+     ],
+     "scene": "Steve refuses to sacrifice Vision",
+     "fact": "Steve's beard and dark suit nod to 'Nomad' - the comics identity Steve took when he gave up being Captain America."
     },
     {
-     "p": 0.66,
-     "scene": "Stormbreaker",
-     "fact": "Thor's new weapon Stormbreaker is forged in Nidavellir, the dwarf forge where Mjolnir was made."
+     "p": 0.68,
+     "cue": [
+      "bring me thanos"
+     ],
+     "scene": "Thor arrives in Wakanda",
+     "fact": "Stormbreaker comes from the comics, where it was the hammer of Beta Ray Bill - an alien warrior who was worthy of Mjolnir."
+    },
+    {
+     "p": 0.7,
+     "cue": [
+      "wakanda forever"
+     ],
+     "scene": "Wakanda charges into battle",
+     "fact": "The crossed-arms 'Wakanda forever' salute was created for Black Panther, released just two months before this film."
     },
     {
      "p": 0.8,
-     "scene": "Back to back",
-     "fact": "Infinity War and Endgame were filmed largely back to back."
+     "cue": [
+      "cursed with knowledge"
+     ],
+     "scene": "Thanos and Tony on Titan",
+     "fact": "Josh Brolin also played Cable in Deadpool 2, released just three weeks after this film."
     },
     {
-     "p": 0.9,
-     "scene": "The box office",
-     "fact": "Infinity War became the first superhero film to earn over  billion worldwide."
+     "p": 0.94,
+     "w": 0.06,
+     "cue": [
+      "i dont feel so good"
+     ],
+     "scene": "Peter and Tony",
+     "fact": "Tom Holland improvised much of this moment - the Russo brothers told him to play a kid who doesn't want to go."
     },
     {
-     "p": 0.995,
-     "scene": "After the credits",
-     "fact": "The post-credits pager shows Captain Marvel's symbol - her film came out the next year, set in the 1990s."
+     "p": 0.95,
+     "w": 0.05,
+     "cue": [
+      "i am groot"
+     ],
+     "scene": "Groot's last words",
+     "fact": "James Gunn later revealed what Groot says here: 'Dad.'"
+    },
+    {
+     "p": 0.97,
+     "w": 0.06,
+     "cue": [
+      "what did it cost"
+     ],
+     "scene": "Thanos meets young Gamora",
+     "fact": "This short 'Soulworld' scene is one of only a handful of quiet beats in the film - young Gamora is Ariana Greenblatt again."
     }
    ]
   },
