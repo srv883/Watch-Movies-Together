@@ -325,6 +325,17 @@ const user = (js) => `(() => { document.dispatchEvent(new Event("keydown", { bub
     const c2x = await waitFor(I, `document.querySelector("#wt-root").classList.contains("wt-open")`, (x) => x === chatWas, 3000);
     rec("I3f", "💬 opens and closes the chat panel with one tap each", c1x.ok && c2x.ok, { chatWas });
     if (!(await I.eval(`document.querySelector("#wt-root").classList.contains("wt-open")`))) await tap(I, J.sh("wtBChat")); // chat open for the rest
+    // I3j: quick reaction from the bar (chat closed) -> pops on the desktop
+    const chatNow = await I.eval(`document.querySelector("#wt-root").classList.contains("wt-open")`);
+    if (chatNow) await tap(I, J.sh("wtBChat"));
+    await tap(I, J.sh("wtBEmo"));
+    const emoN = await I.eval(`${J.sh("wtEmo")}.querySelectorAll("button").length`);
+    await H.eval(`(window.__seenFloat = [], new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => { if (n.classList && n.classList.contains("wt-float")) window.__seenFloat.push(n.textContent); }))).observe(document.documentElement, { childList: true, subtree: true }), true)`);
+    await tap(I, `${J.sh("wtEmo")}.querySelector("button")`);
+    const fl = await waitFor(H, "window.__seenFloat", (a) => a.length > 0, 5000);
+    const chatStill = await I.eval(`document.querySelector("#wt-root").classList.contains("wt-open")`);
+    rec("I3j", "😀 on the bar -> emoji row; one tap sends a reaction the desktop sees, chat stays closed", emoN >= 6 && fl.ok && !chatStill, { emojis: emoN, desktopSaw: fl.v });
+    await tap(I, J.sh("wtBChat")); // chat open again for the rest
     // I3g: full screen - ours, and the site's own button routed to it
     await tap(I, J.sh("wtBFs"));
     const fsOn = await waitFor(I, `(() => { const p = document.getElementById("player").getBoundingClientRect(); return { w: Math.round(p.width), h: Math.round(p.height), t: Math.round(p.top), W: innerWidth, H: innerHeight }; })()`, (r) => r.w >= r.W - 1 && r.h >= r.H - 1 && r.t === 0, 3000);

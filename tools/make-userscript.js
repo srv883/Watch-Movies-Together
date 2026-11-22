@@ -253,6 +253,12 @@ const panel = String.raw`
     .wt-x { position: sticky; top: 0; float: right; margin: 6px 6px 0 0; width: 36px; height: 36px; border-radius: 50%; border: 0;
       background: #2a2a38; color: #ddd; font-size: 17px; line-height: 36px; text-align: center; padding: 0; z-index: 1; }
     .wt-hidden { display: none !important; }
+    .wt-emo { position: fixed; display: flex; gap: 4px; padding: 5px; border-radius: 26px; background: rgba(16,16,24,.85);
+      -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: 0 2px 10px rgba(0,0,0,.5); }
+    .wt-emo button { width: 42px; height: 42px; border: 0; border-radius: 50%; background: rgba(255,255,255,.08); font-size: 24px; line-height: 42px; padding: 0; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+    .wt-emo button:active { transform: scale(1.25); }
+    .wt-hint { position: fixed; left: 50%; top: calc(14px + env(safe-area-inset-top)); transform: translateX(-50%); padding: 8px 14px; border-radius: 18px;
+      background: rgba(16,16,24,.85); color: #fff; font: 14px -apple-system, system-ui, sans-serif; pointer-events: none; }
     .wt-ios-note { margin: 10px 0 0; font-size: 12px; color: #9a9ab0; line-height: 1.4; }
     input, button { font-size: 16px; }
   `)} + "</style>" +
@@ -261,16 +267,19 @@ const panel = String.raw`
       '<button class="wt-b" id="wtBParty" aria-label="Watch Together party"><img alt="" src="${icon48}"></button>' +
       '<button class="wt-b wt-hidden" id="wtBChat" aria-label="Chat">💬</button>' +
       '<button class="wt-b wt-hidden" id="wtBMic" aria-label="Microphone">🎤</button>' +
+      '<button class="wt-b wt-hidden" id="wtBEmo" aria-label="Quick reaction">😀</button>' +
       '<button class="wt-b wt-hidden" id="wtBFs" aria-label="Fill the screen (chat on top)">⛶</button>' +
       '<button class="wt-b wt-hidden" id="wtBTv" aria-label="Apple full screen">📺</button>' +
     '</div>' +
+    '<div class="wt-emo wt-hidden" id="wtEmo"></div>' +
+    '<div class="wt-hint wt-hidden" id="wtHint">Swipe up once to hide Safari’s bar</div>' +
     '<div class="wt-sheet wt-hidden" id="wtSheet"><button class="wt-x" id="wtX" aria-label="Close">✕</button><div class="wtp">' +
     ${JSON.stringify(panelBody)} +
-    '<p class="wt-ios-note">The bar on the side: logo = this panel (start / join / leave), 💬 = chat, 🎤 = your mic, ⛶ = fill the screen with chat and trivia on top, 📺 = Apple’s full screen (edge to edge; sync and voice keep going, chat shows again when you leave it). Drag the little handle on top to move the bar. Turn on English subtitles for scene trivia; earphones work best for voice.</p>' +
+    '<p class="wt-ios-note">The bar on the side: logo = this panel (start / join / leave), 💬 = chat, 🎤 = your mic, 😀 = quick reaction, ⛶ = fill the screen with chat and trivia on top, 📺 = Apple’s full screen (edge to edge; sync and voice keep going, chat shows again when you leave it). Drag the little handle on top to move the bar. Turn on English subtitles for scene trivia; earphones work best for voice.</p>' +
     '</div></div>';
   const $s = (id) => shadow.getElementById(id);
   const bar = $s("wtBar"), sheet = $s("wtSheet"), fab = $s("wtBParty");
-  const bChat = $s("wtBChat"), bMic = $s("wtBMic"), bFs = $s("wtBFs"), bTv = $s("wtBTv"), grip = $s("wtGrip");
+  const bEmo = $s("wtBEmo"), emo = $s("wtEmo"), bChat = $s("wtBChat"), bMic = $s("wtBMic"), bFs = $s("wtBFs"), bTv = $s("wtBTv"), grip = $s("wtGrip");
   let fadeT = 0, pos = { side: "left", top: 0.4 };
   const wake = () => { bar.classList.remove("wt-faded"); clearTimeout(fadeT); fadeT = setTimeout(() => { if (sheet.classList.contains("wt-hidden")) bar.classList.add("wt-faded"); }, 4000); };
   const open = () => { sheet.classList.remove("wt-hidden"); wake(); };
@@ -286,6 +295,27 @@ const panel = String.raw`
   bMic.addEventListener("click", () => { const m = document.getElementById("wt-mic"); if (m) m.click(); setTimeout(syncState, 300); });
   bFs.addEventListener("click", () => { close(); if (fsBox) exitFs(); else enterFs(); });
   bTv.addEventListener("click", () => { close(); appleFs(); });
+  // quick reactions: the chat panel's own emoji buttons, one tap each, chat stays closed
+  let emoT = 0;
+  const emoHide = () => { emo.classList.add("wt-hidden"); bEmo.classList.remove("wt-on"); };
+  function emoShow() {
+    const src = Array.prototype.slice.call(document.querySelectorAll("#wt-root .wt-react"));
+    if (!src.length) return;
+    emo.innerHTML = "";
+    for (const b of src) {
+      const e = document.createElement("button");
+      e.textContent = b.dataset.e || b.textContent;
+      e.setAttribute("aria-label", "React " + e.textContent);
+      e.addEventListener("click", () => { b.click(); window.__wtIosReacts = (window.__wtIosReacts || 0) + 1; clearTimeout(emoT); emoT = setTimeout(emoHide, 3000); wake(); });
+      emo.appendChild(e);
+    }
+    emo.classList.remove("wt-hidden"); bEmo.classList.add("wt-on");
+    const br = bar.getBoundingClientRect(), bb = bEmo.getBoundingClientRect(), w = emo.offsetWidth;
+    emo.style.top = Math.max(4, Math.min(innerHeight - emo.offsetHeight - 4, bb.top - 6)) + "px";
+    emo.style.left = (pos.side === "right" ? Math.max(4, br.left - w - 8) : Math.min(innerWidth - w - 4, br.right + 8)) + "px";
+    clearTimeout(emoT); emoT = setTimeout(emoHide, 4000);
+  }
+  bEmo.addEventListener("click", () => { close(); if (emo.classList.contains("wt-hidden")) emoShow(); else emoHide(); });
 
   // what each button shows: party on / chat open / mic on / full screen
   async function syncState() {
@@ -295,6 +325,8 @@ const panel = String.raw`
     fab.classList.toggle("wt-live", !!party);
     bChat.classList.toggle("wt-hidden", !live);
     bMic.classList.toggle("wt-hidden", !live);
+    bEmo.classList.toggle("wt-hidden", !live);
+    if (!live) emoHide();
     const r = root();
     bChat.classList.toggle("wt-on", !!(r && r.classList.contains("wt-open")));
     bMic.classList.toggle("wt-mic-on", live && mic);
@@ -381,6 +413,7 @@ const panel = String.raw`
     for (let p = fsBox.parentElement; p && p !== document.documentElement; p = p.parentElement) { p.classList.add("wt-ios-fsanc"); fsAnc.push(p); }
     document.documentElement.classList.add("wt-ios-fs");
     try { scrollTo(0, 0); } catch (_) {}
+    const hint = $s("wtHint"); hint.classList.remove("wt-hidden"); setTimeout(() => hint.classList.add("wt-hidden"), 3500);
     setTimeout(() => {
       if (!fsBox) return;
       const r = v.getBoundingClientRect();
@@ -473,7 +506,8 @@ const IOS_CSS = `
 /* iPhone build: keep the player's controls free */
 #wt-pill, #wt-quick { display: none !important; }
 /* full screen that works on iPhone: the player box stretched over the screen */
-html.wt-ios-fs, html.wt-ios-fs body { overflow: hidden !important; }
+/* the page stays scrollable so one swipe up hides Safari's bar */
+html.wt-ios-fs body { min-height: calc(100vh + 160px) !important; }
 .wt-ios-fsanc { transform: none !important; filter: none !important; contain: none !important; will-change: auto !important; overflow: visible !important; }
 .wt-ios-fsbox { position: fixed !important; inset: 0 !important; left: 0 !important; top: 0 !important; width: 100vw !important; height: 100vh !important; height: 100dvh !important; max-width: none !important; max-height: none !important; margin: 0 !important; padding: 0 !important; z-index: 2147483000 !important; background: #000 !important; transform: none !important; }
 .wt-ios-fsvid { position: fixed !important; inset: 0 !important; left: 0 !important; top: 0 !important; width: 100vw !important; height: 100vh !important; height: 100dvh !important; max-width: none !important; max-height: none !important; z-index: 2147483001 !important; object-fit: contain !important; background: #000 !important; transform: none !important; }

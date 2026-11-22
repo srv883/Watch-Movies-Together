@@ -1,5 +1,5 @@
 {
- "version": "1.37.5",
+ "version": "1.37.6",
  "url": "https://raw.githubusercontent.com/srv883/Watch-Movies-Together/main/ios/watch-together.user.js",
- "notes": "Full screen fixed: 📺 = Apple's edge-to-edge full screen (Hotstar's own button too), ⛶ = fill the screen with chat on top"
+ "notes": "😀 quick reactions from the side bar; ⛶ full screen now lets one swipe up hide Safari's bar (chat, mic and reactions stay on top)"
 }
