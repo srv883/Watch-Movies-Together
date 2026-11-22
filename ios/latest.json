@@ -1,5 +1,5 @@
 {
- "version": "1.37.2",
+ "version": "1.37.3",
  "url": "https://raw.githubusercontent.com/srv883/Watch-Movies-Together/main/ios/watch-together.user.js",
- "notes": "Nothing over the player: the red pill and the bottom emoji bar are gone - tap the small edge button for chat, hold it for the party panel"
+ "notes": "The Watch Together button is back to doing everything: tap it for Start / Join / Leave and an Open chat button; nothing covers the player"
 }

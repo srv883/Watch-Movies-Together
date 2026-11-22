@@ -232,7 +232,7 @@ const user = (js) => `(() => { document.dispatchEvent(new Event("keydown", { bub
     await shot(I, "1-phone-start");
     // I1c: the button stays out of the player's way: small, on the right edge, not in the bottom area
     const fr = await I.eval(`(() => { const r = ${J.sh("wtFab")}.getBoundingClientRect(); return { l: r.left, t: r.top, w: r.width, W: innerWidth, H: innerHeight }; })()`);
-    rec("I1c", "button is small and docked to the right edge, away from the bottom controls", fr.w <= 36 && fr.l > fr.W - 50 && fr.t < fr.H * 0.5, fr);
+    rec("I1c", "button (40 px) docked to the right edge, away from the bottom controls", fr.w <= 42 && fr.l > fr.W - 50 && fr.t < fr.H * 0.5, fr);
     if (!WEBKIT) {
       // I1d: drag it with a finger to the left side -> snaps to the left edge, remembered after reload
       const c = { x: fr.l + fr.w / 2, y: fr.t + fr.w / 2 };
@@ -286,7 +286,7 @@ const user = (js) => `(() => { document.dispatchEvent(new Event("keydown", { bub
       await I.eval(`(async () => { await GM.setValue("wt_ios_update", JSON.stringify({ version: "9.9.9", notes: "test", checkedAt: Date.now() })); return true; })()`);
       await I.send("Page.reload");
       await waitFor(I, visible(J.sh("wtFab")), (x) => x === true, 15000);
-      await hold(I, J.sh("wtFab"));
+      await tap(I, J.sh("wtFab"));
       const ub = await waitFor(I, visible(J.sh("updateBar")), (x) => x === true, 4000);
       rec("W7", "update notice in the panel (WebKit)", ub.ok, {});
       await tap(I, J.sh("leaveBtn"));
@@ -315,18 +315,17 @@ const user = (js) => `(() => { document.dispatchEvent(new Event("keydown", { bub
     if (!c1.ok) throw new Error("no connection");
     // I3e: nothing over the bottom of the player; the edge button does the pill's job
     const hidden = await I.eval(`(() => { const v = (s) => { const e = document.querySelector(s); if (!e) return false; const r = e.getBoundingClientRect(); return r.width > 0 && getComputedStyle(e).display !== "none"; }; return { pill: v("#wt-pill"), quick: v("#wt-quick") }; })()`);
-    const openBefore = await I.eval(`document.querySelector("#wt-root").classList.contains("wt-open")`);
+    // close the chat panel first (its own ✕), then reach everything from the edge button
+    await I.eval(`(() => { const r = document.querySelector("#wt-root"); if (r.classList.contains("wt-open")) document.getElementById("wt-pill").click(); return true; })()`);
+    await sleep(400);
     await tap(I, J.sh("wtFab"));
-    const t1 = await waitFor(I, `document.querySelector("#wt-root").classList.contains("wt-open")`, (x) => x === !openBefore, 3000);
-    await tap(I, J.sh("wtFab"));
-    const t2 = await waitFor(I, `document.querySelector("#wt-root").classList.contains("wt-open")`, (x) => x === openBefore, 3000);
+    const sh = await waitFor(I, visible(J.sh("activeView")), (v) => v === true, 3000);
+    const chatBtn = await I.eval(visible(J.sh("wtChat")));
+    rec("I3e", "no red pill / emoji bar over the player; tap the edge button = party panel (code, Leave) with an Open chat button", !hidden.pill && !hidden.quick && sh.ok && chatBtn, { hidden, chatBtn });
+    await tap(I, J.sh("wtChat"));
+    const chatOpen = await waitFor(I, `document.querySelector("#wt-root").classList.contains("wt-open")`, (x) => x === true, 3000);
     const sheetShut = !(await I.eval(visible(J.sh("wtSheet"))));
-    rec("I3e", "no red pill / emoji bar over the player; tap the edge button = chat panel open/close", !hidden.pill && !hidden.quick && t1.ok && t2.ok && sheetShut, { hidden, openBefore });
-    await hold(I, J.sh("wtFab"));
-    const held = await waitFor(I, visible(J.sh("activeView")), (v) => v === true, 3000);
-    rec("I3f", "hold the edge button = party panel (code, leave)", held.ok, {});
-    await tap(I, J.sh("wtX"));
-    if (!(await I.eval(`document.querySelector("#wt-root").classList.contains("wt-open")`))) await tap(I, J.sh("wtFab")); // chat open for the rest
+    rec("I3f", "Open chat -> chat panel open, party panel closes", chatOpen.ok && sheetShut, {});
 
     // ---- I4: playback sync both ways ----
     await sleep(1500);
@@ -393,7 +392,7 @@ const user = (js) => `(() => { document.dispatchEvent(new Event("keydown", { bub
     await I.eval(`(async () => { await GM.setValue("wt_ios_update", JSON.stringify({ version: "9.9.9", notes: "test", checkedAt: Date.now() })); return true; })()`);
     await I.send("Page.reload");
     await waitFor(I, visible(J.sh("wtFab")), (x) => x === true, 15000);
-    await hold(I, J.sh("wtFab"));
+    await tap(I, J.sh("wtFab"));
     const ub = await waitFor(I, visible(J.sh("updateBar")), (x) => x === true, 4000);
     await tap(I, J.sh("updateBtn"));
     const opened = await I.eval(`window.__opened || []`);
