@@ -18,9 +18,9 @@ The same Watch Together runs on iPhone in Safari through the free **Userscripts*
 1. Install **Userscripts** from the App Store (free, by Justin Wasack) and open it once.
 2. iPhone **Settings → Apps → Safari → Extensions → Userscripts**: turn it on and set **All Websites → Allow**.
 3. In Safari open [watch-together.user.js](https://raw.githubusercontent.com/srv883/Watch-Movies-Together/main/ios/watch-together.user.js), tap the **aA / puzzle** button in the address bar → **Userscripts** → **Install**.
-4. Open **hotstar.com** in Safari, start the film or episode. Tap the round Watch Together button → enter your name → **Join Party** with your friend's code (or **Start Watch Party**).
+4. Open **hotstar.com** in **Safari itself** (not a Home Screen icon) and start the film or episode. A slim Watch Together bar sits on the left edge: tap the **logo** for Start / Join / Leave, **💬** for chat, **🎤** for your mic, **⛶** for full screen (chat and trivia stay on top; Hotstar's own full-screen button does the same). Drag the little handle on top of the bar to move it.
 
-Tips: turn the phone sideways and keep the video in the page (the full-screen player hides chat and trivia); turn on English subtitles for trivia; tap the screen once if your friend's voice doesn't start. Netflix and Prime Video don't play in phone browsers (they push their apps), so on iPhone this is for JioHotstar. If JioHotstar only offers its app, try Safari's **aA → Request Desktop Website**.
+Tips: turn on English subtitles for trivia; tap the screen once if your friend's voice doesn't start. Netflix and Prime Video don't play in phone browsers (they push their apps), so on iPhone this is for JioHotstar. If JioHotstar only offers its app, try Safari's **aA → Request Desktop Website**.
 New iPhone versions show an **Update** button in the panel. Build it with `node tools/make-userscript.js V<N>-name "notes"` (→ `ios/`), then commit and push.
 
 ## Publishing updates

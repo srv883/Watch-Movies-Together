@@ -61,7 +61,7 @@ const phoneHtml = `<!doctype html><html><head><meta charset="utf-8">
 .shaka-text-container{position:absolute;left:0;right:0;bottom:12%;text-align:center;color:#fff;font:16px sans-serif;text-shadow:0 0 4px #000}
 p{padding:0 14px}</style></head><body>
 <header>JioHotstar</header>
-<div id="player"><video id="vid" playsinline></video><div class="shaka-text-container"></div></div>
+<div id="player"><video id="vid" playsinline></video><div class="shaka-text-container"></div><button id="sitefs" aria-label="Full Screen" style="position:absolute;right:8px;bottom:8px" onclick="window.__siteFs=(window.__siteFs||0)+1; const p=document.getElementById('player'); (p.requestFullscreen||p.webkitRequestFullscreen||function(){}).call(p)">[ ]</button></div>
 <p>Avengers: Infinity War · 2018 · Action</p><p>The Avengers and their allies must be willing to sacrifice all in an attempt to defeat the powerful Thanos.</p>
 <script>
 (() => {
@@ -224,36 +224,36 @@ const user = (js) => `(() => { document.dispatchEvent(new Event("keydown", { bub
     await I.send("Page.navigate", { url: `http://127.0.0.1:${port}/ios/${PATH}` });
 
     // ---- I1: the script starts on the phone ----
-    const fab = await waitFor(I, visible(J.sh("wtFab")), (v) => v === true, 15000);
+    const fab = await waitFor(I, visible(J.sh("wtBParty")), (v) => v === true, 15000);
     const errs0 = await I.eval(J.errs);
-    rec("I1", "userscript runs on the iPhone page: round button shown, no errors", fab.ok && !errs0.length, { ms: fab.ms, errs: errs0 });
+    rec("I1", "userscript runs on the iPhone page: side bar shown, no errors", fab.ok && !errs0.length, { ms: fab.ms, errs: errs0 });
     const ua = await I.eval("navigator.userAgent");
     rec("I1b", "page sees an iPhone (Safari UA" + (WEBKIT ? ")" : ", touch)"), /iPhone/.test(ua) && (WEBKIT || (await I.eval("navigator.maxTouchPoints")) > 0), { ua: ua.slice(0, 60) });
     await shot(I, "1-phone-start");
-    // I1c: the button stays out of the player's way: small, on the right edge, not in the bottom area
-    const fr = await I.eval(`(() => { const r = ${J.sh("wtFab")}.getBoundingClientRect(); return { l: r.left, t: r.top, w: r.width, W: innerWidth, H: innerHeight }; })()`);
-    rec("I1c", "button (40 px) docked to the right edge, away from the bottom controls", fr.w <= 42 && fr.l > fr.W - 50 && fr.t < fr.H * 0.5, fr);
+    // I1c: a slim bar on the left edge, clear of the bottom controls; chat/mic only once in a party
+    const fr = await I.eval(`(() => { const r = ${J.sh("wtBar")}.getBoundingClientRect(); return { l: r.left, t: r.top, b: r.bottom, w: r.width, W: innerWidth, H: innerHeight }; })()`);
+    const btns0 = await I.eval(`["wtBParty","wtBChat","wtBMic","wtBFs"].map(id => { const e = ${J.sh("wtBParty")}.getRootNode().getElementById(id); return !e.classList.contains("wt-hidden"); })`);
+    rec("I1c", "slim bar on the left edge, out of the bottom area; party + full-screen buttons (no chat/mic before a party)", fr.w <= 52 && fr.l <= 8 && fr.b < fr.H - 40 && JSON.stringify(btns0) === "[true,false,false,true]", { bar: fr, buttons: btns0 });
     if (!WEBKIT) {
-      // I1d: drag it with a finger to the left side -> snaps to the left edge, remembered after reload
-      const c = { x: fr.l + fr.w / 2, y: fr.t + fr.w / 2 };
-      await I.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: c.x, y: c.y }] });
-      for (let k = 1; k <= 10; k++) { await I.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: c.x - k * 25, y: c.y + k * 15 }] }); await sleep(20); }
+      // I1d: drag the bar's handle to the right -> snaps to the right edge, remembered after reload
+      const g = await I.eval(`(() => { const r = ${J.sh("wtGrip")}.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; })()`);
+      await I.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: g.x, y: g.y }] });
+      for (let k = 1; k <= 10; k++) { await I.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: g.x + k * 30, y: g.y - k * 10 }] }); await sleep(20); }
       await I.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
       await sleep(400);
-      const d1 = await I.eval(`(() => { const r = ${J.sh("wtFab")}.getBoundingClientRect(); return { l: Math.round(r.left), t: Math.round(r.top), open: getComputedStyle(${J.sh("wtSheet")}).display !== "none" }; })()`);
+      const d1 = await I.eval(`(() => { const r = ${J.sh("wtBar")}.getBoundingClientRect(); return { r: Math.round(innerWidth - r.right), t: Math.round(r.top), open: getComputedStyle(${J.sh("wtSheet")}).display !== "none" }; })()`);
       await I.send("Page.reload");
-      await waitFor(I, visible(J.sh("wtFab")), (v) => v === true, 15000);
+      await waitFor(I, visible(J.sh("wtBParty")), (v) => v === true, 15000);
       await sleep(500);
-      const d2 = await I.eval(`(() => { const r = ${J.sh("wtFab")}.getBoundingClientRect(); return { l: Math.round(r.left), t: Math.round(r.top) }; })()`);
-      rec("I1d", "drag by finger -> snaps to the left edge, no panel opened, same spot after reload", d1.l <= 8 && !d1.open && Math.abs(d1.t - (fr.t + 150)) < 30 && d2.l <= 8 && Math.abs(d2.t - d1.t) < 3, { before: fr, after: d1, reloaded: d2 });
-      await sleep(4200);
-      const faded = await I.eval(`${J.sh("wtFab")}.classList.contains("wt-faded")`);
-      rec("I1e", "button fades when untouched", faded, {});
+      const d2 = await I.eval(`(() => { const r = ${J.sh("wtBar")}.getBoundingClientRect(); return { r: Math.round(innerWidth - r.right), t: Math.round(r.top) }; })()`);
+      rec("I1d", "drag the handle -> bar snaps to the right edge, no panel opened, same spot after reload", d1.r <= 8 && !d1.open && Math.abs(d1.t - (fr.t - 100)) < 30 && d2.r <= 8 && Math.abs(d2.t - d1.t) < 3, { before: fr, after: d1, reloaded: d2 });
+      await sleep(4500);
+      const faded = await I.eval(`${J.sh("wtBar")}.classList.contains("wt-faded")`);
+      rec("I1e", "bar dims when untouched", faded, {});
     }
 
-
     // ---- I2: the popup panel, by touch ----
-    await tap(I, J.sh("wtFab"));
+    await tap(I, J.sh("wtBParty"));
     const sheet = await waitFor(I, visible(J.sh("setupView")), (v) => v === true, 4000);
     const ver = await I.eval(`${J.sh("verLine")}.textContent`);
     const site = await I.eval(`${J.sh("siteName")}.textContent`);
@@ -285,8 +285,8 @@ const user = (js) => `(() => { document.dispatchEvent(new Event("keydown", { bub
       await phoneView(I, false);
       await I.eval(`(async () => { await GM.setValue("wt_ios_update", JSON.stringify({ version: "9.9.9", notes: "test", checkedAt: Date.now() })); return true; })()`);
       await I.send("Page.reload");
-      await waitFor(I, visible(J.sh("wtFab")), (x) => x === true, 15000);
-      await tap(I, J.sh("wtFab"));
+      await waitFor(I, visible(J.sh("wtBParty")), (x) => x === true, 15000);
+      await tap(I, J.sh("wtBParty"));
       const ub = await waitFor(I, visible(J.sh("updateBar")), (x) => x === true, 4000);
       rec("W7", "update notice in the panel (WebKit)", ub.ok, {});
       await tap(I, J.sh("leaveBtn"));
@@ -311,21 +311,34 @@ const user = (js) => `(() => { document.dispatchEvent(new Event("keydown", { bub
     rec("I3c", "panel status follows the party", pst.ok, { status: pst.v });
     await tap(I, J.sh("wtX"));
     const closed = await waitFor(I, visible(J.sh("wtSheet")), (v) => v === false, 3000);
-    rec("I3d", "✕ closes the panel; button shows the live dot", closed.ok && (await I.eval(`${J.sh("wtFab")}.classList.contains("wt-live")`)), {});
+    rec("I3d", "✕ closes the panel; button shows the live dot", closed.ok && (await I.eval(`${J.sh("wtBParty")}.classList.contains("wt-live")`)), {});
     if (!c1.ok) throw new Error("no connection");
-    // I3e: nothing over the bottom of the player; the edge button does the pill's job
+    // I3e: nothing over the bottom of the player; the bar has one button per action
     const hidden = await I.eval(`(() => { const v = (s) => { const e = document.querySelector(s); if (!e) return false; const r = e.getBoundingClientRect(); return r.width > 0 && getComputedStyle(e).display !== "none"; }; return { pill: v("#wt-pill"), quick: v("#wt-quick") }; })()`);
-    // close the chat panel first (its own ✕), then reach everything from the edge button
-    await I.eval(`(() => { const r = document.querySelector("#wt-root"); if (r.classList.contains("wt-open")) document.getElementById("wt-pill").click(); return true; })()`);
-    await sleep(400);
-    await tap(I, J.sh("wtFab"));
-    const sh = await waitFor(I, visible(J.sh("activeView")), (v) => v === true, 3000);
-    const chatBtn = await I.eval(visible(J.sh("wtChat")));
-    rec("I3e", "no red pill / emoji bar over the player; tap the edge button = party panel (code, Leave) with an Open chat button", !hidden.pill && !hidden.quick && sh.ok && chatBtn, { hidden, chatBtn });
-    await tap(I, J.sh("wtChat"));
-    const chatOpen = await waitFor(I, `document.querySelector("#wt-root").classList.contains("wt-open")`, (x) => x === true, 3000);
-    const sheetShut = !(await I.eval(visible(J.sh("wtSheet"))));
-    rec("I3f", "Open chat -> chat panel open, party panel closes", chatOpen.ok && sheetShut, {});
+    await sleep(1600); // bar refresh
+    const shown = await I.eval(`["wtBChat","wtBMic"].map(id => !${J.sh("wtBParty")}.getRootNode().getElementById(id).classList.contains("wt-hidden"))`);
+    rec("I3e", "no red pill / emoji bar over the player; in a party the bar shows 💬 and 🎤", !hidden.pill && !hidden.quick && shown.every(Boolean), { hidden, shown });
+    const chatWas = await I.eval(`document.querySelector("#wt-root").classList.contains("wt-open")`);
+    await tap(I, J.sh("wtBChat"));
+    const c1x = await waitFor(I, `document.querySelector("#wt-root").classList.contains("wt-open")`, (x) => x === !chatWas, 3000);
+    await tap(I, J.sh("wtBChat"));
+    const c2x = await waitFor(I, `document.querySelector("#wt-root").classList.contains("wt-open")`, (x) => x === chatWas, 3000);
+    rec("I3f", "💬 opens and closes the chat panel with one tap each", c1x.ok && c2x.ok, { chatWas });
+    if (!(await I.eval(`document.querySelector("#wt-root").classList.contains("wt-open")`))) await tap(I, J.sh("wtBChat")); // chat open for the rest
+    // I3g: full screen - ours, and the site's own button routed to it
+    await tap(I, J.sh("wtBFs"));
+    const fsOn = await waitFor(I, `(() => { const p = document.getElementById("player").getBoundingClientRect(); return { w: Math.round(p.width), h: Math.round(p.height), t: Math.round(p.top), W: innerWidth, H: innerHeight }; })()`, (r) => r.w >= r.W - 1 && r.h >= r.H - 1 && r.t === 0, 3000);
+    const onTop = await I.eval(`(() => { const p = document.querySelector("#wt-panel"); const r = p.getBoundingClientRect(); const e = document.elementFromPoint(r.left + r.width / 2, r.top + 30); return !!(e && e.closest("#wt-root")); })()`);
+    await shot(I, "6-fullscreen");
+    await tap(I, J.sh("wtBFs"));
+    const offOk = await I.eval(`!window.__wtIosFs() && !document.documentElement.classList.contains("wt-ios-fs")`);
+    rec("I3g", "⛶ fills the whole screen with the player, chat stays on top; ✕ exits", fsOn.ok && onTop && offOk, { fs: fsOn.v, chatOnTop: onTop });
+    await I.eval(`(document.getElementById("sitefs").click(), true)`, true);
+    await sleep(500);
+    const siteFs = await I.eval(`({ ours: window.__wtIosFs(), nativeFs: !!(document.fullscreenElement || document.webkitFullscreenElement), siteHandler: window.__siteFs || 0 })`);
+    rec("I3h", "the site's own full-screen button gives our full screen (no blank native full screen)", siteFs.ours && !siteFs.nativeFs, siteFs);
+    await tap(I, J.sh("wtBFs"));
+    await sleep(300);
 
     // ---- I4: playback sync both ways ----
     await sleep(1500);
@@ -379,10 +392,10 @@ const user = (js) => `(() => { document.dispatchEvent(new Event("keydown", { bub
 
     // ---- I7: voice, unlocked by a tap ----
     await H.eval(`document.querySelector("#wt-mic").click(), true`, true);
-    await tap(I, `document.querySelector("#wt-mic")`);
+    await tap(I, J.sh("wtBMic"));
     const t0 = Date.now(); const a0 = await H.eval(J.inPkts), b0 = await I.eval(J.inPkts); let v = null;
     while (Date.now() - t0 < 15000) { await sleep(500); const a = await H.eval(J.inPkts), b = await I.eval(J.inPkts); if (a > a0 + 40 && b > b0 + 40) { v = { hostIn: a - a0, phoneIn: b - b0, ms: Date.now() - t0 }; break; } }
-    rec("I7a", "two-way voice iPhone <-> desktop (mic tapped on)", !!v, v || {});
+    rec("I7a", "two-way voice iPhone <-> desktop (🎤 on the bar tapped on)", !!v && (await I.eval(`${J.sh("wtBMic")}.classList.contains("wt-mic-on")`)), v || {});
     await tap(I, `document.querySelector("header")`);
     const au = await waitFor(I, `(() => { const a = document.querySelector("#wt-remote-audio"); return a ? { paused: a.paused, src: !!a.srcObject } : null; })()`, (x) => x && x.src && !x.paused, 6000);
     const pill = await I.eval(`!!document.getElementById("wt-voice-pill")`);
@@ -391,8 +404,8 @@ const user = (js) => `(() => { document.dispatchEvent(new Event("keydown", { bub
     // ---- I8: update notice ----
     await I.eval(`(async () => { await GM.setValue("wt_ios_update", JSON.stringify({ version: "9.9.9", notes: "test", checkedAt: Date.now() })); return true; })()`);
     await I.send("Page.reload");
-    await waitFor(I, visible(J.sh("wtFab")), (x) => x === true, 15000);
-    await tap(I, J.sh("wtFab"));
+    await waitFor(I, visible(J.sh("wtBParty")), (x) => x === true, 15000);
+    await tap(I, J.sh("wtBParty"));
     const ub = await waitFor(I, visible(J.sh("updateBar")), (x) => x === true, 4000);
     await tap(I, J.sh("updateBtn"));
     const opened = await I.eval(`window.__opened || []`);

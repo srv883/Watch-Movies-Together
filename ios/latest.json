@@ -1,5 +1,5 @@
 {
- "version": "1.37.3",
+ "version": "1.37.4",
  "url": "https://raw.githubusercontent.com/srv883/Watch-Movies-Together/main/ios/watch-together.user.js",
- "notes": "The Watch Together button is back to doing everything: tap it for Start / Join / Leave and an Open chat button; nothing covers the player"
+ "notes": "New side bar: logo = start/join/leave, 💬 chat, 🎤 mic, ⛶ full screen (now works on iPhone, with chat and trivia on top)"
 }

@@ -228,101 +228,189 @@ const panel = String.raw`
   host.style.cssText = "all:initial;position:fixed;z-index:2147483647;top:0;left:0;width:0;height:0;";
   const shadow = host.attachShadow({ mode: "open" });
   shadow.innerHTML = "<style>" + ${JSON.stringify(panelCss)} + ${JSON.stringify(`
-    .wt-fab { position: fixed; right: calc(4px + env(safe-area-inset-right)); top: 30%;
-      width: 40px; height: 40px; border-radius: 50%; border: 0; padding: 0; background: #14141c; opacity: .9;
-      box-shadow: 0 2px 8px rgba(0,0,0,.5); cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: none;
-      -webkit-user-select: none; user-select: none; transition: opacity .4s, left .2s, right .2s; }
-    .wt-fab.wt-dragging { transition: none; opacity: 1; }
-    .wt-fab.wt-faded { opacity: .5; }
-    .wt-fab img { width: 40px; height: 40px; border-radius: 50%; display: block; pointer-events: none; -webkit-user-drag: none; }
-    .wt-fab.wt-live::after { content: ""; position: absolute; right: 0; top: 0; width: 9px; height: 9px; border-radius: 50%; background: #43d17a; border: 2px solid #14141c; }
+    .wt-bar { position: fixed; left: calc(4px + env(safe-area-inset-left)); top: 40%;
+      display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 4px;
+      border-radius: 24px; background: rgba(16,16,24,.72); box-shadow: 0 2px 10px rgba(0,0,0,.5);
+      -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+      -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent;
+      transition: opacity .4s; opacity: 1; }
+    .wt-bar.wt-faded { opacity: .45; }
+    .wt-bar.wt-dragging { transition: none; }
+    .wt-grip { width: 40px; height: 16px; display: flex; align-items: center; justify-content: center; touch-action: none; cursor: grab; }
+    .wt-grip::before { content: ""; width: 18px; height: 4px; border-radius: 2px; background: rgba(255,255,255,.45); }
+    .wt-b { position: relative; width: 40px; height: 40px; border-radius: 50%; border: 0; padding: 0; margin: 0;
+      background: rgba(255,255,255,.08); color: #fff; font-size: 19px; line-height: 40px; text-align: center; cursor: pointer;
+      -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+    .wt-b:active { transform: scale(.92); }
+    .wt-b img { width: 40px; height: 40px; border-radius: 50%; display: block; pointer-events: none; -webkit-user-drag: none; }
+    .wt-b.wt-on { background: #43d17a; color: #0c1a12; }
+    .wt-b.wt-mic-on { background: #e53935; }
+    .wt-b.wt-live::after { content: ""; position: absolute; right: 0; top: 0; width: 10px; height: 10px; border-radius: 50%; background: #43d17a; border: 2px solid #14141c; }
     .wt-sheet { position: fixed; left: 50%; top: calc(8px + env(safe-area-inset-top)); transform: translateX(-50%);
       width: min(340px, calc(100vw - 16px)); max-height: calc(100vh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
       overflow-y: auto; -webkit-overflow-scrolling: touch; border-radius: 14px; box-shadow: 0 8px 40px rgba(0,0,0,.6); }
     .wt-sheet .wtp { width: auto; }
-    .wt-x { position: sticky; top: 0; float: right; margin: 6px 6px 0 0; width: 32px; height: 32px; border-radius: 50%; border: 0;
-      background: #2a2a38; color: #ddd; font-size: 16px; line-height: 32px; text-align: center; padding: 0; z-index: 1; }
+    .wt-x { position: sticky; top: 0; float: right; margin: 6px 6px 0 0; width: 36px; height: 36px; border-radius: 50%; border: 0;
+      background: #2a2a38; color: #ddd; font-size: 17px; line-height: 36px; text-align: center; padding: 0; z-index: 1; }
     .wt-hidden { display: none !important; }
-    .wt-chat-btn { display: block; width: 100%; margin: 0 0 12px; padding: 12px; border: 0; border-radius: 10px; background: #43d17a; color: #0c1a12; font-weight: 700; font-size: 16px; }
     .wt-ios-note { margin: 10px 0 0; font-size: 12px; color: #9a9ab0; line-height: 1.4; }
     input, button { font-size: 16px; }
   `)} + "</style>" +
-    '<button class="wt-fab" id="wtFab" aria-label="Watch Together"><img alt="" src="${icon48}"></button>' +
-    '<div class="wt-sheet wt-hidden" id="wtSheet"><button class="wt-x" id="wtX" aria-label="Close">✕</button><div class="wtp"><button class="wt-chat-btn wt-hidden" id="wtChat">💬 Open chat</button>' +
+    '<div class="wt-bar" id="wtBar">' +
+      '<div class="wt-grip" id="wtGrip" aria-label="Move"></div>' +
+      '<button class="wt-b" id="wtBParty" aria-label="Watch Together party"><img alt="" src="${icon48}"></button>' +
+      '<button class="wt-b wt-hidden" id="wtBChat" aria-label="Chat">💬</button>' +
+      '<button class="wt-b wt-hidden" id="wtBMic" aria-label="Microphone">🎤</button>' +
+      '<button class="wt-b wt-hidden" id="wtBFs" aria-label="Full screen">⛶</button>' +
+    '</div>' +
+    '<div class="wt-sheet wt-hidden" id="wtSheet"><button class="wt-x" id="wtX" aria-label="Close">✕</button><div class="wtp">' +
     ${JSON.stringify(panelBody)} +
-    '<p class="wt-ios-note">The round button: tap = this panel, drag = move it. iPhone tips: turn the phone sideways and keep the video in the page (not the full-screen player) so chat and trivia can show. Turn on English subtitles for scene trivia. For voice chat, earphones work best.</p>' +
+    '<p class="wt-ios-note">The bar on the side: logo = this panel (start / join / leave), 💬 = chat, 🎤 = your mic, ⛶ = full screen with chat and trivia on top. Drag the little handle on top to move the bar. Turn on English subtitles for scene trivia; earphones work best for voice.</p>' +
     '</div></div>';
   const $s = (id) => shadow.getElementById(id);
-  const fab = $s("wtFab"), sheet = $s("wtSheet");
-  const open = () => { sheet.classList.remove("wt-hidden"); };
-  const close = () => { sheet.classList.add("wt-hidden"); try { wake(); } catch (_) {} };
-  // a small button docked to a screen edge: drag it anywhere (it snaps to the
-  // nearest side and remembers the spot), tap to open; it fades when untouched
-  const SZ = 40, M = 4;
-  let drag = null, fadeT = 0;
-  const wake = () => { fab.classList.remove("wt-faded"); clearTimeout(fadeT); fadeT = setTimeout(() => { if (sheet.classList.contains("wt-hidden")) fab.classList.add("wt-faded"); }, 3500); };
-  function dock(pos) {
-    const top = Math.max(M, Math.min(innerHeight - SZ - M, (pos.top || 0.3) * innerHeight));
-    fab.style.top = top + "px";
-    if (pos.side === "left") { fab.style.left = "calc(" + M + "px + env(safe-area-inset-left))"; fab.style.right = "auto"; }
-    else { fab.style.right = "calc(" + M + "px + env(safe-area-inset-right))"; fab.style.left = "auto"; }
-  }
-  let pos = { side: "right", top: 0.3 };
-  // in a party: tap = chat panel (the red pill's job), long press = this party panel
-  const inParty = () => !!document.querySelector("#wt-root.wt-active");
-  let pressT = 0, pressed = false;
-  const down = (x, y) => {
-    drag = { x, y, moved: false, r: fab.getBoundingClientRect() }; wake();
-    pressed = false; clearTimeout(pressT);
-    pressT = setTimeout(() => { if (drag && !drag.moved) { pressed = true; open(); } }, 550);
-  };
-  const move = (x, y) => {
-    if (!drag) return;
-    const dx = x - drag.x, dy = y - drag.y;
-    if (!drag.moved && Math.abs(dx) + Math.abs(dy) < 8) return;
-    drag.moved = true; fab.classList.add("wt-dragging"); clearTimeout(pressT);
-    const l = Math.max(M, Math.min(innerWidth - SZ - M, drag.r.left + dx)), t = Math.max(M, Math.min(innerHeight - SZ - M, drag.r.top + dy));
-    fab.style.left = l + "px"; fab.style.right = "auto"; fab.style.top = t + "px";
-  };
-  const up = () => {
-    const d = drag; drag = null; fab.classList.remove("wt-dragging"); wake(); clearTimeout(pressT);
-    if (pressed) { pressed = false; return; }
-    if (d && d.moved) {
-      const r = fab.getBoundingClientRect();
-      pos = { side: r.left + SZ / 2 < innerWidth / 2 ? "left" : "right", top: r.top / innerHeight };
-      dock(pos);
-      try { chrome.storage.local.set({ wt_ios_fab2: pos }); } catch (_) {}
-      return;
-    }
-    if (!sheet.classList.contains("wt-hidden")) return close();
-    open();
-  };
-  // touch first (iPhone); the touch handlers stop the page scrolling while dragging
-  let touchAt = 0; // a touch is followed by emulated mouse events: ignore those
-  fab.addEventListener("touchstart", (e) => { touchAt = Date.now(); const t = e.touches[0]; down(t.clientX, t.clientY); e.preventDefault(); }, { passive: false });
-  fab.addEventListener("touchmove", (e) => { const t = e.touches[0]; move(t.clientX, t.clientY); e.preventDefault(); }, { passive: false });
-  fab.addEventListener("touchend", (e) => { e.preventDefault(); up(); }, { passive: false });
-  fab.addEventListener("touchcancel", () => { drag = null; fab.classList.remove("wt-dragging"); });
-  fab.addEventListener("mousedown", (e) => { if (Date.now() - touchAt < 800) return; down(e.clientX, e.clientY); const mm = (ev) => move(ev.clientX, ev.clientY); const mu = () => { document.removeEventListener("mousemove", mm, true); document.removeEventListener("mouseup", mu, true); up(); }; document.addEventListener("mousemove", mm, true); document.addEventListener("mouseup", mu, true); });
+  const bar = $s("wtBar"), sheet = $s("wtSheet"), fab = $s("wtBParty");
+  const bChat = $s("wtBChat"), bMic = $s("wtBMic"), bFs = $s("wtBFs"), grip = $s("wtGrip");
+  let fadeT = 0, pos = { side: "left", top: 0.4 };
+  const wake = () => { bar.classList.remove("wt-faded"); clearTimeout(fadeT); fadeT = setTimeout(() => { if (sheet.classList.contains("wt-hidden")) bar.classList.add("wt-faded"); }, 4000); };
+  const open = () => { sheet.classList.remove("wt-hidden"); wake(); };
+  const close = () => { sheet.classList.add("wt-hidden"); wake(); };
+  bar.addEventListener("touchstart", wake, { passive: true });
+  bar.addEventListener("mousedown", wake);
+
+  // ---- one tap, one action ----
+  fab.addEventListener("click", () => { if (sheet.classList.contains("wt-hidden")) open(); else close(); });
   $s("wtX").addEventListener("click", close);
-  chrome.storage.local.get("wt_ios_fab2").then((r) => { if (r.wt_ios_fab2 && r.wt_ios_fab2.side) pos = r.wt_ios_fab2; dock(pos); });
+  const root = () => document.getElementById("wt-root");
+  bChat.addEventListener("click", () => { close(); const p = document.getElementById("wt-pill"); if (p) p.click(); setTimeout(syncState, 60); });
+  bMic.addEventListener("click", () => { const m = document.getElementById("wt-mic"); if (m) m.click(); setTimeout(syncState, 300); });
+  bFs.addEventListener("click", () => { close(); if (fsBox) exitFs(); else enterFs(); });
+
+  // what each button shows: party on / chat open / mic on / full screen
+  async function syncState() {
+    let party = null, mic = false;
+    try { const r = await chrome.storage.local.get(["wt_party", "wt_mic_state"]); party = r.wt_party; mic = !!r.wt_mic_state; } catch (_) {}
+    const live = !!party && !!document.querySelector("#wt-root.wt-active");
+    fab.classList.toggle("wt-live", !!party);
+    bChat.classList.toggle("wt-hidden", !live);
+    bMic.classList.toggle("wt-hidden", !live);
+    const r = root();
+    bChat.classList.toggle("wt-on", !!(r && r.classList.contains("wt-open")));
+    bMic.classList.toggle("wt-mic-on", live && mic);
+    bFs.classList.toggle("wt-hidden", !bestVideo());
+    bFs.classList.toggle("wt-on", !!fsBox);
+    bFs.textContent = fsBox ? "✕" : "⛶";
+    bFs.setAttribute("aria-label", fsBox ? "Exit full screen" : "Full screen");
+    makeRoom();
+  }
+  // the chat panel moves over when the bar sits on the right edge (unless the user dragged the panel)
+  function makeRoom() {
+    const r = root();
+    if (!r || r.style.left) return;
+    const want = pos.side === "right" ? "calc(62px + env(safe-area-inset-right))" : "";
+    if (r.style.right !== want) r.style.right = want;
+  }
+  chrome.storage.onChanged.addListener((ch) => { if (ch.wt_party || ch.wt_mic_state || ch.wt_status) syncState(); });
+  setInterval(syncState, 1500);
+  syncState();
+
+  // ---- move the bar: drag its handle; it snaps to the nearest side ----
+  const M = 4;
+  let drag = null;
+  function dock(p) {
+    const h = bar.offsetHeight || 200;
+    bar.style.top = Math.max(M, Math.min(innerHeight - h - M, (p.top || 0.4) * innerHeight)) + "px";
+    if (p.side === "right") { bar.style.right = "calc(" + M + "px + env(safe-area-inset-right))"; bar.style.left = "auto"; }
+    else { bar.style.left = "calc(" + M + "px + env(safe-area-inset-left))"; bar.style.right = "auto"; }
+  }
+  const gDown = (x, y) => { drag = { x, y, r: bar.getBoundingClientRect() }; bar.classList.add("wt-dragging"); wake(); };
+  const gMove = (x, y) => {
+    if (!drag) return;
+    const w = drag.r.width, h = drag.r.height;
+    bar.style.left = Math.max(M, Math.min(innerWidth - w - M, drag.r.left + x - drag.x)) + "px"; bar.style.right = "auto";
+    bar.style.top = Math.max(M, Math.min(innerHeight - h - M, drag.r.top + y - drag.y)) + "px";
+  };
+  const gUp = () => {
+    if (!drag) return;
+    drag = null; bar.classList.remove("wt-dragging");
+    const r = bar.getBoundingClientRect();
+    pos = { side: r.left + r.width / 2 < innerWidth / 2 ? "left" : "right", top: r.top / innerHeight };
+    dock(pos);
+    try { chrome.storage.local.set({ wt_ios_bar: pos }); } catch (_) {}
+    makeRoom();
+  };
+  grip.addEventListener("touchstart", (e) => { const t = e.touches[0]; gDown(t.clientX, t.clientY); e.preventDefault(); }, { passive: false });
+  grip.addEventListener("touchmove", (e) => { const t = e.touches[0]; gMove(t.clientX, t.clientY); e.preventDefault(); }, { passive: false });
+  grip.addEventListener("touchend", (e) => { e.preventDefault(); gUp(); }, { passive: false });
+  grip.addEventListener("touchcancel", gUp);
+  grip.addEventListener("mousedown", (e) => { gDown(e.clientX, e.clientY); const mm = (ev) => gMove(ev.clientX, ev.clientY); const mu = () => { document.removeEventListener("mousemove", mm, true); document.removeEventListener("mouseup", mu, true); gUp(); }; document.addEventListener("mousemove", mm, true); document.addEventListener("mouseup", mu, true); });
+  chrome.storage.local.get("wt_ios_bar").then((r) => { if (r.wt_ios_bar && r.wt_ios_bar.side) pos = r.wt_ios_bar; dock(pos); });
   addEventListener("resize", () => dock(pos));
   wake();
-  const liveDot = () => chrome.storage.local.get("wt_party").then((r) => { fab.classList.toggle("wt-live", !!r.wt_party); $s("wtChat").classList.toggle("wt-hidden", !r.wt_party); });
-  // during a party: the chat panel (the red pill is hidden on iPhone)
-  $s("wtChat").addEventListener("click", () => { close(); const root = document.getElementById("wt-root"); const pill = document.getElementById("wt-pill"); if (pill && root && !root.classList.contains("wt-open")) pill.click(); });
-  chrome.storage.onChanged.addListener((ch) => { if (ch.wt_party) liveDot(); });
-  liveDot();
-  // keep the button on top of the page's own full-screen element
-  function place() {
-    const fs = document.fullscreenElement || document.webkitFullscreenElement;
-    const parent = fs && fs.tagName !== "VIDEO" ? fs : document.documentElement;
-    if (host.parentNode !== parent) parent.appendChild(host);
+
+  // ---- full screen that works on iPhone ----
+  // iPhone Safari can't make a page element full screen; the site's button ends
+  // in a blank screen or in Apple's own player (which hides chat and trivia).
+  // Instead the player box is stretched over the whole screen, our overlay on top.
+  let fsBox = null, fsAnc = [];
+  function bestVideo() {
+    let best = null, area = 0;
+    for (const v of document.querySelectorAll("video")) {
+      const r = v.getBoundingClientRect(), a = r.width * r.height;
+      if (a > area) { area = a; best = v; }
+    }
+    return area > 1000 ? best : null;
   }
-  document.addEventListener("fullscreenchange", place);
-  document.addEventListener("webkitfullscreenchange", place);
-  place();
-  setInterval(place, 3000);
+  function playerBox(v) {
+    const vr = v.getBoundingClientRect(), va = Math.max(1, vr.width * vr.height);
+    let best = v.parentElement || v;
+    for (let p = v.parentElement; p && p !== document.body && p !== document.documentElement; p = p.parentElement) {
+      const r = p.getBoundingClientRect();
+      if (r.width * r.height <= va * 1.6) best = p; else break;
+    }
+    return best;
+  }
+  function enterFs() {
+    const v = bestVideo();
+    if (!v) return;
+    fsBox = playerBox(v);
+    fsBox.classList.add("wt-ios-fsbox");
+    fsAnc = [];
+    for (let p = fsBox.parentElement; p && p !== document.documentElement; p = p.parentElement) { p.classList.add("wt-ios-fsanc"); fsAnc.push(p); }
+    document.documentElement.classList.add("wt-ios-fs");
+    try { scrollTo(0, 0); } catch (_) {}
+    syncState();
+  }
+  function exitFs() {
+    if (fsBox) fsBox.classList.remove("wt-ios-fsbox");
+    for (const p of fsAnc) p.classList.remove("wt-ios-fsanc");
+    fsAnc = []; fsBox = null;
+    document.documentElement.classList.remove("wt-ios-fs");
+    syncState();
+  }
+  window.__wtIosFs = () => !!fsBox;
+  // the site's own full-screen button -> ours
+  const FS_SEL = '[aria-label*="full screen" i], [aria-label*="fullscreen" i], [title*="full screen" i], [title*="fullscreen" i], [data-testid*="fullscreen" i], [class*="fullscreen" i], [class*="full-screen" i]';
+  document.addEventListener("click", (e) => {
+    const t = e.target && e.target.closest ? e.target.closest(FS_SEL) : null;
+    if (!t || t.closest("#wt-root, #wt-ios-host") || !bestVideo()) return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    if (fsBox) exitFs(); else enterFs();
+  }, true);
+  // ...and if the page still goes full screen some other way, take it over
+  const takeOver = () => {
+    const el = document.fullscreenElement || document.webkitFullscreenElement;
+    if (!el) return;
+    try { (document.exitFullscreen || document.webkitExitFullscreen).call(document); } catch (_) {}
+    if (!fsBox) setTimeout(enterFs, 120);
+  };
+  document.addEventListener("fullscreenchange", takeOver);
+  document.addEventListener("webkitfullscreenchange", takeOver);
+  document.addEventListener("webkitbeginfullscreen", (e) => {
+    const v = e.target;
+    setTimeout(() => { try { if (v && v.webkitExitFullscreen) v.webkitExitFullscreen(); } catch (_) {} if (!fsBox) enterFs(); }, 60);
+  }, true);
+  document.documentElement.appendChild(host);
+  setInterval(() => { if (host.parentNode !== document.documentElement) document.documentElement.appendChild(host); }, 3000);
 
   // popup.js, unchanged, seeing the panel as its document
   const doc = {
@@ -375,6 +463,11 @@ const css = rd("overlay.css");
 const IOS_CSS = `
 /* iPhone build: keep the player's controls free */
 #wt-pill, #wt-quick { display: none !important; }
+/* full screen that works on iPhone: the player box stretched over the screen */
+html.wt-ios-fs, html.wt-ios-fs body { overflow: hidden !important; }
+.wt-ios-fsanc { transform: none !important; filter: none !important; contain: none !important; will-change: auto !important; overflow: visible !important; }
+.wt-ios-fsbox { position: fixed !important; inset: 0 !important; left: 0 !important; top: 0 !important; width: 100vw !important; height: 100vh !important; height: 100dvh !important; max-width: none !important; max-height: none !important; margin: 0 !important; padding: 0 !important; z-index: 2147483000 !important; background: #000 !important; transform: none !important; }
+.wt-ios-fsbox video { width: 100% !important; height: 100% !important; max-height: none !important; object-fit: contain !important; }
 `;
 const out = [
   meta,
