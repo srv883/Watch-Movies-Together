@@ -4153,7 +4153,7 @@ console.log("\n--- 12e. error sweep ---");
     ok(metaVal("inject-into")[0] === "content" && head[1].indexOf("// @noframes") !== -1, "41a: runs in the content world (GM APIs), top frame only");
     ok(/^https:\/\/raw\.githubusercontent\.com\/srv883\/Watch-Movies-Together\/main\/ios\/watch-together\.user\.js$/.test(metaVal("updateURL")[0]), "41a: updates come only from the project's repo");
     ok(US.indexOf(SRC) !== -1, "41b: contains this version's content.js unchanged");
-    ok(US.indexOf(JSON.stringify(fs.readFileSync(DIR12 + "/overlay.css", "utf8"))) !== -1, "41b: contains this version's overlay.css");
+    ok(US.indexOf(JSON.stringify(fs.readFileSync(DIR12 + "/overlay.css", "utf8")).slice(0, -1)) !== -1 && US.indexOf("#wt-pill, #wt-quick { display: none !important; }") !== -1, "41b: contains this version's overlay.css + the iPhone rule (no pill / bottom bar)");
     const latestIos = JSON.parse(fs.readFileSync(ROOT + "/ios/latest.json", "utf8"));
     ok(latestIos.version === metaVal("version")[0], "41c: ios/latest.json announces the script's own version " + latestIos.version);
     ok(US.indexOf('update_url: "userscript", wt_ios: true') !== -1, "41d: stand-in manifest marks the iPhone build (no folder self-update, no Chrome zip notice)");

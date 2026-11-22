@@ -249,7 +249,7 @@ const panel = String.raw`
     '<button class="wt-fab" id="wtFab" aria-label="Watch Together"><img alt="" src="${icon48}"></button>' +
     '<div class="wt-sheet wt-hidden" id="wtSheet"><button class="wt-x" id="wtX" aria-label="Close">✕</button><div class="wtp">' +
     ${JSON.stringify(panelBody)} +
-    '<p class="wt-ios-note">iPhone tips: turn the phone sideways and keep the video in the page (not the full-screen player) so chat and trivia can show. Turn on English subtitles for scene trivia. For voice chat, earphones work best.</p>' +
+    '<p class="wt-ios-note">The round button: tap = chat (during a party), hold = this panel, drag = move it. iPhone tips: turn the phone sideways and keep the video in the page (not the full-screen player) so chat and trivia can show. Turn on English subtitles for scene trivia. For voice chat, earphones work best.</p>' +
     '</div></div>';
   const $s = (id) => shadow.getElementById(id);
   const fab = $s("wtFab"), sheet = $s("wtSheet");
@@ -267,17 +267,25 @@ const panel = String.raw`
     else { fab.style.right = "calc(" + M + "px + env(safe-area-inset-right))"; fab.style.left = "auto"; }
   }
   let pos = { side: "right", top: 0.3 };
-  const down = (x, y) => { drag = { x, y, moved: false, r: fab.getBoundingClientRect() }; wake(); };
+  // in a party: tap = chat panel (the red pill's job), long press = this party panel
+  const inParty = () => !!document.querySelector("#wt-root.wt-active");
+  let pressT = 0, pressed = false;
+  const down = (x, y) => {
+    drag = { x, y, moved: false, r: fab.getBoundingClientRect() }; wake();
+    pressed = false; clearTimeout(pressT);
+    pressT = setTimeout(() => { if (drag && !drag.moved) { pressed = true; open(); } }, 550);
+  };
   const move = (x, y) => {
     if (!drag) return;
     const dx = x - drag.x, dy = y - drag.y;
     if (!drag.moved && Math.abs(dx) + Math.abs(dy) < 8) return;
-    drag.moved = true; fab.classList.add("wt-dragging");
+    drag.moved = true; fab.classList.add("wt-dragging"); clearTimeout(pressT);
     const l = Math.max(M, Math.min(innerWidth - SZ - M, drag.r.left + dx)), t = Math.max(M, Math.min(innerHeight - SZ - M, drag.r.top + dy));
     fab.style.left = l + "px"; fab.style.right = "auto"; fab.style.top = t + "px";
   };
   const up = () => {
-    const d = drag; drag = null; fab.classList.remove("wt-dragging"); wake();
+    const d = drag; drag = null; fab.classList.remove("wt-dragging"); wake(); clearTimeout(pressT);
+    if (pressed) { pressed = false; return; }
     if (d && d.moved) {
       const r = fab.getBoundingClientRect();
       pos = { side: r.left + SZ / 2 < innerWidth / 2 ? "left" : "right", top: r.top / innerHeight };
@@ -285,15 +293,17 @@ const panel = String.raw`
       try { chrome.storage.local.set({ wt_ios_fab2: pos }); } catch (_) {}
       return;
     }
-    if (sheet.classList.contains("wt-hidden")) open(); else close();
+    if (!sheet.classList.contains("wt-hidden")) return close();
+    if (inParty()) { const pill = document.getElementById("wt-pill"); if (pill) { pill.click(); return; } }
+    open();
   };
   // touch first (iPhone); the touch handlers stop the page scrolling while dragging
-  let touch = false;
-  fab.addEventListener("touchstart", (e) => { touch = true; const t = e.touches[0]; down(t.clientX, t.clientY); e.preventDefault(); }, { passive: false });
+  let touchAt = 0; // a touch is followed by emulated mouse events: ignore those
+  fab.addEventListener("touchstart", (e) => { touchAt = Date.now(); const t = e.touches[0]; down(t.clientX, t.clientY); e.preventDefault(); }, { passive: false });
   fab.addEventListener("touchmove", (e) => { const t = e.touches[0]; move(t.clientX, t.clientY); e.preventDefault(); }, { passive: false });
   fab.addEventListener("touchend", (e) => { e.preventDefault(); up(); }, { passive: false });
   fab.addEventListener("touchcancel", () => { drag = null; fab.classList.remove("wt-dragging"); });
-  fab.addEventListener("mousedown", (e) => { if (touch) return; down(e.clientX, e.clientY); const mm = (ev) => move(ev.clientX, ev.clientY); const mu = () => { document.removeEventListener("mousemove", mm, true); document.removeEventListener("mouseup", mu, true); up(); }; document.addEventListener("mousemove", mm, true); document.addEventListener("mouseup", mu, true); });
+  fab.addEventListener("mousedown", (e) => { if (Date.now() - touchAt < 800) return; down(e.clientX, e.clientY); const mm = (ev) => move(ev.clientX, ev.clientY); const mu = () => { document.removeEventListener("mousemove", mm, true); document.removeEventListener("mouseup", mu, true); up(); }; document.addEventListener("mousemove", mm, true); document.addEventListener("mouseup", mu, true); });
   $s("wtX").addEventListener("click", close);
   chrome.storage.local.get("wt_ios_fab2").then((r) => { if (r.wt_ios_fab2 && r.wt_ios_fab2.side) pos = r.wt_ios_fab2; dock(pos); });
   addEventListener("resize", () => dock(pos));
@@ -357,6 +367,13 @@ ${popupJs}
 `;
 
 const css = rd("overlay.css");
+// iPhone only: nothing over the bottom of the player. The emoji bar / "Say
+// something" box and the red pill go; the edge button opens the chat panel
+// (its emojis and chat box are inside it).
+const IOS_CSS = `
+/* iPhone build: keep the player's controls free */
+#wt-pill, #wt-quick { display: none !important; }
+`;
 const out = [
   meta,
   "",
@@ -365,7 +382,7 @@ const out = [
   "if (window.__wtIos) return; window.__wtIos = true;",
   shim,
   "// ---- overlay.css ----",
-  "(function () { const st = document.createElement('style'); st.id = 'wt-ios-css'; st.textContent = " + JSON.stringify(css) + "; (document.head || document.documentElement).appendChild(st); })();",
+  "(function () { const st = document.createElement('style'); st.id = 'wt-ios-css'; st.textContent = " + JSON.stringify(css + IOS_CSS) + "; (document.head || document.documentElement).appendChild(st); })();",
   "// ---- background (" + folder + "/background.src.js, bundled) ----",
   bg,
   "// ---- lib/peerjs.min.js ----",

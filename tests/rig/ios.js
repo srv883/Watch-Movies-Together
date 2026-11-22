@@ -192,6 +192,17 @@ const user = (js) => `(() => { document.dispatchEvent(new Event("keydown", { bub
     await sleep(250);
     return r;
   }
+  // press and hold (the edge button: hold = party panel)
+  async function hold(P, expr) {
+    const r = await P.eval(`(() => { const b = (${expr}).getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2 }; })()`);
+    if (P.page) { await P.page.mouse.move(r.x, r.y); await P.page.mouse.down(); await sleep(800); await P.page.mouse.up(); }
+    else {
+      await P.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: r.x, y: r.y }] });
+      await sleep(800);
+      await P.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+    }
+    await sleep(250);
+  }
   async function typeInto(P, expr, text) { await tap(P, expr); await P.send("Input.insertText", { text }); await sleep(100); }
   async function shot(P, name) { const s = await P.send("Page.captureScreenshot", { format: "png" }); fs.writeFileSync(path.join(SHOTS, name + ".png"), Buffer.from(s.data, "base64")); }
   async function phoneView(P, landscape) {
@@ -275,7 +286,7 @@ const user = (js) => `(() => { document.dispatchEvent(new Event("keydown", { bub
       await I.eval(`(async () => { await GM.setValue("wt_ios_update", JSON.stringify({ version: "9.9.9", notes: "test", checkedAt: Date.now() })); return true; })()`);
       await I.send("Page.reload");
       await waitFor(I, visible(J.sh("wtFab")), (x) => x === true, 15000);
-      await tap(I, J.sh("wtFab"));
+      await hold(I, J.sh("wtFab"));
       const ub = await waitFor(I, visible(J.sh("updateBar")), (x) => x === true, 4000);
       rec("W7", "update notice in the panel (WebKit)", ub.ok, {});
       await tap(I, J.sh("leaveBtn"));
@@ -302,6 +313,20 @@ const user = (js) => `(() => { document.dispatchEvent(new Event("keydown", { bub
     const closed = await waitFor(I, visible(J.sh("wtSheet")), (v) => v === false, 3000);
     rec("I3d", "✕ closes the panel; button shows the live dot", closed.ok && (await I.eval(`${J.sh("wtFab")}.classList.contains("wt-live")`)), {});
     if (!c1.ok) throw new Error("no connection");
+    // I3e: nothing over the bottom of the player; the edge button does the pill's job
+    const hidden = await I.eval(`(() => { const v = (s) => { const e = document.querySelector(s); if (!e) return false; const r = e.getBoundingClientRect(); return r.width > 0 && getComputedStyle(e).display !== "none"; }; return { pill: v("#wt-pill"), quick: v("#wt-quick") }; })()`);
+    const openBefore = await I.eval(`document.querySelector("#wt-root").classList.contains("wt-open")`);
+    await tap(I, J.sh("wtFab"));
+    const t1 = await waitFor(I, `document.querySelector("#wt-root").classList.contains("wt-open")`, (x) => x === !openBefore, 3000);
+    await tap(I, J.sh("wtFab"));
+    const t2 = await waitFor(I, `document.querySelector("#wt-root").classList.contains("wt-open")`, (x) => x === openBefore, 3000);
+    const sheetShut = !(await I.eval(visible(J.sh("wtSheet"))));
+    rec("I3e", "no red pill / emoji bar over the player; tap the edge button = chat panel open/close", !hidden.pill && !hidden.quick && t1.ok && t2.ok && sheetShut, { hidden, openBefore });
+    await hold(I, J.sh("wtFab"));
+    const held = await waitFor(I, visible(J.sh("activeView")), (v) => v === true, 3000);
+    rec("I3f", "hold the edge button = party panel (code, leave)", held.ok, {});
+    await tap(I, J.sh("wtX"));
+    if (!(await I.eval(`document.querySelector("#wt-root").classList.contains("wt-open")`))) await tap(I, J.sh("wtFab")); // chat open for the rest
 
     // ---- I4: playback sync both ways ----
     await sleep(1500);
@@ -368,7 +393,7 @@ const user = (js) => `(() => { document.dispatchEvent(new Event("keydown", { bub
     await I.eval(`(async () => { await GM.setValue("wt_ios_update", JSON.stringify({ version: "9.9.9", notes: "test", checkedAt: Date.now() })); return true; })()`);
     await I.send("Page.reload");
     await waitFor(I, visible(J.sh("wtFab")), (x) => x === true, 15000);
-    await tap(I, J.sh("wtFab"));
+    await hold(I, J.sh("wtFab"));
     const ub = await waitFor(I, visible(J.sh("updateBar")), (x) => x === true, 4000);
     await tap(I, J.sh("updateBtn"));
     const opened = await I.eval(`window.__opened || []`);
