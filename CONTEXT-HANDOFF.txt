@@ -1,7 +1,19 @@
 WATCH TOGETHER - DETAILED CONTEXT HANDOFF
 ==========================================
 As of: 22 Nov 2026
-Current version: V36 (manifest 1.36.0), folder V36-cues - SHIPPED, nothing pending.
+Current version: V37 (manifest 1.37.0), folder V37-iphone = V36 + iPHONE VERSION.
+  The same code runs on iPhone Safari as a userscript in the free App Store
+  app "Userscripts". Built by: node tools\make-userscript.js V37-iphone "notes"
+  -> ios\watch-together.user.js + ios\latest.json (the phone's own update
+  check). Install steps: README "iPhone (Safari)". Joins the same parties as
+  the laptops (1.36.0 - latest.json NOT bumped; release V37 to laptops only
+  when the user asks). Works where the site plays in phone Safari: JioHotstar
+  (mobile site has a FairPlay player); Netflix/Prime push their apps.
+  Tests: test-V37.js 735/735; tests\rig\ios.js 22/22 (emulated iPhone vs
+  desktop: join, sync, chat, voice by tap, trivia, layout, update) and
+  10/10 with --phone webkit (Playwright WebKit 26, Safari's engine).
+  NOT verified on a real iPhone / real Hotstar mobile site.
+(previous, V36:)
 V36 = trivia anchored to subtitle lines: every fact has a `cue` (a line of
 dialogue) and pops up the moment that line appears in the subtitles (turn on
 English subtitles). No more guessed-time facts, no Wikipedia. Packs on GitHub
