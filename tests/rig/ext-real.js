@@ -58,6 +58,13 @@ const rec = (name, pass, detail) => { results.push({ name, pass }); console.log(
     rec("The Office - Night Out -> pack", r2 && r2.source === "pack", { source: r2 && r2.source, title: r2 && r2.title, err: r2 && r2.error });
     const r3 = await ask({ t: "wt-trivia", key: "netflix:80057281", duration: 2900, hints: ["Stranger Things"], slug: "Stranger Things · Chapter One The Vanishing Of Will Byers" });
     rec("Stranger Things (no pack, no key) -> nothing (Wikipedia no longer used)", r3 && r3.error === "unknown", { source: r3 && r3.source, title: r3 && r3.title, first: r3 && r3.items && r3.items[0] && r3.items[0].fact, err: r3 && r3.error });
+    for (const [name, msg] of [
+      ["Breaking Bad - Ozymandias", { key: "netflix:70236421", duration: 2820, hints: ["Breaking Bad", "Ozymandias"], slug: "Breaking Bad · Ozymandias" }],
+      ["Game of Thrones - The Rains of Castamere", { key: "hotstar:1", duration: 3060, hints: ["Game of Thrones", "The Rains of Castamere"], slug: "Game of Thrones · The Rains of Castamere" }],
+      ["Avengers: Endgame", { key: "hotstar:2", duration: 10860, hints: ["Avengers: Endgame"], title: "Avengers: Endgame", slug: "Avengers Endgame" }]]) {
+      const r = await ask(Object.assign({ t: "wt-trivia" }, msg));
+      rec(name + " -> line-anchored pack facts", r && r.source === "pack" && r.items.length && r.items.every(i => i.cue && i.cue.length), { source: r && r.source, title: r && r.title, n: r && r.items && r.items.length, err: r && r.error });
+    }
     const logs = await ev(`(async () => { const s = await chrome.storage.local.get(null); return Object.keys(s); })()`);
     rec("worker stored its caches", logs.indexOf("wt_pack_cache") !== -1, { keys: logs });
   } catch (e) {

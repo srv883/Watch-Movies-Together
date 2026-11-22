@@ -1,7 +1,9 @@
-# WATCH TOGETHER — Context Handoff (as of Nov 15, 2026)
+# WATCH TOGETHER — Context Handoff (as of Nov 22, 2026)
+
+**Current: V36-cues (1.36.0), installed on this laptop (Downloads\wt-V32 folder, self-updated). Everything is shipped; nothing pending on the code side.**
 
 ## Objective
-Maintain the personal "Watch Together" Chrome extension using strict **per-version folders** (`V1`–`V34`) inside `C:\Users\Sourav\ML Coding\watch-together-versions\`. NEVER overwrite an old version's folder; always create the next numbered folder. Deliverables are zips named `wt-V<N>.zip` in the same root and copied to `C:\Users\Sourav\Downloads\`. Push every commit to `https://github.com/srv883/Watch-Movies-Together`.
+Maintain the personal "Watch Together" Chrome extension using strict **per-version folders** (`V1`–`V36`) inside `C:\Users\Sourav\ML Coding\watch-together-versions\`. NEVER overwrite an old version's folder; always create the next numbered folder. Deliverables are zips named `wt-V<N>.zip` in the same root and copied to `C:\Users\Sourav\Downloads\`. Push every commit to `https://github.com/srv883/Watch-Movies-Together`.
 
 ## HOW TO SHIP (since V34) — push updates and features
 1. Copy the newest folder to `V<N+1>-name`, bump `manifest.json` "version" AND `EXT_VER`, make the change, extend `tests\test-V<N+1>.js` (`node --experimental-vm-modules`), run the real-Chrome e2e (`tests\rig\e2e.js`, run it from the scratch rig dir that has the WAVs; never two runs at once).
@@ -15,9 +17,10 @@ Maintain the personal "Watch Together" Chrome extension using strict **per-versi
 - Cause: pack facts were placed by GUESSED fractions of the runtime (late/early) and were mostly generic production trivia; Wikipedia fallback was worse.
 - Now every shown fact has `cue` (1–4 spellings of a line of dialogue, ≥ 2 words) and optional `w` (window as a fraction of runtime, default 0.25; e.g. 0.05 for "i am groot", which recurs). `captionTick` (400 ms) reads captions from `video.textTracks` activeCues and from caption elements (`CAP_SELECTORS`: `.player-timedtext` Netflix, `.shaka-text-container` Shaka/JioHotstar, `.atvwebplayersdk-captions-text` Prime, `[class*=subtitle i]`, `[class*=caption i]`, `[data-testid*=subtitle i]`, `[aria-live]`; only over the video, never our own UI), normalises words, matches the cue exactly or ≥ 80% of its words (≥ 3-word cues), within ±w×runtime of the fact's moment → card at once (on both screens via sharing). Cue-less facts are never shown (background filters them; content skips them in the time path). No subtitles for 2 min while anchored trivia exists → one hint "Turn on English subtitles…". 🧠 status: "N scene facts … – each pops up on its line · subtitles found / turn on English subtitles".
 - Background: packs → only cued items (with cue + w); Wikipedia fallback removed (and its host permission); Claude prompt/schema now require `cue` (exact short line) and facts about that moment, cue-less answers dropped.
-- Packs: Infinity War 13 anchored facts; The Office S4–S5: 15 anchored facts across 12 episodes (the rest removed); GoT/BB/other MCU entries still have only cue-less facts → show nothing until lines are added. ADDING TRIVIA = add `cue` lines to pack items (data only, push).
+- Packs (22 Nov, all line-anchored, cue-less items removed): MCU 12 films / 32 facts (Infinity War 13, Endgame 4, Iron Man, Avengers, First Avenger, Thor, Winter Soldier, Guardians, Age of Ultron, Doctor Strange, Ragnarok, Black Panther); Game of Thrones 13 episodes / 15 facts; Breaking Bad 10 episodes / 10 facts; The Office S4–S5 12 episodes / 15 facts. Titles not in a pack show nothing unless a Claude key is saved. ADDING TRIVIA = add items with `cue` lines (≥ 2 words, a line really spoken in that scene) to a pack, run test-V36 (37a validates packs), push.
 - IMPORTANT: it needs subtitles on (English); a Hindi dub's subtitles won't match English cues.
-- Tests: test-V36 717/717 (40 = cue matching; 36/37 updated); e2e 54/54 incl. S16 (Shaka-style caption div + native VTT track in rig.html `&subs=1`, stub `&trivia=2`); ext-real 6/6 after the packs were pushed.
+- Tests: test-V36 718/718 (40 = cue matching; 36/37 updated); e2e 54/54 incl. S16 (Shaka-style caption div + native VTT track in rig.html `&subs=1`, stub `&trivia=2`); `testsig\ext-real.js --build V36-cues` 9/9 against the live packs (Infinity War, The Office, Breaking Bad, GoT, Endgame, Stranger Things → nothing).
+- NOT verified: the real JioHotstar/Netflix caption DOM with a logged-in account (selectors are generic; if cards never appear with subtitles on, inspect the caption element's class and add it to `CAP_SELECTORS`).
 
 ## V35 (released 21 Nov 2026 at the user's request: "push the update and call it v35")
 - On 20 Nov the user had said not to change his and Megha's installed version; on 21 Nov he asked for V35 to be pushed — released with `tools\release.js`. Before any future release, make sure the user asked for it.
@@ -26,6 +29,7 @@ Maintain the personal "Watch Together" Chrome extension using strict **per-versi
 - Tests: `node --experimental-vm-modules tests\test-V35.js` = 715/715 (39 = gate/stale tab/watching/trivia status; test clock guard raised to 400000 events; fake analyser is time-based). e2e 49/49; `tests\rig\ext-real.js` 6/6 (real extension + real background worker in Chrome).
 
 ## Chrome Web Store package
+- **Current (22 Nov): `store\watch-together-1.36.0-chrome-web-store.zip`** built from V36-cues (no Wikipedia, no `alarms`); 1.35.0 zip deleted; `STORE-LISTING.md` and `PRIVACY.md` updated for V36 (no Wikipedia; subtitle text is only compared locally). History below.
 - `store\watch-together-1.35.0-chrome-web-store.zip` rebuilt from the final V35.
 - Folder `V35-store\` (manifest/EXT_VER 1.35.0) = V34 + store awareness: when the manifest has `update_url` (Chrome Web Store adds it) the background skips the folder self-update/alarms, the popup skips the GitHub update check, and the version-mismatch chat line says "update through Chrome" instead of linking the zip. New icon (indigo/violet, two play triangles — the old red square + white triangle looked like YouTube's logo).
 - `store\`: `watch-together-1.35.0-chrome-web-store.zip` (built by `node tools\make-store-zip.js V35-store`: drops background.src.js and the `alarms` permission, forward-slash zip paths), 3 screenshots 1280×800 (`tests\rig\store-shots.js`, neutral names Alex/Sam, neutral backdrop), `promo-tile-440x280.png`, `STORE-LISTING.md` (steps, listing texts, single purpose, permission justifications, data-use answers). Privacy policy: `PRIVACY.md` → https://github.com/srv883/Watch-Movies-Together/blob/main/PRIVACY.md
@@ -148,13 +152,14 @@ Maintain the personal "Watch Together" Chrome extension using strict **per-versi
 - Bar input (`#wt-qtype-input`) is separate from overlay input (`#wt-qtype-overlay-input`). Tests must use correct IDs.
 
 ## Relevant Files
-- `C:\Users\Sourav\ML Coding\watch-together-versions\V32-sametitle\` — current version (v1.32.0): content.js, overlay.css, manifest.json, popup.html, popup.js, popup.css, lib/peerjs.min.js, icons/
-- `C:\Users\Sourav\Downloads\wt-V32.zip` — deliverable (repo root also has `wt-latest.zip` + `latest.json`)
-- `C:\Users\Sourav\ML Coding\watch-together-versions\tests\test-V32.js` — 613-check regression suite; `tests\rig\` — real-Chrome rig: `e2e.js` (whole-session end-to-end) + `matrix.js`/`run.js` (voice quality, TTS mics, scored); `tests\live\` — interactive two-tab voice page (`&vol=` sets the fake mic level)
-- `C:\Users\Sourav\ML Coding\watch-together-versions\V30-solidlink\` + `wt-V30.zip` — frozen
-- Git push: `git add -A && git commit -m "..." && git push` from `watch-together-versions\`
+- `V36-cues\` — current version (1.36.0): content.js, background.src.js → background.js (esbuild bundle), overlay.css, manifest.json, popup.*, lib/peerjs.min.js, icons/
+- `trivia\` — live trivia packs (index.json + one file per franchise); `tools\` — release.js, wt-updater.ps1, install-watch-together.ps1, make-store-zip.js
+- `tests	est-V36.js` (718 checks); `testsig\` — e2e.js (54), ext-real.js (9), matrix.js/run.js (voice), store-shots.js
+- `store\` — store zip 1.36.0, screenshots, promo tile, STORE-LISTING.md; `PRIVACY.md` at the root
+- Git: `git add -A && git commit -m "..." && git push` from `watch-together-versions\`
 
 ## Next Move (when resumed)
-1. Install V32 on BOTH laptops (as of Nov 15 this laptop still ran V27 from `Downloads\wt-V27`) and do a real session on Hotstar (episode change → follow banner; buffering → wait banner). From V31 on, the popup announces newer versions itself.
-2. Any new request → create `V33-*` folder, port from V32, bump manifest+EXT_VER together, extend test suite, run `tests\rig\e2e.js` (+ rig matrix for audio changes), zip as wt-V33.zip, copy to `wt-latest.zip`, update `latest.json`, update CONTEXT-HANDOFF.md + CONTEXT-HANDOFF.txt, commit+push to GitHub.
-3. Not done / ideas: Netflix seeks still set `video.currentTime` (Netflix's player is known to throw error M7375 on that; the fix is a MAIN-world script calling Netflix's own player API — untestable without a Netflix login, and the user watches Hotstar). Prime Video episodes share one `/detail/` URL, so follow works per title, not per episode there.
+1. User-side: Megha runs the installer one-liner once (then Load unpacked); both turn on English subtitles; refresh open streaming tabs after an update.
+2. Store: the user creates the developer account ($5), uploads the 1.36.0 zip, fills the listing from STORE-LISTING.md, visibility Unlisted.
+3. Ideas: more packs (data only); check real caption DOM on JioHotstar; Netflix seek via MAIN-world player API (error M7375); Prime episodes share one URL.
+4. Only release a NEW extension version when the user asks (pack pushes are fine).
