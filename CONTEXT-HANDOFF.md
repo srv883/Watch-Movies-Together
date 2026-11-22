@@ -1,6 +1,6 @@
 # WATCH TOGETHER — Context Handoff (as of Nov 22, 2026)
 
-**Current: V37-iphone (1.37.0) = V36 + the iPhone version (Safari userscript, `ios/`). Laptops still run 1.36.0 (`latest.json` NOT bumped - release V37 to laptops only when the user asks). Phone and 1.36 laptops join the same parties (protocol unchanged; the chat just notes the version difference).**
+**Current: V37-iphone (1.37.0) = V36 + the iPhone version (Safari userscript, `ios/`). RELEASED to the laptops on 22 Nov 2026 at the user's request (`latest.json` = 1.37.0, wt-V37.zip). This laptop updated 1.36.0 -> 1.37.0 at 23:56 - its updater loop had stopped (no process running) and was restarted from the Startup shortcut; if a laptop doesn't update, check that `wt-updater.ps1 -Loop` is running. Megha's updates within 30 min if her updater runs.**
 
 ## Objective
 Maintain the personal "Watch Together" Chrome extension using strict **per-version folders** (`V1`–`V37`) inside `C:\Users\Sourav\ML Coding\watch-together-versions\`. NEVER overwrite an old version's folder; always create the next numbered folder. Deliverables are zips named `wt-V<N>.zip` in the same root and copied to `C:\Users\Sourav\Downloads\`. Push every commit to `https://github.com/srv883/Watch-Movies-Together`.
@@ -168,7 +168,7 @@ Maintain the personal "Watch Together" Chrome extension using strict **per-versi
 - Git: `git add -A && git commit -m "..." && git push` from `watch-together-versions\`
 
 ## Next Move (when resumed)
-0. iPhone: the user installs Userscripts + the script (README "iPhone (Safari)") and tries a real JioHotstar film in Safari. If Hotstar's mobile site won't play: try aA → Request Desktop Website. If cards never show with subtitles on: inspect the mweb caption element and add it to `CAP_SELECTORS`. Release V37 to the laptops (`node tools/release.js V37-iphone ...`) only if the user asks.
+0. iPhone: the user installs Userscripts + the script (README "iPhone (Safari)") and tries a real JioHotstar film in Safari. If Hotstar's mobile site won't play: try aA → Request Desktop Website. If cards never show with subtitles on: inspect the mweb caption element and add it to `CAP_SELECTORS`. (V37 is released to the laptops.)
 1. User-side: Megha runs the installer one-liner once (then Load unpacked); both turn on English subtitles; refresh open streaming tabs after an update.
 2. Store: the user creates the developer account ($5), uploads the 1.36.0 zip, fills the listing from STORE-LISTING.md, visibility Unlisted.
 3. Ideas: more packs (data only); check real caption DOM on JioHotstar; Netflix seek via MAIN-world player API (error M7375); Prime episodes share one URL.
