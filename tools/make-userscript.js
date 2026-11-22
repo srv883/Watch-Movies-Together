@@ -261,15 +261,16 @@ const panel = String.raw`
       '<button class="wt-b" id="wtBParty" aria-label="Watch Together party"><img alt="" src="${icon48}"></button>' +
       '<button class="wt-b wt-hidden" id="wtBChat" aria-label="Chat">💬</button>' +
       '<button class="wt-b wt-hidden" id="wtBMic" aria-label="Microphone">🎤</button>' +
-      '<button class="wt-b wt-hidden" id="wtBFs" aria-label="Full screen">⛶</button>' +
+      '<button class="wt-b wt-hidden" id="wtBFs" aria-label="Fill the screen (chat on top)">⛶</button>' +
+      '<button class="wt-b wt-hidden" id="wtBTv" aria-label="Apple full screen">📺</button>' +
     '</div>' +
     '<div class="wt-sheet wt-hidden" id="wtSheet"><button class="wt-x" id="wtX" aria-label="Close">✕</button><div class="wtp">' +
     ${JSON.stringify(panelBody)} +
-    '<p class="wt-ios-note">The bar on the side: logo = this panel (start / join / leave), 💬 = chat, 🎤 = your mic, ⛶ = full screen with chat and trivia on top. Drag the little handle on top to move the bar. Turn on English subtitles for scene trivia; earphones work best for voice.</p>' +
+    '<p class="wt-ios-note">The bar on the side: logo = this panel (start / join / leave), 💬 = chat, 🎤 = your mic, ⛶ = fill the screen with chat and trivia on top, 📺 = Apple’s full screen (edge to edge; sync and voice keep going, chat shows again when you leave it). Drag the little handle on top to move the bar. Turn on English subtitles for scene trivia; earphones work best for voice.</p>' +
     '</div></div>';
   const $s = (id) => shadow.getElementById(id);
   const bar = $s("wtBar"), sheet = $s("wtSheet"), fab = $s("wtBParty");
-  const bChat = $s("wtBChat"), bMic = $s("wtBMic"), bFs = $s("wtBFs"), grip = $s("wtGrip");
+  const bChat = $s("wtBChat"), bMic = $s("wtBMic"), bFs = $s("wtBFs"), bTv = $s("wtBTv"), grip = $s("wtGrip");
   let fadeT = 0, pos = { side: "left", top: 0.4 };
   const wake = () => { bar.classList.remove("wt-faded"); clearTimeout(fadeT); fadeT = setTimeout(() => { if (sheet.classList.contains("wt-hidden")) bar.classList.add("wt-faded"); }, 4000); };
   const open = () => { sheet.classList.remove("wt-hidden"); wake(); };
@@ -284,6 +285,7 @@ const panel = String.raw`
   bChat.addEventListener("click", () => { close(); const p = document.getElementById("wt-pill"); if (p) p.click(); setTimeout(syncState, 60); });
   bMic.addEventListener("click", () => { const m = document.getElementById("wt-mic"); if (m) m.click(); setTimeout(syncState, 300); });
   bFs.addEventListener("click", () => { close(); if (fsBox) exitFs(); else enterFs(); });
+  bTv.addEventListener("click", () => { close(); appleFs(); });
 
   // what each button shows: party on / chat open / mic on / full screen
   async function syncState() {
@@ -297,6 +299,7 @@ const panel = String.raw`
     bChat.classList.toggle("wt-on", !!(r && r.classList.contains("wt-open")));
     bMic.classList.toggle("wt-mic-on", live && mic);
     bFs.classList.toggle("wt-hidden", !bestVideo());
+    bTv.classList.toggle("wt-hidden", !bestVideo());
     bFs.classList.toggle("wt-on", !!fsBox);
     bFs.textContent = fsBox ? "✕" : "⛶";
     bFs.setAttribute("aria-label", fsBox ? "Exit full screen" : "Full screen");
@@ -351,7 +354,7 @@ const panel = String.raw`
   // iPhone Safari can't make a page element full screen; the site's button ends
   // in a blank screen or in Apple's own player (which hides chat and trivia).
   // Instead the player box is stretched over the whole screen, our overlay on top.
-  let fsBox = null, fsAnc = [];
+  let fsBox = null, fsAnc = [], fsVid = null;
   function bestVideo() {
     let best = null, area = 0;
     for (const v of document.querySelectorAll("video")) {
@@ -378,36 +381,42 @@ const panel = String.raw`
     for (let p = fsBox.parentElement; p && p !== document.documentElement; p = p.parentElement) { p.classList.add("wt-ios-fsanc"); fsAnc.push(p); }
     document.documentElement.classList.add("wt-ios-fs");
     try { scrollTo(0, 0); } catch (_) {}
+    setTimeout(() => {
+      if (!fsBox) return;
+      const r = v.getBoundingClientRect();
+      if (r.width * r.height < innerWidth * innerHeight * 0.8) { fsVid = v; v.classList.add("wt-ios-fsvid"); }
+    }, 150);
     syncState();
   }
   function exitFs() {
     if (fsBox) fsBox.classList.remove("wt-ios-fsbox");
+    if (fsVid) { fsVid.classList.remove("wt-ios-fsvid"); fsVid = null; }
     for (const p of fsAnc) p.classList.remove("wt-ios-fsanc");
     fsAnc = []; fsBox = null;
     document.documentElement.classList.remove("wt-ios-fs");
     syncState();
   }
   window.__wtIosFs = () => !!fsBox;
-  // the site's own full-screen button -> ours
+  // Apple's own full-screen player: really edge to edge. Our overlay can't show
+  // over it, but sync and voice keep running; chat is back when you leave it.
+  function appleFs() {
+    const v = bestVideo();
+    if (!v) return;
+    if (fsBox) exitFs();
+    try {
+      if (typeof v.webkitEnterFullscreen === "function") v.webkitEnterFullscreen();
+      else if (typeof v.requestFullscreen === "function") v.requestFullscreen();
+    } catch (_) {}
+    window.__wtIosAppleFs = (window.__wtIosAppleFs || 0) + 1;
+  }
+  // the site's own full-screen button: iPhone can't make the site's player box
+  // full screen (it went blank), so it opens Apple's full screen instead
   const FS_SEL = '[aria-label*="full screen" i], [aria-label*="fullscreen" i], [title*="full screen" i], [title*="fullscreen" i], [data-testid*="fullscreen" i], [class*="fullscreen" i], [class*="full-screen" i]';
   document.addEventListener("click", (e) => {
     const t = e.target && e.target.closest ? e.target.closest(FS_SEL) : null;
     if (!t || t.closest("#wt-root, #wt-ios-host") || !bestVideo()) return;
     e.preventDefault(); e.stopImmediatePropagation();
-    if (fsBox) exitFs(); else enterFs();
-  }, true);
-  // ...and if the page still goes full screen some other way, take it over
-  const takeOver = () => {
-    const el = document.fullscreenElement || document.webkitFullscreenElement;
-    if (!el) return;
-    try { (document.exitFullscreen || document.webkitExitFullscreen).call(document); } catch (_) {}
-    if (!fsBox) setTimeout(enterFs, 120);
-  };
-  document.addEventListener("fullscreenchange", takeOver);
-  document.addEventListener("webkitfullscreenchange", takeOver);
-  document.addEventListener("webkitbeginfullscreen", (e) => {
-    const v = e.target;
-    setTimeout(() => { try { if (v && v.webkitExitFullscreen) v.webkitExitFullscreen(); } catch (_) {} if (!fsBox) enterFs(); }, 60);
+    appleFs();
   }, true);
   document.documentElement.appendChild(host);
   setInterval(() => { if (host.parentNode !== document.documentElement) document.documentElement.appendChild(host); }, 3000);
@@ -467,6 +476,7 @@ const IOS_CSS = `
 html.wt-ios-fs, html.wt-ios-fs body { overflow: hidden !important; }
 .wt-ios-fsanc { transform: none !important; filter: none !important; contain: none !important; will-change: auto !important; overflow: visible !important; }
 .wt-ios-fsbox { position: fixed !important; inset: 0 !important; left: 0 !important; top: 0 !important; width: 100vw !important; height: 100vh !important; height: 100dvh !important; max-width: none !important; max-height: none !important; margin: 0 !important; padding: 0 !important; z-index: 2147483000 !important; background: #000 !important; transform: none !important; }
+.wt-ios-fsvid { position: fixed !important; inset: 0 !important; left: 0 !important; top: 0 !important; width: 100vw !important; height: 100vh !important; height: 100dvh !important; max-width: none !important; max-height: none !important; z-index: 2147483001 !important; object-fit: contain !important; background: #000 !important; transform: none !important; }
 .wt-ios-fsbox video { width: 100% !important; height: 100% !important; max-height: none !important; object-fit: contain !important; }
 `;
 const out = [

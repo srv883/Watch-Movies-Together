@@ -335,10 +335,18 @@ const user = (js) => `(() => { document.dispatchEvent(new Event("keydown", { bub
     rec("I3g", "⛶ fills the whole screen with the player, chat stays on top; ✕ exits", fsOn.ok && onTop && offOk, { fs: fsOn.v, chatOnTop: onTop });
     await I.eval(`(document.getElementById("sitefs").click(), true)`, true);
     await sleep(500);
-    const siteFs = await I.eval(`({ ours: window.__wtIosFs(), nativeFs: !!(document.fullscreenElement || document.webkitFullscreenElement), siteHandler: window.__siteFs || 0 })`);
-    rec("I3h", "the site's own full-screen button gives our full screen (no blank native full screen)", siteFs.ours && !siteFs.nativeFs, siteFs);
-    await tap(I, J.sh("wtBFs"));
-    await sleep(300);
+    const siteFs = await I.eval(`({ apple: window.__wtIosAppleFs || 0, ours: window.__wtIosFs(), siteHandler: window.__siteFs || 0 })`);
+    rec("I3h", "the site's own full-screen button opens Apple's full screen (not the blank element full screen)", siteFs.apple === 1 && !siteFs.ours && siteFs.siteHandler === 0, siteFs);
+    await I.eval(`(async () => { try { if (document.fullscreenElement) await document.exitFullscreen(); } catch (_) {} return true; })()`);
+    await sleep(600);
+    // 📺 = Apple's full screen; it is never undone by us (that blocked full screen in landscape)
+    await tap(I, J.sh("wtBTv"));
+    await sleep(800);
+    const tv = await I.eval(`({ apple: window.__wtIosAppleFs || 0 })`);
+    const neverExits = !/webkitExitFullscreen|exitFullscreen[(]/.test(userscript.split("// ---- the toolbar popup")[1] || "x");
+    rec("I3i", "📺 opens Apple's full screen, and nothing in the iPhone code ever leaves it (that blocked landscape full screen)", tv.apple === 2 && neverExits, { ...tv, neverExits });
+    await I.eval(`(async () => { try { if (document.fullscreenElement) await document.exitFullscreen(); } catch (_) {} return true; })()`);
+    await sleep(600);
 
     // ---- I4: playback sync both ways ----
     await sleep(1500);
