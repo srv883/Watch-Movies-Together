@@ -3904,8 +3904,10 @@ console.log("\n--- 12e. error sweep ---");
     ok(gh.every(u => /^https:\/\/raw\.githubusercontent\.com\/srv883\/Watch-Movies-Together\/main\/trivia\//.test(u)), "37b: packs only ever come from the project's repo");
 
     // 37c (v36): a title whose pack facts have no lines yet -> nothing (never the old guessed-time facts)
-    const r2 = await P1.ask({ t: "wt-trivia", key: "netflix:70196252", duration: 2800, hints: ["Netflix", "Breaking Bad E14 Ozymandias"] });
-    ok(r2 && r2.source === "claude", "37c: Breaking Bad has no anchored facts yet -> goes to Claude when a key is saved (" + (r2 && (r2.source || r2.error)) + ")");
+    const r2 = await P1.ask({ t: "wt-trivia", key: "netflix:80057281", duration: 2900, hints: ["Netflix", "Stranger Things Chapter One"], slug: "Stranger Things · Chapter One" });
+    ok(r2 && r2.source === "claude", "37c: a title with no pack -> goes to Claude when a key is saved (" + (r2 && (r2.source || r2.error)) + ")");
+    const r2b = await P1.ask({ t: "wt-trivia", key: "netflix:70196252", duration: 2800, hints: ["Netflix", "Breaking Bad E14 Ozymandias"] });
+    ok(r2b && r2b.source === "pack" && r2b.items.every(i => i.cue), "37c: Breaking Bad Ozymandias -> line-anchored pack facts (" + (r2b && (r2b.source || r2b.error)) + ")");
     const P2 = await load({});
     const r3 = await P2.ask({ t: "wt-trivia", key: "netflix:80057281", duration: 2900, hints: ["Stranger Things Chapter One"], slug: "Stranger Things · Chapter One" });
     ok(r3 && r3.error === "unknown" && P2.wiki().length === 0 && P2.api().length === 0, "37c: no pack, no key -> nothing shown, and Wikipedia is no longer used");
