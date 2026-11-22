@@ -1,5 +1,5 @@
 {
- "version": "1.37.0",
+ "version": "1.37.1",
  "url": "https://raw.githubusercontent.com/srv883/Watch-Movies-Together/main/ios/watch-together.user.js",
- "notes": "First iPhone version"
+ "notes": "Smaller Watch Together button: sits on the right edge, fades when untouched, drag it anywhere"
 }

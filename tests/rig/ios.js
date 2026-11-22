@@ -219,13 +219,34 @@ const user = (js) => `(() => { document.dispatchEvent(new Event("keydown", { bub
     const ua = await I.eval("navigator.userAgent");
     rec("I1b", "page sees an iPhone (Safari UA" + (WEBKIT ? ")" : ", touch)"), /iPhone/.test(ua) && (WEBKIT || (await I.eval("navigator.maxTouchPoints")) > 0), { ua: ua.slice(0, 60) });
     await shot(I, "1-phone-start");
+    // I1c: the button stays out of the player's way: small, on the right edge, not in the bottom area
+    const fr = await I.eval(`(() => { const r = ${J.sh("wtFab")}.getBoundingClientRect(); return { l: r.left, t: r.top, w: r.width, W: innerWidth, H: innerHeight }; })()`);
+    rec("I1c", "button is small and docked to the right edge, away from the bottom controls", fr.w <= 36 && fr.l > fr.W - 50 && fr.t < fr.H * 0.5, fr);
+    if (!WEBKIT) {
+      // I1d: drag it with a finger to the left side -> snaps to the left edge, remembered after reload
+      const c = { x: fr.l + fr.w / 2, y: fr.t + fr.w / 2 };
+      await I.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: c.x, y: c.y }] });
+      for (let k = 1; k <= 10; k++) { await I.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: c.x - k * 25, y: c.y + k * 15 }] }); await sleep(20); }
+      await I.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+      await sleep(400);
+      const d1 = await I.eval(`(() => { const r = ${J.sh("wtFab")}.getBoundingClientRect(); return { l: Math.round(r.left), t: Math.round(r.top), open: getComputedStyle(${J.sh("wtSheet")}).display !== "none" }; })()`);
+      await I.send("Page.reload");
+      await waitFor(I, visible(J.sh("wtFab")), (v) => v === true, 15000);
+      await sleep(500);
+      const d2 = await I.eval(`(() => { const r = ${J.sh("wtFab")}.getBoundingClientRect(); return { l: Math.round(r.left), t: Math.round(r.top) }; })()`);
+      rec("I1d", "drag by finger -> snaps to the left edge, no panel opened, same spot after reload", d1.l <= 8 && !d1.open && Math.abs(d1.t - (fr.t + 150)) < 30 && d2.l <= 8 && Math.abs(d2.t - d1.t) < 3, { before: fr, after: d1, reloaded: d2 });
+      await sleep(4200);
+      const faded = await I.eval(`${J.sh("wtFab")}.classList.contains("wt-faded")`);
+      rec("I1e", "button fades when untouched", faded, {});
+    }
+
 
     // ---- I2: the popup panel, by touch ----
     await tap(I, J.sh("wtFab"));
     const sheet = await waitFor(I, visible(J.sh("setupView")), (v) => v === true, 4000);
     const ver = await I.eval(`${J.sh("verLine")}.textContent`);
     const site = await I.eval(`${J.sh("siteName")}.textContent`);
-    rec("I2", "tap the button -> the Watch Together panel (name / start / join)", sheet.ok && ver === "v1.37.0", { ver, site });
+    rec("I2", "tap the button -> the Watch Together panel (name / start / join)", sheet.ok && /^v1\.37\.\d+$/.test(ver), { ver, site });
     await shot(I, "2-panel");
 
     if (WEBKIT) {

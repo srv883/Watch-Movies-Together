@@ -17,7 +17,9 @@ const SRC = path.join(ROOT, folder);
 const OUT = path.join(ROOT, "ios");
 const rd = (f) => fs.readFileSync(path.join(SRC, f), "utf8");
 const manifest = JSON.parse(rd("manifest.json"));
-const VERSION = manifest.version;
+const vArg = process.argv.indexOf("--version");
+const VERSION = vArg > 0 ? process.argv[vArg + 1] : manifest.version;
+if (!/^\d+\.\d+\.\d+$/.test(VERSION) || VERSION.split(".").slice(0, 2).join(".") !== manifest.version.split(".").slice(0, 2).join(".")) throw new Error("--version must be " + manifest.version.split(".").slice(0, 2).join(".") + ".x");
 const RAW = "https://raw.githubusercontent.com/srv883/Watch-Movies-Together/main/ios/";
 const SCRIPT_URL = RAW + "watch-together.user.js";
 
@@ -226,12 +228,14 @@ const panel = String.raw`
   host.style.cssText = "all:initial;position:fixed;z-index:2147483647;top:0;left:0;width:0;height:0;";
   const shadow = host.attachShadow({ mode: "open" });
   shadow.innerHTML = "<style>" + ${JSON.stringify(panelCss)} + ${JSON.stringify(`
-    .wt-fab { position: fixed; left: calc(10px + env(safe-area-inset-left)); bottom: calc(96px + env(safe-area-inset-bottom));
-      width: 44px; height: 44px; border-radius: 50%; border: 0; padding: 0; background: #14141c; opacity: .72;
-      box-shadow: 0 2px 10px rgba(0,0,0,.5); cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: none; }
-    .wt-fab img { width: 44px; height: 44px; border-radius: 50%; display: block; pointer-events: none; }
-    .wt-fab.wt-live::after { content: ""; position: absolute; right: 1px; top: 1px; width: 11px; height: 11px; border-radius: 50%; background: #43d17a; border: 2px solid #14141c; }
-    .wt-fab.wt-live { opacity: .5; }
+    .wt-fab { position: fixed; right: calc(4px + env(safe-area-inset-right)); top: 30%;
+      width: 34px; height: 34px; border-radius: 50%; border: 0; padding: 0; background: #14141c; opacity: .8;
+      box-shadow: 0 2px 8px rgba(0,0,0,.5); cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: none;
+      -webkit-user-select: none; user-select: none; transition: opacity .4s, left .2s, right .2s; }
+    .wt-fab.wt-dragging { transition: none; opacity: 1; }
+    .wt-fab.wt-faded { opacity: .22; }
+    .wt-fab img { width: 34px; height: 34px; border-radius: 50%; display: block; pointer-events: none; -webkit-user-drag: none; }
+    .wt-fab.wt-live::after { content: ""; position: absolute; right: 0; top: 0; width: 9px; height: 9px; border-radius: 50%; background: #43d17a; border: 2px solid #14141c; }
     .wt-sheet { position: fixed; left: 50%; top: calc(8px + env(safe-area-inset-top)); transform: translateX(-50%);
       width: min(340px, calc(100vw - 16px)); max-height: calc(100vh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
       overflow-y: auto; -webkit-overflow-scrolling: touch; border-radius: 14px; box-shadow: 0 8px 40px rgba(0,0,0,.6); }
@@ -250,25 +254,50 @@ const panel = String.raw`
   const $s = (id) => shadow.getElementById(id);
   const fab = $s("wtFab"), sheet = $s("wtSheet");
   const open = () => { sheet.classList.remove("wt-hidden"); };
-  const close = () => { sheet.classList.add("wt-hidden"); };
-  // drag the button out of the way; a tap without moving opens the panel
-  let drag = null;
-  fab.addEventListener("pointerdown", (e) => { drag = { x: e.clientX, y: e.clientY, moved: false, r: fab.getBoundingClientRect() }; try { fab.setPointerCapture(e.pointerId); } catch (_) {} });
-  fab.addEventListener("pointermove", (e) => {
+  const close = () => { sheet.classList.add("wt-hidden"); try { wake(); } catch (_) {} };
+  // a small button docked to a screen edge: drag it anywhere (it snaps to the
+  // nearest side and remembers the spot), tap to open; it fades when untouched
+  const SZ = 34, M = 4;
+  let drag = null, fadeT = 0;
+  const wake = () => { fab.classList.remove("wt-faded"); clearTimeout(fadeT); fadeT = setTimeout(() => { if (sheet.classList.contains("wt-hidden")) fab.classList.add("wt-faded"); }, 3500); };
+  function dock(pos) {
+    const top = Math.max(M, Math.min(innerHeight - SZ - M, (pos.top || 0.3) * innerHeight));
+    fab.style.top = top + "px";
+    if (pos.side === "left") { fab.style.left = "calc(" + M + "px + env(safe-area-inset-left))"; fab.style.right = "auto"; }
+    else { fab.style.right = "calc(" + M + "px + env(safe-area-inset-right))"; fab.style.left = "auto"; }
+  }
+  let pos = { side: "right", top: 0.3 };
+  const down = (x, y) => { drag = { x, y, moved: false, r: fab.getBoundingClientRect() }; wake(); };
+  const move = (x, y) => {
     if (!drag) return;
-    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    const dx = x - drag.x, dy = y - drag.y;
     if (!drag.moved && Math.abs(dx) + Math.abs(dy) < 8) return;
-    drag.moved = true;
-    const l = Math.max(4, Math.min(innerWidth - 48, drag.r.left + dx)), t = Math.max(4, Math.min(innerHeight - 48, drag.r.top + dy));
-    fab.style.left = l + "px"; fab.style.top = t + "px"; fab.style.bottom = "auto";
-  });
-  fab.addEventListener("pointerup", () => {
-    const d = drag; drag = null;
-    if (d && d.moved) { try { chrome.storage.local.set({ wt_ios_fab: { left: fab.style.left, top: fab.style.top } }); } catch (_) {} return; }
+    drag.moved = true; fab.classList.add("wt-dragging");
+    const l = Math.max(M, Math.min(innerWidth - SZ - M, drag.r.left + dx)), t = Math.max(M, Math.min(innerHeight - SZ - M, drag.r.top + dy));
+    fab.style.left = l + "px"; fab.style.right = "auto"; fab.style.top = t + "px";
+  };
+  const up = () => {
+    const d = drag; drag = null; fab.classList.remove("wt-dragging"); wake();
+    if (d && d.moved) {
+      const r = fab.getBoundingClientRect();
+      pos = { side: r.left + SZ / 2 < innerWidth / 2 ? "left" : "right", top: r.top / innerHeight };
+      dock(pos);
+      try { chrome.storage.local.set({ wt_ios_fab2: pos }); } catch (_) {}
+      return;
+    }
     if (sheet.classList.contains("wt-hidden")) open(); else close();
-  });
+  };
+  // touch first (iPhone); the touch handlers stop the page scrolling while dragging
+  let touch = false;
+  fab.addEventListener("touchstart", (e) => { touch = true; const t = e.touches[0]; down(t.clientX, t.clientY); e.preventDefault(); }, { passive: false });
+  fab.addEventListener("touchmove", (e) => { const t = e.touches[0]; move(t.clientX, t.clientY); e.preventDefault(); }, { passive: false });
+  fab.addEventListener("touchend", (e) => { e.preventDefault(); up(); }, { passive: false });
+  fab.addEventListener("touchcancel", () => { drag = null; fab.classList.remove("wt-dragging"); });
+  fab.addEventListener("mousedown", (e) => { if (touch) return; down(e.clientX, e.clientY); const mm = (ev) => move(ev.clientX, ev.clientY); const mu = () => { document.removeEventListener("mousemove", mm, true); document.removeEventListener("mouseup", mu, true); up(); }; document.addEventListener("mousemove", mm, true); document.addEventListener("mouseup", mu, true); });
   $s("wtX").addEventListener("click", close);
-  chrome.storage.local.get("wt_ios_fab").then((r) => { const p = r.wt_ios_fab; if (p && p.left) { fab.style.left = p.left; fab.style.top = p.top; fab.style.bottom = "auto"; } });
+  chrome.storage.local.get("wt_ios_fab2").then((r) => { if (r.wt_ios_fab2 && r.wt_ios_fab2.side) pos = r.wt_ios_fab2; dock(pos); });
+  addEventListener("resize", () => dock(pos));
+  wake();
   const liveDot = () => chrome.storage.local.get("wt_party").then((r) => fab.classList.toggle("wt-live", !!r.wt_party));
   chrome.storage.onChanged.addListener((ch) => { if (ch.wt_party) liveDot(); });
   liveDot();
@@ -350,5 +379,5 @@ const out = [
 
 fs.mkdirSync(OUT, { recursive: true });
 fs.writeFileSync(path.join(OUT, "watch-together.user.js"), out);
-fs.writeFileSync(path.join(OUT, "latest.json"), JSON.stringify({ version: VERSION, url: SCRIPT_URL, notes: process.argv[3] || "" }, null, 1) + "\n");
+fs.writeFileSync(path.join(OUT, "latest.json"), JSON.stringify({ version: VERSION, url: SCRIPT_URL, notes: (process.argv[3] && process.argv[3] !== "--version" ? process.argv[3] : "") }, null, 1) + "\n");
 console.log("ios/watch-together.user.js", (out.length / 1024).toFixed(0) + " KB", "v" + VERSION);

@@ -4148,14 +4148,14 @@ console.log("\n--- 12e. error sweep ---");
     const head = /\/\/ ==UserScript==([\s\S]*?)\/\/ ==\/UserScript==/.exec(US);
     ok(!!head, "41a: userscript has a metadata block");
     const metaVal = (k) => head[1].split("\n").filter(l => l.startsWith("// @" + k + " ")).map(l => l.slice(("// @" + k).length).trim());
-    ok(metaVal("version")[0] === mf.version, "41a: @version = manifest version (" + metaVal("version")[0] + ")");
+    ok(metaVal("version")[0].split(".").slice(0, 2).join(".") === mf.version.split(".").slice(0, 2).join("."), "41a: @version is this version or an iPhone-only patch of it (" + metaVal("version")[0] + ")");
     ok(JSON.stringify(metaVal("match")) === JSON.stringify(mf.content_scripts[0].matches), "41a: @match = the manifest's 6 streaming sites, nothing else");
     ok(metaVal("inject-into")[0] === "content" && head[1].indexOf("// @noframes") !== -1, "41a: runs in the content world (GM APIs), top frame only");
     ok(/^https:\/\/raw\.githubusercontent\.com\/srv883\/Watch-Movies-Together\/main\/ios\/watch-together\.user\.js$/.test(metaVal("updateURL")[0]), "41a: updates come only from the project's repo");
     ok(US.indexOf(SRC) !== -1, "41b: contains this version's content.js unchanged");
     ok(US.indexOf(JSON.stringify(fs.readFileSync(DIR12 + "/overlay.css", "utf8"))) !== -1, "41b: contains this version's overlay.css");
     const latestIos = JSON.parse(fs.readFileSync(ROOT + "/ios/latest.json", "utf8"));
-    ok(latestIos.version === mf.version, "41c: ios/latest.json announces " + latestIos.version);
+    ok(latestIos.version === metaVal("version")[0], "41c: ios/latest.json announces the script's own version " + latestIos.version);
     ok(US.indexOf('update_url: "userscript", wt_ios: true') !== -1, "41d: stand-in manifest marks the iPhone build (no folder self-update, no Chrome zip notice)");
     // 41e: iPhone wording for the version-mismatch line
     ok(SRC.indexOf('if (iosBuild()) return mine ? "tap the round Watch Together button -> Update"') !== -1, "41e: iPhone users are told how to update on the phone");
