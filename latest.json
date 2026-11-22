@@ -1,5 +1,5 @@
 {
-  "version": "1.36.0",
-  "zip": "https://github.com/srv883/Watch-Movies-Together/raw/main/wt-V36.zip",
-  "notes": "Trivia now pops up exactly when the line it is about is said (turn on English subtitles), with facts about that scene - no more late, generic facts."
+  "version": "1.37.0",
+  "zip": "https://github.com/srv883/Watch-Movies-Together/raw/main/wt-V37.zip",
+  "notes": "iPhone version (Safari, via the free Userscripts app) joins your parties; voice unlocks with a tap on phones; phone-sized layouts."
 }
