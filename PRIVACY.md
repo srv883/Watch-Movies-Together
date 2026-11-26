@@ -13,7 +13,7 @@ Stored only in your browser's extension storage: the display name you type, the 
 - **Trivia packs:** the extension downloads trivia files from this project's GitHub repository (raw.githubusercontent.com). Nothing about you or what you watch is sent – it simply downloads the published files.
 - **Subtitles:** to pop a trivia card up on the right line, the extension reads the subtitle text shown on the page. That text is only compared with the trivia pack in your browser; it is never stored or sent anywhere.
 - **Anthropic (api.anthropic.com) – only if you add your own Claude API key:** the title information of what you are watching (page title, words from the page address, the video's length) is sent with your key to generate trivia. Anthropic's own privacy policy applies to that request. Without a key, nothing is ever sent to Anthropic.
-- **iPhone version:** the same code running in Safari through the free Userscripts app. It sends exactly the same things to the same places as above; its settings are kept in the Userscripts app on the phone, and it checks this repository for a newer iPhone version (`ios/latest.json`).
+- **Phone version (iPhone / Android):** the same code running in Safari through the free Userscripts app, or in Firefox for Android through Tampermonkey / Violentmonkey. It sends exactly the same things to the same places as above; its settings are kept in that app on the phone, and it checks this repository for a newer iPhone version (`ios/latest.json`).
 - **Update check (manual installs only):** copies installed from GitHub check this repository's `latest.json` for new versions. Copies installed from the Chrome Web Store are updated by Chrome and do not do this.
 
 ## What we never do

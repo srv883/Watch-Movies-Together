@@ -1,7 +1,13 @@
 # Watch-Movies-Together
-A free P2P chrome extension to watch any tv shows, or movies together in any streaming platform
+A free P2P watch party for JioHotstar, Netflix, Prime Video, JioTV and JioCinema: playback in sync, chat, voice, reactions and scene trivia. Works across devices - one of you on a laptop, the other on a phone is fine.
 
-## Install (Windows) - updates itself from then on
+## Watch together across devices
+- Start a party on any device, then **Copy invite** (laptop) or **Share invite** (phone). The invite is a link to the episode you're on.
+- Your friend opens that link where Watch Together is installed - laptop, iPhone or Android - and joins the party by itself. No code to type (the code is in the invite too, for **Join Party**).
+- Phones: Netflix and Prime Video don't play in phone browsers (they push their apps), so phones are for **JioHotstar**.
+
+## Install
+### Laptop (Windows, Chrome) - updates itself from then on
 In PowerShell:
 
 ```
@@ -13,19 +19,26 @@ A hidden updater (started with Windows from your Startup folder) checks this rep
 
 Manual install instead: [wt-latest.zip](https://github.com/srv883/Watch-Movies-Together/raw/main/wt-latest.zip) (unzip -> Load unpacked; remove the old one first).
 
-## iPhone (Safari)
-The same Watch Together runs on iPhone in Safari through the free **Userscripts** app, and joins the same parties as the Chrome extension (sync, chat, voice, reactions, trivia).
+### iPhone (Safari)
 1. Install **Userscripts** from the App Store (free, by Justin Wasack) and open it once.
 2. iPhone **Settings → Apps → Safari → Extensions → Userscripts**: turn it on and set **All Websites → Allow**.
-3. In Safari open [watch-together.user.js](https://raw.githubusercontent.com/srv883/Watch-Movies-Together/main/ios/watch-together.user.js), tap the **aA / puzzle** button in the address bar → **Userscripts** → **Install**.
-4. Open **hotstar.com** in **Safari itself** (not a Home Screen icon) and start the film or episode. A slim Watch Together bar sits on the left edge: tap the **logo** for Start / Join / Leave, **💬** for chat, **🎤** for your mic, **😀** for a quick reaction, **⛶** to fill the screen with chat and trivia on top (swipe up once to hide Safari's bar), **📺** for Apple's edge-to-edge full screen (also what Hotstar's own full-screen button does; sync and voice keep going, chat shows again when you leave it). Drag the little handle on top of the bar to move it.
+3. In Safari open [watch-together.user.js](https://raw.githubusercontent.com/srv883/Watch-Movies-Together/main/ios/watch-together.user.js), tap the **aA / puzzle** button in the address bar → **Userscripts** → **Install**. (Or **⋯ → Share → Save to Files → On My iPhone → Userscripts**.)
+4. Open **hotstar.com** in **Safari itself** (not a Home Screen icon). Invite links must open in Safari too (if they open in another browser, copy them into Safari).
 
-Tips: turn on English subtitles for trivia; tap the screen once if your friend's voice doesn't start. Netflix and Prime Video don't play in phone browsers (they push their apps), so on iPhone this is for JioHotstar. If JioHotstar only offers its app, try Safari's **aA → Request Desktop Website**.
-New iPhone versions show an **Update** button in the panel. Build it with `node tools/make-userscript.js V<N>-name "notes"` (→ `ios/`), then commit and push.
+### Android (Firefox)
+Chrome on Android can't run add-ons; Firefox can.
+1. Install **Firefox** from the Play Store, then in Firefox: **⋮ → Add-ons → Tampermonkey** (or **Violentmonkey**) → **Add**.
+2. In Firefox open [watch-together.user.js](https://raw.githubusercontent.com/srv883/Watch-Movies-Together/main/ios/watch-together.user.js) → Tampermonkey shows its install page → **Install**.
+3. Open **hotstar.com** in Firefox (invite links too - if they open in Chrome, copy them into Firefox). If Hotstar only offers its app, use **⋮ → Desktop site**.
+
+### On a phone
+A slim Watch Together bar sits on the left edge: the **logo** for Start / Join / Leave and the invite, **💬** chat, **🎤** your mic, **😀** a quick reaction, **⛶** full screen with chat and trivia on top (iPhone: swipe up once to hide Safari's bar; Android: real full screen), **📺** the phone's own full-screen player (edge to edge; sync and voice keep going, chat shows again when you leave it). Drag the little handle on top of the bar to move it.
+Tips: turn on English subtitles for trivia; earphones work best for voice; tap the screen once if your friend's voice doesn't start. New phone versions show an **Update** button in the panel.
 
 ## Publishing updates
 - **New version:** make the next `V<N>-name` folder, bump `manifest.json` + `EXT_VER`, test, then
   `node tools/release.js V<N>-name "what's new"` - zips it, updates `latest.json` + `wt-latest.zip`, commits and pushes. Installed copies update themselves.
+- **Phone build:** `node tools/make-userscript.js V<N>-name "notes"` (→ `ios/`; `--version X.Y.Z` for a phone-only fix), then commit and push.
 - **New trivia:** add or edit a pack in `trivia/` (listed in `trivia/index.json`) and push - every extension picks it up within 6 hours, no new version needed.
 
 ## Trivia

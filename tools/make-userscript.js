@@ -55,7 +55,7 @@ const meta = [
   "// @name         Watch Together",
   "// @namespace    https://github.com/srv883/Watch-Movies-Together",
   `// @version      ${VERSION}`,
-  "// @description  Watch JioHotstar (and the other supported sites) together in sync with a friend: chat, voice, reactions and scene trivia. iPhone build of the Watch Together extension.",
+  "// @description  Watch JioHotstar (and the other supported sites) together in sync with a friend: chat, voice, reactions and scene trivia. Phone build of the Watch Together extension (iPhone Safari with Userscripts, Android Firefox with Tampermonkey or Violentmonkey).",
   ...manifest.content_scripts[0].matches.map((m) => "// @match        " + m),
   "// @run-at       document-idle",
   "// @inject-into  content",
@@ -269,15 +269,21 @@ const panel = String.raw`
       '<button class="wt-b wt-hidden" id="wtBMic" aria-label="Microphone">🎤</button>' +
       '<button class="wt-b wt-hidden" id="wtBEmo" aria-label="Quick reaction">😀</button>' +
       '<button class="wt-b wt-hidden" id="wtBFs" aria-label="Fill the screen (chat on top)">⛶</button>' +
-      '<button class="wt-b wt-hidden" id="wtBTv" aria-label="Apple full screen">📺</button>' +
+      '<button class="wt-b wt-hidden" id="wtBTv" aria-label="The phone’s own full screen">📺</button>' +
     '</div>' +
     '<div class="wt-emo wt-hidden" id="wtEmo"></div>' +
-    '<div class="wt-hint wt-hidden" id="wtHint">Swipe up once to hide Safari’s bar</div>' +
+    '<div class="wt-hint wt-hidden" id="wtHint">Swipe up once to hide the browser bar</div>' +
     '<div class="wt-sheet wt-hidden" id="wtSheet"><button class="wt-x" id="wtX" aria-label="Close">✕</button><div class="wtp">' +
     ${JSON.stringify(panelBody)} +
-    '<p class="wt-ios-note">The bar on the side: logo = this panel (start / join / leave), 💬 = chat, 🎤 = your mic, 😀 = quick reaction, ⛶ = fill the screen with chat and trivia on top, 📺 = Apple’s full screen (edge to edge; sync and voice keep going, chat shows again when you leave it). Drag the little handle on top to move the bar. Turn on English subtitles for scene trivia; earphones work best for voice.</p>' +
+    '<p class="wt-ios-note">The bar on the side: logo = this panel (start / join / leave), 💬 = chat, 🎤 = your mic, 😀 = quick reaction, ⛶ = fill the screen with chat and trivia on top, 📺 = the phone’s own full-screen player (edge to edge; sync and voice keep going, chat shows again when you leave it). Drag the little handle on top to move the bar. Turn on English subtitles for scene trivia; earphones work best for voice.</p>' +
     '</div></div>';
   const $s = (id) => shadow.getElementById(id);
+  const UA = String(navigator.userAgent || "");
+  const ANDROID = /Android/i.test(UA);
+  // iPhone / iPad (also in "desktop website" mode, which reports a Mac)
+  const APPLE_TOUCH = /iPhone|iPad|iPod/.test(UA) || (/Macintosh/.test(UA) && navigator.maxTouchPoints > 1);
+  // Android browsers can put a page element in full screen; iPhone Safari can't
+  const ELEMENT_FS = !APPLE_TOUCH && !!(document.fullscreenEnabled && Element.prototype.requestFullscreen);
   const bar = $s("wtBar"), sheet = $s("wtSheet"), fab = $s("wtBParty");
   const bEmo = $s("wtBEmo"), emo = $s("wtEmo"), bChat = $s("wtBChat"), bMic = $s("wtBMic"), bFs = $s("wtBFs"), bTv = $s("wtBTv"), grip = $s("wtGrip");
   let fadeT = 0, pos = { side: "left", top: 0.4 };
@@ -386,7 +392,7 @@ const panel = String.raw`
   // iPhone Safari can't make a page element full screen; the site's button ends
   // in a blank screen or in Apple's own player (which hides chat and trivia).
   // Instead the player box is stretched over the whole screen, our overlay on top.
-  let fsBox = null, fsAnc = [], fsVid = null;
+  let fsBox = null, fsAnc = [], fsVid = null, fsReal = false;
   function bestVideo() {
     let best = null, area = 0;
     for (const v of document.querySelectorAll("video")) {
@@ -407,6 +413,16 @@ const panel = String.raw`
   function enterFs() {
     const v = bestVideo();
     if (!v) return;
+    if (ELEMENT_FS) {
+      // Android: the player box itself goes full screen; the bar and chat move inside it
+      fsBox = playerBox(v); fsReal = true;
+      Promise.resolve().then(() => fsBox.requestFullscreen({ navigationUI: "hide" })).then(placeHost, () => { fsReal = false; fsBox = null; stretchFs(v); });
+      syncState();
+      return;
+    }
+    stretchFs(v);
+  }
+  function stretchFs(v) {
     fsBox = playerBox(v);
     fsBox.classList.add("wt-ios-fsbox");
     fsAnc = [];
@@ -422,6 +438,12 @@ const panel = String.raw`
     syncState();
   }
   function exitFs() {
+    if (fsReal) {
+      fsReal = false; fsBox = null;
+      try { if (document.fullscreenElement) document.exitFullscreen(); } catch (_) {}
+      syncState();
+      return;
+    }
     if (fsBox) fsBox.classList.remove("wt-ios-fsbox");
     if (fsVid) { fsVid.classList.remove("wt-ios-fsvid"); fsVid = null; }
     for (const p of fsAnc) p.classList.remove("wt-ios-fsanc");
@@ -447,12 +469,25 @@ const panel = String.raw`
   const FS_SEL = '[aria-label*="full screen" i], [aria-label*="fullscreen" i], [title*="full screen" i], [title*="fullscreen" i], [data-testid*="fullscreen" i], [class*="fullscreen" i], [class*="full-screen" i]';
   document.addEventListener("click", (e) => {
     const t = e.target && e.target.closest ? e.target.closest(FS_SEL) : null;
-    if (!t || t.closest("#wt-root, #wt-ios-host") || !bestVideo()) return;
+    if (!APPLE_TOUCH || !t || t.closest("#wt-root, #wt-ios-host") || !bestVideo()) return;
     e.preventDefault(); e.stopImmediatePropagation();
     appleFs();
   }, true);
-  document.documentElement.appendChild(host);
-  setInterval(() => { if (host.parentNode !== document.documentElement) document.documentElement.appendChild(host); }, 3000);
+  function placeHost() {
+    const el = document.fullscreenElement || document.webkitFullscreenElement;
+    const parent = el && el.tagName !== "VIDEO" ? el : document.documentElement;
+    if (host.parentNode !== parent) parent.appendChild(host);
+  }
+  const onFsChange = () => {
+    const el = document.fullscreenElement || document.webkitFullscreenElement;
+    if (!el && fsReal) { fsReal = false; fsBox = null; }
+    placeHost(); syncState();
+  };
+  document.addEventListener("fullscreenchange", onFsChange);
+  document.addEventListener("webkitfullscreenchange", onFsChange);
+  placeHost();
+  setInterval(placeHost, 3000);
+  window.__wtFsMode = () => (fsReal ? "element" : fsBox ? "stretch" : "off");
 
   // popup.js, unchanged, seeing the panel as its document
   const doc = {
@@ -465,6 +500,23 @@ const panel = String.raw`
   const alert = (m) => window.alert(m);
   (function (document, window, alert) {
 ${popupJs}
+    // phones: the invite goes out through the share sheet (WhatsApp, Messages ...)
+    if (typeof inviteText === "function" && typeof navigator.share === "function") {
+      const ib = $("inviteBtn"), nb = ib.cloneNode(true);
+      ib.parentNode.replaceChild(nb, ib);
+      nb.textContent = "Share invite";
+      nb.addEventListener("click", async () => {
+        const { wt_party: party } = await chrome.storage.local.get("wt_party");
+        if (!party) return;
+        const text = inviteText(party, siteFor(location.href), location.href);
+        window.__wtShared = text;
+        try { await navigator.share({ text }); }
+        catch (e) {
+          if (e && e.name === "AbortError") return;
+          try { await navigator.clipboard.writeText(text); nb.textContent = "Invite copied!"; setTimeout(() => { nb.textContent = "Share invite"; }, 1600); } catch (_) {}
+        }
+      });
+    }
   })(doc, win, alert);
 
   // ---- iPhone updates: this script's own copy on GitHub ----
@@ -485,7 +537,9 @@ ${popupJs}
     $s("updateText").textContent = "🆕 Version " + u.version + " is out (you have " + WT_IOS_VERSION + ")";
     $s("updateNotes").textContent = u.notes || "";
     $s("updateBtn").textContent = "Update";
-    $s("updateHelp").innerHTML = "<li>Safari opens the new script.</li><li>Tap the <b>puzzle-piece / Aa</b> button in the address bar → <b>Userscripts</b> → <b>Update</b> (or Install).</li><li>Come back and reload this page.</li>";
+    $s("updateHelp").innerHTML = ANDROID
+      ? "<li>The new script opens.</li><li>Tampermonkey / Violentmonkey shows its install page → tap <b>Update</b> (or Install).</li><li>Come back and reload this page.</li>"
+      : "<li>Safari opens the new script.</li><li>Tap the <b>puzzle-piece / Aa</b> button in the address bar → <b>Userscripts</b> → <b>Update</b> (or Install).</li><li>Come back and reload this page.</li>";
     $s("extPageBtn").remove();
     $s("updateBar").classList.remove("hidden");
     fab.classList.add("wt-live");

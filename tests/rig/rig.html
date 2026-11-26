@@ -27,7 +27,7 @@
   // per-tab chrome.storage stub
   let saved = {};
   try { saved = JSON.parse(sessionStorage.getItem("rigstore") || "{}") || {}; } catch (_) {}
-  const store = Object.assign(saved, { wt_party: { id: code, role, name: role === "host" ? "Sourav" : "Megha" } });
+  const store = qs.get("noparty") === "1" ? saved : Object.assign(saved, { wt_party: { id: code, role, name: role === "host" ? "Sourav" : "Megha" } });
   if (qs.get("mic") === "1") store.wt_mic_state = true;
   if (qs.has("nc")) store.wt_nc = qs.get("nc") === "1";
   if (qs.has("vol")) store.wt_voice_vol = Number(qs.get("vol"));

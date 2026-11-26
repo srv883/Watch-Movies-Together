@@ -7,7 +7,7 @@
 const fs = require("fs"), path = require("path"), http = require("http"), cp = require("child_process");
 const A = {};
 for (let i = 2; i < process.argv.length; i += 2) A[process.argv[i].replace(/^--/, "")] = process.argv[i + 1];
-const HBUILD = A.hbuild || "V37-iphone";
+const HBUILD = A.hbuild || "V38-crossplatform";
 const VERS = "C:/Users/Sourav/ML Coding/watch-together-versions";
 const CHROME = "C:/Program Files/Google/Chrome/Application/chrome.exe";
 const WAVS = A.wavs || process.cwd();
@@ -43,6 +43,7 @@ const GM_STUB = `
   // the Userscripts app's GM.* (async, string values), kept in localStorage
   const P = "gm:";
   window.__gmCalls = [];
+  navigator.share = async (d) => { window.__shareData = d; };
   window.GM = {
     getValue: async (k, d) => { const v = localStorage.getItem(P + k); return v == null ? d : JSON.parse(v); },
     setValue: async (k, v) => { localStorage.setItem(P + k, JSON.stringify(v)); },
@@ -135,11 +136,20 @@ function launch(name, port, wav, phone) {
 
 // --phone webkit --pw <dir with node_modules/playwright>: the phone is WebKit
 // (Safari's engine; Playwright's build) instead of Chrome. Same CDP-style calls.
+// --phone firefox: the phone is Firefox (Gecko, the engine of Firefox for
+// Android) with an Android user agent - the full party flow runs there.
 const WEBKIT = A.phone === "webkit";
+const ANDROID_RUN = A.phone === "firefox";
+const PW_PHONE = WEBKIT || ANDROID_RUN;
+const ANDROID_UA = "Mozilla/5.0 (Android 15; Mobile; rv:145.0) Gecko/145.0 Firefox/145.0";
 async function webkitPhone() {
-  const { webkit } = require(path.join(A.pw, "node_modules", "playwright"));
-  const browser = await webkit.launch();
-  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, userAgent: IPHONE_UA });
+  const pw = require(path.join(A.pw, "node_modules", "playwright"));
+  const browser = ANDROID_RUN
+    ? await pw.firefox.launch({ firefoxUserPrefs: { "media.navigator.streams.fake": true, "media.navigator.permission.disabled": true, "media.autoplay.block-webaudio": false, "full-screen-api.allow-trusted-requests-only": false } })
+    : await pw.webkit.launch();
+  const ctx = ANDROID_RUN
+    ? await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, userAgent: ANDROID_UA })
+    : await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, userAgent: IPHONE_UA });
   const page = await ctx.newPage();
   let at = null;
   return {
@@ -212,9 +222,9 @@ const user = (js) => `(() => { document.dispatchEvent(new Event("keydown", { bub
 
   try {
     ch = [launch("h", 9421, path.join(WAVS, "host.wav"), false)];
-    if (!WEBKIT) ch.push(launch("p", 9422, path.join(WAVS, "guest_normal.wav"), true));
-    const H = await cdpPage(9421), I = WEBKIT ? await webkitPhone() : await cdpPage(9422);
-    if (WEBKIT) ch.push({ kill: () => I.browser.close().catch(() => {}) });
+    if (!PW_PHONE) ch.push(launch("p", 9422, path.join(WAVS, "guest_normal.wav"), true));
+    const H = await cdpPage(9421), I = PW_PHONE ? await webkitPhone() : await cdpPage(9422);
+    if (PW_PHONE) ch.push({ kill: () => I.browser.close().catch(() => {}) });
     for (const P of [H, I]) { await P.send("Page.enable"); await P.send("Runtime.enable"); }
     await I.send("Network.enable");
     await I.send("Network.setUserAgentOverride", { userAgent: IPHONE_UA, platform: "iPhone" });
@@ -228,13 +238,13 @@ const user = (js) => `(() => { document.dispatchEvent(new Event("keydown", { bub
     const errs0 = await I.eval(J.errs);
     rec("I1", "userscript runs on the iPhone page: side bar shown, no errors", fab.ok && !errs0.length, { ms: fab.ms, errs: errs0 });
     const ua = await I.eval("navigator.userAgent");
-    rec("I1b", "page sees an iPhone (Safari UA" + (WEBKIT ? ")" : ", touch)"), /iPhone/.test(ua) && (WEBKIT || (await I.eval("navigator.maxTouchPoints")) > 0), { ua: ua.slice(0, 60) });
+    rec("I1b", "page sees a phone (" + (ANDROID_RUN ? "Android Firefox" : "iPhone Safari") + " UA" + (PW_PHONE ? ")" : ", touch)"), (ANDROID_RUN ? /Android/ : /iPhone/).test(ua) && (PW_PHONE || (await I.eval("navigator.maxTouchPoints")) > 0), { ua: ua.slice(0, 60) });
     await shot(I, "1-phone-start");
     // I1c: a slim bar on the left edge, clear of the bottom controls; chat/mic only once in a party
     const fr = await I.eval(`(() => { const r = ${J.sh("wtBar")}.getBoundingClientRect(); return { l: r.left, t: r.top, b: r.bottom, w: r.width, W: innerWidth, H: innerHeight }; })()`);
     const btns0 = await I.eval(`["wtBParty","wtBChat","wtBMic","wtBFs"].map(id => { const e = ${J.sh("wtBParty")}.getRootNode().getElementById(id); return !e.classList.contains("wt-hidden"); })`);
     rec("I1c", "slim bar on the left edge, out of the bottom area; party + full-screen buttons (no chat/mic before a party)", fr.w <= 52 && fr.l <= 8 && fr.b < fr.H - 40 && JSON.stringify(btns0) === "[true,false,false,true]", { bar: fr, buttons: btns0 });
-    if (!WEBKIT) {
+    if (!PW_PHONE) {
       // I1d: drag the bar's handle to the right -> snaps to the right edge, remembered after reload
       const g = await I.eval(`(() => { const r = ${J.sh("wtGrip")}.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; })()`);
       await I.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: g.x, y: g.y }] });
@@ -257,7 +267,7 @@ const user = (js) => `(() => { document.dispatchEvent(new Event("keydown", { bub
     const sheet = await waitFor(I, visible(J.sh("setupView")), (v) => v === true, 4000);
     const ver = await I.eval(`${J.sh("verLine")}.textContent`);
     const site = await I.eval(`${J.sh("siteName")}.textContent`);
-    rec("I2", "tap the button -> the Watch Together panel (name / start / join)", sheet.ok && /^v1\.37\.\d+$/.test(ver), { ver, site });
+    rec("I2", "tap the button -> the Watch Together panel (name / start / join)", sheet.ok && /^v1\.\d+\.\d+$/.test(ver), { ver, site });
     await shot(I, "2-panel");
 
     if (WEBKIT) {
@@ -337,6 +347,20 @@ const user = (js) => `(() => { document.dispatchEvent(new Event("keydown", { bub
     rec("I3j", "😀 on the bar -> emoji row; one tap sends a reaction the desktop sees, chat stays closed", emoN >= 6 && fl.ok && !chatStill, { emojis: emoN, desktopSaw: fl.v });
     await tap(I, J.sh("wtBChat")); // chat open again for the rest
     // I3g: full screen - ours, and the site's own button routed to it
+    if (ANDROID_RUN) {
+      // Android: real element full screen of the player box, our bar and chat inside it
+      await tap(I, J.sh("wtBFs"));
+      const af = await waitFor(I, `(() => { const el = document.fullscreenElement; return { mode: window.__wtFsMode(), fs: el ? el.id : null, bar: !!(el && el.contains(document.getElementById("wt-ios-host"))), chat: !!(el && el.contains(document.getElementById("wt-root"))) }; })()`, (r) => r.mode === "element" && r.fs === "player" && r.bar && r.chat, 4000);
+      await shot(I, "a-fullscreen");
+      await tap(I, J.sh("wtBFs"));
+      const aoff = await waitFor(I, `({ mode: window.__wtFsMode(), fs: !!document.fullscreenElement })`, (r) => r.mode === "off" && !r.fs, 4000);
+      rec("A3g", "Android ⛶ = real full screen of the player, bar + chat inside it; ✕ exits", af.ok && aoff.ok, { on: af.v, off: aoff.v });
+      await tap(I, `document.getElementById("sitefs")`);
+      const asite = await waitFor(I, `(() => { const el = document.fullscreenElement; return { site: window.__siteFs || 0, fs: el ? el.id : null, bar: !!(el && el.contains(document.getElementById("wt-ios-host"))) }; })()`, (r) => r.site === 1 && r.fs === "player" && r.bar, 4000);
+      rec("A3h", "Android: the site's own full-screen button works as is, and the bar follows into it", asite.ok, asite.v);
+      await I.page.evaluate(() => document.exitFullscreen().catch(() => {}));
+      await sleep(600);
+    } else {
     await tap(I, J.sh("wtBFs"));
     const fsOn = await waitFor(I, `(() => { const p = document.getElementById("player").getBoundingClientRect(); return { w: Math.round(p.width), h: Math.round(p.height), t: Math.round(p.top), W: innerWidth, H: innerHeight }; })()`, (r) => r.w >= r.W - 1 && r.h >= r.H - 1 && r.t === 0, 3000);
     const onTop = await I.eval(`(() => { const p = document.querySelector("#wt-panel"); const r = p.getBoundingClientRect(); const e = document.elementFromPoint(r.left + r.width / 2, r.top + 30); return !!(e && e.closest("#wt-root")); })()`);
@@ -354,10 +378,13 @@ const user = (js) => `(() => { document.dispatchEvent(new Event("keydown", { bub
     await tap(I, J.sh("wtBTv"));
     await sleep(800);
     const tv = await I.eval(`({ apple: window.__wtIosAppleFs || 0 })`);
-    const neverExits = !/webkitExitFullscreen|exitFullscreen[(]/.test(userscript.split("// ---- the toolbar popup")[1] || "x");
+    // nothing leaves Apple's player; the only exitFullscreen() is the user's own ✕ on Android's element full screen
+    const phoneCode = userscript.split("// ---- the toolbar popup")[1] || "x";
+    const neverExits = !/webkitExitFullscreen/.test(phoneCode) && (phoneCode.match(/exitFullscreen[(]/g) || []).length === 1 && /if \(fsReal\) \{[\s\S]{0,160}document\.exitFullscreen\(\)/.test(phoneCode);
     rec("I3i", "📺 opens Apple's full screen, and nothing in the iPhone code ever leaves it (that blocked landscape full screen)", tv.apple === 2 && neverExits, { ...tv, neverExits });
     await I.eval(`(async () => { try { if (document.fullscreenElement) await document.exitFullscreen(); } catch (_) {} return true; })()`);
     await sleep(600);
+    }
 
     // ---- I4: playback sync both ways ----
     await sleep(1500);
@@ -438,6 +465,49 @@ const user = (js) => `(() => { document.dispatchEvent(new Event("keydown", { bub
     const left = await waitFor(I, visible(J.sh("setupView")), (x) => x === true, 4000);
     const gone = await waitFor(H, J.status, (s) => !synced(s), 15000);
     rec("I10", "Leave party in the panel -> the phone leaves, desktop notices", left.ok && gone.ok, { host: gone.v });
+    // ---- X: across devices - the phone hosts, the laptop joins by link; then the reverse ----
+    // X1: phone starts a party; "Share invite" -> share sheet with a join link + install link
+    await tap(I, J.sh("createBtn"));
+    const pc = await waitFor(I, `${J.sh("codeDisplay")}.textContent`, (c) => /^[A-Z0-9]{6}$/.test(c), 5000);
+    const pcode = pc.v;
+    const sbtn = await I.eval(`${J.sh("inviteBtn")}.textContent`);
+    await tap(I, J.sh("inviteBtn"));
+    const shared = await waitFor(I, "window.__shareData && window.__shareData.text", (t) => !!t, 3000);
+    const joinUrl = ((shared.v || "").match(/https?:\/\/\S+#wt-join=[A-Z0-9]{6}/) || [""])[0];
+    rec("X1", "phone hosts: 'Share invite' opens the share sheet with a join link and the install link", sbtn === "Share invite" && joinUrl.endsWith("#wt-join=" + pcode) && /github\.com\/srv883\/Watch-Movies-Together#install/.test(shared.v || ""), { button: sbtn, text: shared.v });
+    // X2: the laptop opens that link (not in any party) -> joins the phone's party by itself
+    const deskJoin = `http://127.0.0.1:${port}/host/${PATH}?role=guest&code=ZZZZZZ&vid=1&mic=0&noparty=1#wt-join=${pcode}`;
+    await H.send("Page.navigate", { url: deskJoin });
+    const x2 = await waitFor(H, J.status, synced, 40000);
+    const x2p = await waitFor(I, J.status, synced, 8000);
+    const deskUrl = await H.eval("location.href");
+    rec("X2", "laptop opens the phone's invite link -> joins its party (no code typed), link tidied", x2.ok && x2p.ok && !/#wt-join/.test(deskUrl), { ms: x2.ms, laptop: x2.v, phone: x2p.v, url: deskUrl.slice(-40) });
+    if (x2.ok) {
+      await sleep(1500);
+      await tap(I, `document.querySelector("header")`);
+      await I.eval(`(() => { const v = document.getElementById("vid"); v.currentTime = 4; return v.play().then(() => true); })()`);
+      const x3 = await waitFor(H, J.vid, (v) => !v.paused && v.t > 3, 8000);
+      await H.eval(user(`(document.getElementById("vid").pause(), true)`), true);
+      const x3b = await waitFor(I, J.vid, (v) => v.paused, 6000);
+      rec("X3", "phone as host: phone PLAY -> laptop plays; laptop PAUSE -> phone pauses", x3.ok && x3b.ok, { laptop: x3.v, phone: x3b.v });
+    }
+    // X4: reverse - the laptop hosts a new party, the phone opens the laptop's join link
+    await tap(I, J.sh("leaveBtn"));
+    await sleep(800);
+    const lcode = ("L" + Math.random().toString(36).slice(2, 7)).toUpperCase().replace(/[^A-Z0-9]/g, "X").slice(0, 6);
+    await H.send("Page.navigate", { url: `http://127.0.0.1:${port}/host/${PATH}?role=host&code=${lcode}&vid=1&mic=0` });
+    await sleep(2500);
+    await I.send("Page.navigate", { url: `http://127.0.0.1:${port}/ios/${PATH}#wt-join=${lcode}` });
+    const x4 = await waitFor(I, J.status, synced, 40000);
+    const x4h = await waitFor(H, J.status, synced, 8000);
+    const phoneParty = await I.eval(`(async () => JSON.parse(await GM.getValue("wt_party")))()`);
+    rec("X4", "phone opens the laptop's invite link -> joins its party by itself", x4.ok && x4h.ok && phoneParty && phoneParty.id === lcode && phoneParty.role === "guest", { ms: x4.ms, phone: x4.v, laptop: x4h.v, party: phoneParty });
+    if (x4.ok) {
+      await sleep(1500);
+      await H.eval(user(`(() => { const v = document.getElementById("vid"); v.currentTime = 7; return v.play().then(() => true); })()`), true);
+      const x5 = await waitFor(I, J.vid, (v) => !v.paused && Math.abs(v.t - 7) < 2, 8000);
+      rec("X5", "laptop as host: laptop PLAY at 0:07 -> phone plays there", x5.ok, { phone: x5.v });
+    }
     const errs = await I.eval(J.errs);
     rec("I11", "no script errors on the iPhone page during the whole session", !errs.length, { errs });
   } catch (e) {
@@ -446,7 +516,7 @@ const user = (js) => `(() => { document.dispatchEvent(new Event("keydown", { bub
     ch.forEach((c) => { try { c.kill(); } catch (_) {} });
     const n = results.filter((r) => r.pass).length;
     console.log(n + "/" + results.length + " passed");
-    fs.writeFileSync(path.join(process.cwd(), "ios-" + HBUILD + (WEBKIT ? "-webkit" : "") + ".json"), JSON.stringify(results, null, 1));
+    fs.writeFileSync(path.join(process.cwd(), "ios-" + HBUILD + (WEBKIT ? "-webkit" : ANDROID_RUN ? "-android" : "") + ".json"), JSON.stringify(results, null, 1));
     setTimeout(() => process.exit(0), 500);
   }
 })();

@@ -1,5 +1,5 @@
 {
- "version": "1.37.6",
+ "version": "1.38.0",
  "url": "https://raw.githubusercontent.com/srv883/Watch-Movies-Together/main/ios/watch-together.user.js",
- "notes": "😀 quick reactions from the side bar; ⛶ full screen now lets one swipe up hide Safari's bar (chat, mic and reactions stay on top)"
+ "notes": "Works across devices: invite links join from any laptop or phone, share sheet on phones, Android support (Firefox + Tampermonkey)"
 }

@@ -1,5 +1,17 @@
 WATCH TOGETHER - DETAILED CONTEXT HANDOFF
 ==========================================
+As of: 26 Nov 2026
+Current version: V38 (manifest 1.38.0), folder V38-crossplatform = V37 +
+  ACROSS DEVICES: invites are join links (<episode>#wt-join=CODE) that join
+  the party by themselves on laptop, iPhone or Android; phone build 1.38.0
+  (ios\watch-together.user.js) runs on iPhone Safari (Userscripts) and
+  Android Firefox (Tampermonkey/Violentmonkey); "Share invite" = share
+  sheet; Android gets real full screen with the bar inside. Phone bar:
+  logo (party), chat, mic, reaction, fill-screen, phone's own full screen.
+  Tests: test-V38.js 745/745; ios.js iPhone 36/36, WebKit 11/11, Firefox
+  (Android) 33/33 incl. phone-hosts / laptop-hosts join links.
+  Released to laptops + phones 26 Nov.
+(previous, V37:)
 As of: 22 Nov 2026
 Current version: V37 (manifest 1.37.0), folder V37-iphone = V36 + iPHONE VERSION.
   The same code runs on iPhone Safari as a userscript in the free App Store
