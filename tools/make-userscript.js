@@ -66,6 +66,8 @@ const meta = [
   "// @grant        GM.listValues",
   "// @grant        GM.xmlHttpRequest",
   "// @grant        GM.openInTab",
+  "// @connect      raw.githubusercontent.com",
+  "// @connect      api.anthropic.com",
   `// @updateURL    ${SCRIPT_URL}`,
   `// @downloadURL  ${SCRIPT_URL}`,
   "// ==/UserScript==",
@@ -534,20 +536,34 @@ ${popupJs}
       } catch (_) {}
     }
     if (!u || !newer(u.version, WT_IOS_VERSION)) return;
-    $s("updateText").textContent = "🆕 Version " + u.version + " is out (you have " + WT_IOS_VERSION + ")";
-    $s("updateNotes").textContent = u.notes || "";
-    $s("updateBtn").textContent = "Update";
+    const auto = typeof window.__wtPhoneUpdate === "function";
+    $s("updateText").textContent = auto ? "🆕 Version " + u.version + " is ready - Watch Together updates itself" : "🆕 Version " + u.version + " is out (you have " + WT_IOS_VERSION + ")";
+    $s("updateNotes").textContent = (u.notes || "") + (auto ? " It switches over the next time you open Hotstar, or now:" : "");
+    $s("updateBtn").textContent = auto ? "Switch now" : "Update";
     $s("updateHelp").innerHTML = ANDROID
       ? "<li>The new script opens.</li><li>Tampermonkey / Violentmonkey shows its install page → tap <b>Update</b> (or Install).</li><li>Come back and reload this page.</li>"
       : "<li>Safari opens the new script.</li><li>Tap the <b>puzzle-piece / Aa</b> button in the address bar → <b>Userscripts</b> → <b>Update</b> (or Install).</li><li>Come back and reload this page.</li>";
     $s("extPageBtn").remove();
+    if (auto) { const hb = $s("updateHelpBtn"); if (hb) hb.remove(); }
     $s("updateBar").classList.remove("hidden");
     fab.classList.add("wt-live");
   }
   // the popup's own buttons point at the Chrome zip; on iPhone they open the script
   const ub = $s("updateBtn");
   const nb = ub.cloneNode(true); ub.parentNode.replaceChild(nb, ub);
-  nb.addEventListener("click", () => { $s("updateHelp").classList.remove("hidden"); chrome.tabs.create({ url: WT_IOS_SCRIPT_URL }); });
+  nb.textContent = typeof window.__wtPhoneUpdate === "function" ? "Switch now" : "Update";
+  nb.addEventListener("click", async () => {
+    if (typeof window.__wtPhoneUpdate === "function") {
+      nb.textContent = "Switching…"; nb.disabled = true;
+      let v = null;
+      try { v = await window.__wtPhoneUpdate(); } catch (_) {}
+      if (v) { nb.textContent = "Reloading…"; setTimeout(() => location.reload(), 300); return; }
+      // never send anyone to reinstall: it simply updates itself on a later visit
+      nb.textContent = "Can't reach GitHub now - it updates itself later"; nb.disabled = false;
+      return;
+    }
+    $s("updateHelp").classList.remove("hidden"); chrome.tabs.create({ url: WT_IOS_SCRIPT_URL });
+  });
   checkIosUpdate();
 })();
 `;
@@ -567,9 +583,8 @@ html.wt-ios-fs body { min-height: calc(100vh + 160px) !important; }
 .wt-ios-fsvid { position: fixed !important; inset: 0 !important; left: 0 !important; top: 0 !important; width: 100vw !important; height: 100vh !important; height: 100dvh !important; max-width: none !important; max-height: none !important; z-index: 2147483001 !important; object-fit: contain !important; background: #000 !important; transform: none !important; }
 .wt-ios-fsbox video { width: 100% !important; height: 100% !important; max-height: none !important; object-fit: contain !important; }
 `;
-const out = [
-  meta,
-  "",
+// the phone code itself (runs with GM passed in)
+const body = [
   "// Built from " + folder + " by tools/make-userscript.js - do not edit by hand.",
   "(function () {",
   "if (window.__wtIos) return; window.__wtIos = true;",
@@ -586,8 +601,70 @@ const out = [
   "})();",
   "",
 ].join("\n");
+const sha256 = require("crypto").createHash("sha256").update(body, "utf8").digest("hex");
+
+// The installed script updates itself: on each visit (at most every 10 min) it
+// reads ios/latest.json; a newer version's code (ios/wt-phone.js) is downloaded,
+// checked against the SHA-256 in latest.json, kept in GM storage and run from
+// the next page load on. If that code is missing, corrupt or fails to start,
+// the version built into this file runs instead. Only this repo is used.
+const loader = String.raw`
+(async function (GM) {
+  const BUILT_IN = ${JSON.stringify(VERSION)};
+  const BASE = (location.hostname === "127.0.0.1" && window.__wtPhoneBase) || "https://raw.githubusercontent.com/srv883/Watch-Movies-Together/main/ios/";
+  const newer = (a, b) => { const x = String(a || "").split(".").map(Number), y = String(b || "").split(".").map(Number); for (let i = 0; i < 3; i++) { if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) > (y[i] || 0); } return false; };
+  const gmGet = async (k) => { try { return GM && GM.getValue ? await GM.getValue(k) : null; } catch (_) { return null; } };
+  const gmSet = async (k, v) => { try { if (GM && GM.setValue) await GM.setValue(k, v); } catch (_) {} };
+  function get(url) {
+    return fetch(url, { cache: "no-store" }).then((r) => { if (!r.ok) throw new Error("http " + r.status); return r.text(); }).catch((e) => {
+      if (!GM || typeof GM.xmlHttpRequest !== "function") throw e;
+      return new Promise((res, rej) => GM.xmlHttpRequest({ method: "GET", url, onload: (r) => (r.status >= 200 && r.status < 300 ? res(r.responseText) : rej(new Error("http " + r.status))), onerror: () => rej(new Error("network")), ontimeout: () => rej(new Error("timeout")) }));
+    });
+  }
+  async function sha256(text) {
+    const d = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+    return Array.prototype.map.call(new Uint8Array(d), (x) => x.toString(16).padStart(2, "0")).join("");
+  }
+  let cached = null;
+  try { cached = JSON.parse((await gmGet("wt_phone_code")) || "null"); } catch (_) {}
+  const running = () => (cached && cached.code && newer(cached.v, BUILT_IN) ? cached.v : BUILT_IN);
+  // download a newer version (if any) for the next page load; returns its version
+  async function update(force) {
+    const last = Number((await gmGet("wt_phone_checked")) || 0);
+    if (!force && Date.now() - last < 10 * 60 * 1000) return null;
+    await gmSet("wt_phone_checked", String(Date.now()));
+    const meta = JSON.parse(await get(BASE + "latest.json?t=" + Date.now()));
+    const kept = async () => { try { const c = JSON.parse((await gmGet("wt_phone_code")) || "null"); return c && c.code && newer(c.v, running()) ? c.v : null; } catch (_) { return null; } };
+    if (!meta || !/^\d+\.\d+\.\d+$/.test(String(meta.version)) || !/^[0-9a-f]{64}$/.test(String(meta.sha256)) || !newer(meta.version, running())) return force ? kept() : null;
+    if (force && (await kept()) === meta.version) return meta.version;
+    const code = await get(BASE + "wt-phone.js?v=" + meta.version);
+    if ((await sha256(code)) !== meta.sha256) return null;
+    await gmSet("wt_phone_code", JSON.stringify({ v: meta.version, code, at: Date.now() }));
+    return meta.version;
+  }
+  window.__wtPhoneUpdate = () => update(true);
+  let ran = null;
+  if (cached && cached.code && newer(cached.v, BUILT_IN)) {
+    try { new Function("GM", cached.code)(GM); ran = cached.v; } catch (e) { console.error("[Watch Together] downloaded version failed, using the built-in one", e); }
+  }
+  if (!ran) { WT_BUILT_IN(GM); ran = BUILT_IN; }
+  window.__wtPhoneRan = ran;
+  try { await update(false); } catch (_) {}
+})(typeof GM !== "undefined" ? GM : undefined);
+`;
+
+const out = [
+  meta,
+  "",
+  "// Watch Together for phones - updates itself from the project's GitHub repo.",
+  "function WT_BUILT_IN(GM) {",
+  body,
+  "}",
+  loader,
+].join("\n");
 
 fs.mkdirSync(OUT, { recursive: true });
 fs.writeFileSync(path.join(OUT, "watch-together.user.js"), out);
-fs.writeFileSync(path.join(OUT, "latest.json"), JSON.stringify({ version: VERSION, url: SCRIPT_URL, notes: (process.argv[3] && process.argv[3] !== "--version" ? process.argv[3] : "") }, null, 1) + "\n");
+fs.writeFileSync(path.join(OUT, "wt-phone.js"), body);
+fs.writeFileSync(path.join(OUT, "latest.json"), JSON.stringify({ version: VERSION, url: SCRIPT_URL, code: RAW + "wt-phone.js", sha256, notes: (process.argv[3] && process.argv[3] !== "--version" ? process.argv[3] : "") }, null, 1) + "\n");
 console.log("ios/watch-together.user.js", (out.length / 1024).toFixed(0) + " KB", "v" + VERSION);

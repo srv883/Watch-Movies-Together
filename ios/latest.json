@@ -1,5 +1,7 @@
 {
- "version": "1.38.0",
+ "version": "1.39.0",
  "url": "https://raw.githubusercontent.com/srv883/Watch-Movies-Together/main/ios/watch-together.user.js",
- "notes": "Works across devices: invite links join from any laptop or phone, share sheet on phones, Android support (Firefox + Tampermonkey)"
+ "code": "https://raw.githubusercontent.com/srv883/Watch-Movies-Together/main/ios/wt-phone.js",
+ "sha256": "99f8ca57db695af5587a3951250003aa460b3893be395a8cab038ec21b7a5712",
+ "notes": "Phones and laptops update themselves"
 }

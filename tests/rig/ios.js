@@ -7,7 +7,7 @@
 const fs = require("fs"), path = require("path"), http = require("http"), cp = require("child_process");
 const A = {};
 for (let i = 2; i < process.argv.length; i += 2) A[process.argv[i].replace(/^--/, "")] = process.argv[i + 1];
-const HBUILD = A.hbuild || "V38-crossplatform";
+const HBUILD = A.hbuild || "V39-autoupdate";
 const VERS = "C:/Users/Sourav/ML Coding/watch-together-versions";
 const CHROME = "C:/Program Files/Google/Chrome/Application/chrome.exe";
 const WAVS = A.wavs || process.cwd();
@@ -453,9 +453,8 @@ const user = (js) => `(() => { document.dispatchEvent(new Event("keydown", { bub
     await waitFor(I, visible(J.sh("wtBParty")), (x) => x === true, 15000);
     await tap(I, J.sh("wtBParty"));
     const ub = await waitFor(I, visible(J.sh("updateBar")), (x) => x === true, 4000);
-    await tap(I, J.sh("updateBtn"));
-    const opened = await I.eval(`window.__opened || []`);
-    rec("I8", "newer iPhone version -> Update opens the script on GitHub", ub.ok && opened.some((u) => /\/ios\/watch-together\.user\.js$/.test(u)), { opened });
+    const ubt = await I.eval(`({ text: ${J.sh("updateText")}.textContent, btn: ${J.sh("updateBtn")}.textContent })`);
+    rec("I8", "newer phone version -> panel says it updates itself, with Switch now (no reinstall)", ub.ok && /updates itself/.test(ubt.text) && ubt.btn === "Switch now" && !(await I.eval("(window.__opened || []).length")), ubt);
     await shot(I, "5-update");
     const back = await waitFor(I, J.status, synced, 40000);
     rec("I9", "after a page reload the iPhone rejoins the party by itself", back.ok, { ms: back.ms, status: back.v });

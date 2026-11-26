@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header>
+    <img src="icons/icon48.png" alt="" />
+    <div>
+      <h1>Watch Together</h1>
+      <p id="siteName">Checking site…</p>
+    </div>
+  </header>
+  <p id="verLine" class="muted small" style="margin:4px 14px"></p>
+
+  <!-- v31: a newer version is out -->
+  <div id="updateBar" class="update-bar hidden">
+    <p id="updateText">🆕 A new version is out</p>
+    <p id="updateNotes" class="small muted"></p>
+    <button id="updateBtn" class="primary hidden">Switch now</button>
+    <button id="updateHelpBtn" class="link">Not updating by itself?</button>
+    <ol id="updateHelp" class="small hidden">
+      <li>Watch Together updates itself through its updater (installed with the one-line installer from the GitHub page). Without it:</li>
+      <li><a id="updateZip" href="#">Download the new version</a>, unzip it, then <b>chrome://extensions</b> → Developer mode → remove the old one → <b>Load unpacked</b>.</li>
+    </ol>
+    <button id="extPageBtn" class="link hidden">Open chrome://extensions</button>
+  </div>
+
+  <section id="notSupported" class="hidden">
+    <p class="muted">Watch Together works on these sites. Open one, start a video, then click this icon again.</p>
+    <div id="siteList" class="site-list"></div>
+  </section>
+
+  <!-- No active party -->
+  <section id="setupView" class="hidden">
+    <label>Your name
+      <input id="nameInput" type="text" maxlength="20" placeholder="e.g. Sourav" />
+    </label>
+
+    <button id="createBtn" class="primary">Start Watch Party</button>
+
+    <p id="resumeLine" class="hidden small">
+      <button id="resumeBtn" class="link">↺ Resume last party</button>
+      <span id="resumeCode"></span>
+    </p>
+
+    <div class="or"><span>or join a friend</span></div>
+
+    <label>Party code
+      <input id="codeInput" type="text" maxlength="6" placeholder="ABC123" autocomplete="off" spellcheck="false" />
+    </label>
+    <button id="joinBtn">Join Party</button>
+  </section>
+
+  <!-- Active party -->
+  <section id="activeView" class="hidden">
+    <p class="code-label">Party code</p>
+    <p id="codeDisplay" title="Click to copy">------</p>
+    <p class="muted small">Your friend: open the same episode → click the icon → enter this code.</p>
+    <p id="offSiteHint" class="hidden small off-site">Not running on this tab — switch to your Netflix / JioHotstar / Prime Video / JioTV / JioCinema tab.</p>
+
+    <p id="statusLine"><span class="dot"></span><span id="statusText">…</span></p>
+
+    <button id="copyBtn" class="secondary">Copy code</button>
+    <button id="inviteBtn" class="secondary">Copy invite</button>
+    <button id="leaveBtn" class="danger">Leave party</button>
+  </section>
+
+  <!-- v33: AI scene trivia -->
+  <section id="triviaBox" class="trivia-box">
+    <label class="trivia-row"><input id="triviaOn" type="checkbox" checked /> <span>🧠 AI scene trivia</span></label>
+    <p class="muted small">Facts float in at the matching moments of the episode or film. Uses your Claude API key (about one request per episode); one of you is enough - it is shared with your friend.</p>
+    <div id="keyRow" class="key-row">
+      <input id="keyInput" type="password" placeholder="Claude API key (sk-ant-…)" autocomplete="off" spellcheck="false" />
+      <button id="keySave" class="secondary">Save</button>
+    </div>
+    <p id="keyStatus" class="small"></p>
+    <button id="keyForget" class="link hidden">Remove key</button>
+  </section>
+
+  <script src="popup.js"></script>
+</body>
+</html>

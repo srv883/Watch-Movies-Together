@@ -65,6 +65,9 @@ const rec = (name, pass, detail) => { results.push({ name, pass }); console.log(
       const r = await ask(Object.assign({ t: "wt-trivia" }, msg));
       rec(name + " -> line-anchored pack facts", r && r.source === "pack" && r.items.length && r.items.every(i => i.cue && i.cue.length), { source: r && r.source, title: r && r.title, n: r && r.items && r.items.length, err: r && r.error });
     }
+    const us = await ask({ t: "wt-update-state" });
+    const mf = JSON.parse(fs.readFileSync(DIR + "/manifest.json", "utf8"));
+    rec("v39: worker reports running + on-disk version (popup: on its way / installed)", us && us.running === mf.version && us.disk === mf.version, us);
     const logs = await ev(`(async () => { const s = await chrome.storage.local.get(null); return Object.keys(s); })()`);
     rec("worker stored its caches", logs.indexOf("wt_pack_cache") !== -1, { keys: logs });
   } catch (e) {

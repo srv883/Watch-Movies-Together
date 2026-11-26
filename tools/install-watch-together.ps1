@@ -11,7 +11,7 @@
 # What it sets up: the extension files in -InstallDir, the updater script in
 # %LOCALAPPDATA%\WatchTogether, and a hidden updater that starts at logon
 # (a shortcut in your Startup folder, "Watch Together updater") and checks
-# GitHub every 30 minutes. (Startup folder, not Task Scheduler: some managed
+# GitHub every 10 minutes. (Startup folder, not Task Scheduler: some managed
 # Windows PCs silently block user scheduled tasks.)
 # Remove it any time: delete the shortcut
 #   %APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\Watch Together updater.lnk
@@ -63,5 +63,5 @@ Start-Process -FilePath (Get-Command $exe).Source -ArgumentList $args2 -WindowSt
 
 Write-Host ""
 Write-Host "Watch Together $ver is in: $InstallDir" -ForegroundColor Green
-Write-Host "Automatic updates: on (checks GitHub every 30 minutes, starts with Windows)."
+Write-Host "Automatic updates: on (checks GitHub every 10 minutes, starts with Windows)."
 Write-Host "First time only: Chrome -> chrome://extensions -> Developer mode -> Load unpacked -> pick the folder above."

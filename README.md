@@ -15,7 +15,7 @@ irm https://raw.githubusercontent.com/srv883/Watch-Movies-Together/main/tools/in
 ```
 
 Then, once: Chrome -> `chrome://extensions` -> Developer mode -> **Load unpacked** -> the folder it prints.
-A hidden updater (started with Windows from your Startup folder) checks this repo every 30 minutes; the extension reloads itself into a new version as soon as no watch party is running.
+A hidden updater (started with Windows from your Startup folder) checks this repo every 10 minutes and keeps itself up to date; the extension switches to a new version by itself as soon as no video or party is running (or right away with **Switch now** in the popup). Nothing to download, ever.
 
 Manual install instead: [wt-latest.zip](https://github.com/srv883/Watch-Movies-Together/raw/main/wt-latest.zip) (unzip -> Load unpacked; remove the old one first).
 
@@ -33,12 +33,12 @@ Chrome on Android can't run add-ons; Firefox can.
 
 ### On a phone
 A slim Watch Together bar sits on the left edge: the **logo** for Start / Join / Leave and the invite, **💬** chat, **🎤** your mic, **😀** a quick reaction, **⛶** full screen with chat and trivia on top (iPhone: swipe up once to hide Safari's bar; Android: real full screen), **📺** the phone's own full-screen player (edge to edge; sync and voice keep going, chat shows again when you leave it). Drag the little handle on top of the bar to move it.
-Tips: turn on English subtitles for trivia; earphones work best for voice; tap the screen once if your friend's voice doesn't start. New phone versions show an **Update** button in the panel.
+Tips: turn on English subtitles for trivia; earphones work best for voice; tap the screen once if your friend's voice doesn't start. Phones update themselves: the script fetches new versions from this repo (checked against a SHA-256) and uses them from the next time you open Hotstar - or right away with **Switch now** in the panel. Install it once; never again.
 
 ## Publishing updates
 - **New version:** make the next `V<N>-name` folder, bump `manifest.json` + `EXT_VER`, test, then
   `node tools/release.js V<N>-name "what's new"` - zips it, updates `latest.json` + `wt-latest.zip`, commits and pushes. Installed copies update themselves.
-- **Phone build:** `node tools/make-userscript.js V<N>-name "notes"` (→ `ios/`; `--version X.Y.Z` for a phone-only fix), then commit and push.
+- **Phone build:** `node tools/make-userscript.js V<N>-name "notes"` (→ `ios/watch-together.user.js`, `ios/wt-phone.js`, `ios/latest.json` with its SHA-256; `--version X.Y.Z` for a phone-only fix), then commit and push - installed phones pick it up by themselves.
 - **New trivia:** add or edit a pack in `trivia/` (listed in `trivia/index.json`) and push - every extension picks it up within 6 hours, no new version needed.
 
 ## Trivia

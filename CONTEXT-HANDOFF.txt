@@ -1,5 +1,16 @@
 WATCH TOGETHER - DETAILED CONTEXT HANDOFF
 ==========================================
+As of: 26 Nov 2026 (late)
+Current version: V39 (1.39.0), folder V39-autoupdate = V38 + EVERYTHING
+  UPDATES ITSELF (user: never make anyone download/reinstall):
+  - laptop popup: "on its way - updates itself" / "installed" + Switch now;
+    no Download button. Updater: every 10 min, updates itself (upgrade-only,
+    "# updater-version: 2").
+  - phone script is a self-updating loader: downloads ios/wt-phone.js when
+    ios/latest.json is newer (SHA-256 checked), runs it from the next visit;
+    built-in version as fallback. Phones on <=1.38.0 reinstall ONCE.
+  Tests: test-V39 754/754, ios-update 6/6, ext-real 10/10 (+ phone/e2e runs).
+(previous, V38:)
 As of: 26 Nov 2026
 Current version: V38 (manifest 1.38.0), folder V38-crossplatform = V37 +
   ACROSS DEVICES: invites are join links (<episode>#wt-join=CODE) that join
