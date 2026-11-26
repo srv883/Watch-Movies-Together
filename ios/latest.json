@@ -1,7 +1,7 @@
 {
- "version": "1.39.0",
+ "version": "1.39.1",
  "url": "https://raw.githubusercontent.com/srv883/Watch-Movies-Together/main/ios/watch-together.user.js",
  "code": "https://raw.githubusercontent.com/srv883/Watch-Movies-Together/main/ios/wt-phone.js",
- "sha256": "99f8ca57db695af5587a3951250003aa460b3893be395a8cab038ec21b7a5712",
- "notes": "Phones and laptops update themselves"
+ "sha256": "115d71c1656676bf1d67b1f74d7aac3a289da35b4befc9e57ce967b0b6e0a61a",
+ "notes": "Phones update themselves (fix)"
 }

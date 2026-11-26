@@ -2,7 +2,7 @@
 (function () {
 if (window.__wtIos) return; window.__wtIos = true;
 
-const WT_IOS_VERSION = "1.39.0";
+const WT_IOS_VERSION = "1.39.1";
 const WT_IOS_SCRIPT_URL = "https://raw.githubusercontent.com/srv883/Watch-Movies-Together/main/ios/watch-together.user.js";
 const WT_IOS_LATEST_URL = "https://raw.githubusercontent.com/srv883/Watch-Movies-Together/main/ios/latest.json";
 const hasGM = typeof GM !== "undefined" && GM && typeof GM.getValue === "function";

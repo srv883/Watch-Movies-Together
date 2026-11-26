@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Watch Together
 // @namespace    https://github.com/srv883/Watch-Movies-Together
-// @version      1.39.0
+// @version      1.39.1
 // @description  Watch JioHotstar (and the other supported sites) together in sync with a friend: chat, voice, reactions and scene trivia. Phone build of the Watch Together extension (iPhone Safari with Userscripts, Android Firefox with Tampermonkey or Violentmonkey).
 // @match        *://*.netflix.com/*
 // @match        *://*.hotstar.com/*
@@ -30,7 +30,7 @@ function WT_BUILT_IN(GM) {
 (function () {
 if (window.__wtIos) return; window.__wtIos = true;
 
-const WT_IOS_VERSION = "1.39.0";
+const WT_IOS_VERSION = "1.39.1";
 const WT_IOS_SCRIPT_URL = "https://raw.githubusercontent.com/srv883/Watch-Movies-Together/main/ios/watch-together.user.js";
 const WT_IOS_LATEST_URL = "https://raw.githubusercontent.com/srv883/Watch-Movies-Together/main/ios/latest.json";
 const hasGM = typeof GM !== "undefined" && GM && typeof GM.getValue === "function";
@@ -5940,7 +5940,7 @@ renderTrivia();
 }
 
 (async function (GM) {
-  const BUILT_IN = "1.39.0";
+  const BUILT_IN = "1.39.1";
   const BASE = (location.hostname === "127.0.0.1" && window.__wtPhoneBase) || "https://raw.githubusercontent.com/srv883/Watch-Movies-Together/main/ios/";
   const newer = (a, b) => { const x = String(a || "").split(".").map(Number), y = String(b || "").split(".").map(Number); for (let i = 0; i < 3; i++) { if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) > (y[i] || 0); } return false; };
   const gmGet = async (k) => { try { return GM && GM.getValue ? await GM.getValue(k) : null; } catch (_) { return null; } };

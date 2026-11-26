@@ -1,0 +1,3 @@
+# phone build: published byte-for-byte (ios/latest.json carries the SHA-256 of wt-phone.js)
+ios/*.js -text
+ios/*.json -text

@@ -600,7 +600,7 @@ const body = [
   panel,
   "})();",
   "",
-].join("\n");
+].join("\n").replace(/\r\n/g, "\n"); // plain LF: exactly what git stores and GitHub serves (the SHA-256 must match)
 const sha256 = require("crypto").createHash("sha256").update(body, "utf8").digest("hex");
 
 // The installed script updates itself: on each visit (at most every 10 min) it
