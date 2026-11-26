@@ -1,5 +1,5 @@
 {
-  "version": "1.38.0",
-  "zip": "https://github.com/srv883/Watch-Movies-Together/raw/main/wt-V38.zip",
-  "notes": "Works across devices: send an invite link and your friend joins from a laptop, iPhone or Android (Firefox) - no code to type."
+  "version": "1.39.0",
+  "zip": "https://github.com/srv883/Watch-Movies-Together/raw/main/wt-V39.zip",
+  "notes": "Everything updates itself now - no downloads. New versions install in the background and switch on when no video or party is running (or tap Switch now)."
 }
