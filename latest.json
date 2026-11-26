@@ -1,5 +1,5 @@
 {
-  "version": "1.37.0",
-  "zip": "https://github.com/srv883/Watch-Movies-Together/raw/main/wt-V37.zip",
-  "notes": "iPhone version (Safari, via the free Userscripts app) joins your parties; voice unlocks with a tap on phones; phone-sized layouts."
+  "version": "1.38.0",
+  "zip": "https://github.com/srv883/Watch-Movies-Together/raw/main/wt-V38.zip",
+  "notes": "Works across devices: send an invite link and your friend joins from a laptop, iPhone or Android (Firefox) - no code to type."
 }
